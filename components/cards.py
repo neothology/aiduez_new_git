@@ -1,0 +1,1 @@
+import ipyvuetify as v
