@@ -1,0 +1,74 @@
+@font-face {
+    font-family: 'Nanum';
+    font-style: normal;
+    font-weight: normal;
+    /* src: local('NanumGothic'); */
+    src: url("../assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
+         url("../assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff'),
+         url("../assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype');
+}
+/* 
+@font-face {
+    font-family: 'Nanum Gothic';
+    font-style: normal;
+    font-weight: bold;
+    src: local('NanumGothic'),
+        url('/opt/code/aian_ide_new/assets/fonts/Nanum_Gothic/NanumGothicBold.eot'),
+        url('/opt/code/aian_ide_new/assets/fonts/Nanum_Gothic/NanumGothicBold.eot?#iefix') format('embedded-opentype'),
+        url('/opt/code/aian_ide_new/assets/fonts/Nanum_Gothic/NanumGothicBold.woff') format('woff'),
+        url('/opt/code/aian_ide_new/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf') format('truetype');
+} */
+
+.vuetify-styles .v-application {
+    font-family: 'Nanum', Nanum, Roboto, sans-serif !important;
+}
+
+.container {
+    width: 100% !important;
+} 
+
+div.output_subarea {
+    padding: 0px !important;
+    margin-top: 10px !important;
+}
+
+.background {
+    border:1px solid #cccccc;
+}
+
+.v-navigation-drawer__border {
+    background-color: none !important;
+}
+
+.vuetify-styles .v-list-item--link:before {
+    border-radius: inherit
+}
+
+.vuetify-styles .theme--light.v-list-item:hover:before {
+    background-color: #ffffff !important;
+    opacity: 0.08 !important;
+}
+
+.vuetify-styles .theme--light.v-list-item--active:before {
+    background-color: #0f172a !important;
+}
+
+.vuetify-styles .theme--light.v-list-item--disabled:before {
+    background-color: #ffffff !important;
+    opacity: 0.08 !important;
+}
+
+.v-list-group__header__prepend-icon {
+    margin-right: 6px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    align-self: auto !important;
+}
+
+.v-list-group__header__prepend-icon .v-icon {
+    color: #e2e2e2de !important;
+}
+
+.v-list-group__header__append-icon .v-icon.mdi-chevron-down {
+    color: #e2e2e2de !important;
+}

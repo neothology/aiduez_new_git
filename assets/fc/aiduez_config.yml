@@ -1,0 +1,77 @@
+
+class_path:
+  BackGround: components.layouts.BackGround
+  TopArea: components.layouts.TopArea
+  WorkArea: components.layouts.WorkArea
+  SideNav: components.layouts.SideNav
+  ListMenu: components.menus.ListMenu
+
+  TaskFavorite: workflows.task.task.Task
+  TaskRecent: workflows.task.task.Task
+  TaskAll: workflows.task.task.Task
+
+  TabluraAiModeling: workflows.tabular.ai_modeling.TabluraAiModeling
+
+  TextDataImport: workflows.text.data_import.TextDataImport
+
+  ImageDataImport: workflows.image.data_import.ImageDataImport
+
+  AudioDataImport: workflows.audio.data_import.AudioDataImport
+
+  VideoDataImport: workflows.video.data_import.VideoDataImport
+
+
+# side_nav_menu 정의
+side_nav_menu:
+  - 
+    icon: mdi-star-outline
+    title: 즐겨 찾기
+    workflow_class_name: TaskFavorite
+  - 
+    icon: mdi-history
+    title: 최근 작업
+    workflow_class_name: TaskRecent
+  - 
+    icon: mdi-file-table-box-outline
+    title: 전체 작업
+    workflow_class_name: TaskAll
+  - 
+    icon: mdi-plus
+    title: 신규 작업
+    sub_menu:
+    - 
+      icon: mdi-border-all
+      title: 테이블
+      workflow_class_name: TabluraAiModeling
+    - 
+      icon: mdi-translate
+      title: 텍스트
+      workflow_class_name: TextDataImport
+    - 
+      icon: mdi-image-outline
+      title: 이미지
+      workflow_class_name: ImageDataImport
+    - 
+      icon: mdi-volume-high
+      title: 오디오
+      workflow_class_name: AudioDataImport
+    - 
+      icon: mdi-video-check-outline
+      title: 비디오
+      workflow_class_name: VideoDataImport
+
+# workflow_stage 정의
+workflow_stages:
+  stage_titles: 
+    - 데이터 입수
+    - 데이터 분석
+    - 데이터 가공
+    - AI모델 생성
+    - AI모델 평가
+
+## tabluar ##
+tabular_tab_menu:
+  tabular:
+    header_title: Work Flow - 테이블 데이터 기반 AI모델 작업
+
+    
