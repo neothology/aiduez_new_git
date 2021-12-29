@@ -19,4 +19,4 @@ COPY custom/aiduez_config.yml /root/.aiduez/aiduez_config.yml
 COPY custom/custom.css /root/.jupyter/custom/custom.css
 COPY custom/index.html.j2 /usr/local/share/jupyter/nbconvert/templates/lab/index.html.j2
 
-ENTRYPOINT [ "jupyter", "notebook", "--allow-root", "--NotebookApp.token=''", "--no-browser", "--ip=0.0.0.0" ]
+CMD [ "jupyter", "notebook", "--allow-root", "--NotebookApp.token=''", "--no-browser", "--ip=0.0.0.0" ]
