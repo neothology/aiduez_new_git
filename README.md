@@ -12,6 +12,7 @@
 - Jupyter Notebook 자동 실행
 
 ```console
+# Container 실행
 -$ docker run -p 8888:8888 (image name)
 
 # Container 실행 후, Browser로 접속
@@ -26,6 +27,7 @@
 - Container 접속하여 Jupyter Notebook 수동 실행 (Volume mount로 소스 코드 실행)
 
 ```console
+# Container 실행
 -$  docker run -itd -v (source code path for volume mount):/opt/code --name (container name) (image name) /bin/bash
 
 # Container 접속 후, Jupyter Notebook 실행
