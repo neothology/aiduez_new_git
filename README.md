@@ -44,7 +44,7 @@
 
  <img alt="Run Voila in notebook" src="assets/images/README_voila.png" style="border: 1px solid #eee; border-radius: 4px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
 
-- (방법2) Jupyter Notebook 실행 후, browser 노트북 주소에 추가/수정하여 voilar 실행
+- (방법2) Jupyter Notebook 실행 후, browser 노트북 주소에 추가/수정하여 voila 실행
 
 ```console
 # (host url) /voila/render/ (notebook name)
