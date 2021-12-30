@@ -61,7 +61,7 @@
 
 ```console
 # voila 실행 후, browser의 notebook 주소 통해 접근하는 경우
--$ voila (notebook path)
+-$ voila
 - Browser > localhost:8866/voila/render/(notebook name) 으로 접속
 (예시) http://localhost:8866/voila/render/app.ipynb
 
