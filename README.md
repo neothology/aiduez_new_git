@@ -13,7 +13,7 @@
 
 ```console
 # Container 실행
--$ docker run -p 8888:8888 (image name)
+-$ docker run -p 8888:8888 --name (container name) (image name)
 
 # Container 실행 후, Browser로 접속
 - localhost:8888
