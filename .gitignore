@@ -156,3 +156,5 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks
 token.txt
 README_sample.md
+
+__pycache__/

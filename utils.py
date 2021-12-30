@@ -8,7 +8,8 @@ def read_config():
         try:
             return yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            print(exc)
+            # print(exc)
+            pass
 
 # return component class if exist, else init a new component class and return it
 def get_or_create_class(class_path, app_context, app_config, **kwargs):
