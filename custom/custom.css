@@ -72,3 +72,25 @@ div.output_subarea {
 .v-list-group__header__append-icon .v-icon.mdi-chevron-down {
     color: #e2e2e2de !important;
 }
+
+.vuetify-styles .col {
+    margin: 0 !important;
+}
+
+.vuetify-styles .theme--light.v-btn-toggle:not(.v-btn-toggle--group) {
+    background: none !important;
+}
+
+.vuetify-styles .work_area_tab_menu .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+    opacity: 0;
+}
+
+/* .vuetify-styles .tab_menu .v-btn:before {
+    background-color: #f1f5f9 ;
+} */
+
+/* .vuetify-styles .v-btn:not(.v-btn--text):not(.v-btn--outlined):hover:before {
+    opacity: 1;
+} */
+
+/*------------------------------------------------------*/

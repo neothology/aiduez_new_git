@@ -1,77 +1,188 @@
 
-class_path:
-  BackGround: components.layouts.BackGround
-  TopArea: components.layouts.TopArea
-  WorkArea: components.layouts.WorkArea
-  SideNav: components.layouts.SideNav
-  ListMenu: components.menus.ListMenu
+class_paths:
+  background: components.layouts.BackGround
+  top_area: components.layouts.TopArea
+  work_area: components.layouts.WorkArea
+  side_nav: components.layouts.SideNav
+  list_menu: components.menus.ListMenu
+  tab_menu:  components.menus.TabtMenu
+  sub_area: components.layouts.SubArea
 
-  TaskFavorite: workflows.task.task.Task
-  TaskRecent: workflows.task.task.Task
-  TaskAll: workflows.task.task.Task
+  task_favorite: workflows.task.TaskFavorite
+  task_recent: workflows.task.TaskRecent
+  task_all: workflows.task.TaskAll
 
-  TabluraAiModeling: workflows.tabular.ai_modeling.TabluraAiModeling
+  tabular_base: workflows.tabular.TabularBase
+  tabular_data_import: workflows.tabular.TabularDataImport
+  tabular_data_analyze: workflows.tabular.TabularDataAnalyze
+  tabular_data_processing: workflows.tabular.TabularDataProcessing
+  tabular_ai_training: workflows.tabular.TabularAITraining
+  tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
+  
+  text_base: workflows.text.TextBase
+  text_data_import: workflows.text.TextDataImport
+  text_data_analyze: workflows.text.TextDataAnalyze
+  text_data_processing: workflows.text.TextDataProcessing
+  text_ai_training: workflows.text.TextAITraining
+  text_ai_evaluation: workflows.text.TextAIEvaluation
 
-  TextDataImport: workflows.text.data_import.TextDataImport
+  image_base: workflows.image.ImageBase
+  image_data_import: workflows.image.ImageDataImport
+  image_data_analyze: workflows.image.ImageDataAnalyze
+  image_data_processing: workflows.image.ImageDataProcessing
+  image_ai_training: workflows.image.ImageAITraining
+  image_ai_evaluation: workflows.image.ImageAIEvaluation
 
-  ImageDataImport: workflows.image.data_import.ImageDataImport
+  audio_base: workflows.audio.AudioBase
+  audio_data_import: workflows.audio.AudioDataImport
+  audio_data_analyze: workflows.audio.AudioDataAnalyze
+  audio_data_processing: workflows.audio.AudioDataProcessing
+  audio_ai_training: workflows.audio.AudioAITraining
+  audio_ai_evaluation: workflows.audio.AudioAIEvaluation
 
-  AudioDataImport: workflows.audio.data_import.AudioDataImport
-
-  VideoDataImport: workflows.video.data_import.VideoDataImport
-
-
+  video_base: workflows.video.VideoBase
+  video_data_import: workflows.video.VideoDataImport
+  video_data_analyze: workflows.video.VideoDataAnalyze
+  video_data_processing: workflows.video.VideoDataProcessing
+  video_ai_training: workflows.video.VideoAITraining
+  video_ai_evaluation: workflows.video.VideoAIEvaluation
+  
 # side_nav_menu 정의
 side_nav_menu:
-  - 
-    icon: mdi-star-outline
-    title: 즐겨 찾기
-    workflow_class_name: TaskFavorite
-  - 
-    icon: mdi-history
-    title: 최근 작업
-    workflow_class_name: TaskRecent
-  - 
-    icon: mdi-file-table-box-outline
-    title: 전체 작업
-    workflow_class_name: TaskAll
-  - 
-    icon: mdi-plus
-    title: 신규 작업
-    sub_menu:
+  default: task_recent
+  target_area: work_area
+  menu_list:
     - 
-      icon: mdi-border-all
-      title: 테이블
-      workflow_class_name: TabluraAiModeling
+      icon: mdi-history
+      title: 최근 작업
+      target: task_recent
     - 
-      icon: mdi-translate
-      title: 텍스트
-      workflow_class_name: TextDataImport
+      icon: mdi-star-outline
+      title: 즐겨 찾기
+      target: task_favorite
     - 
-      icon: mdi-image-outline
-      title: 이미지
-      workflow_class_name: ImageDataImport
+      icon: mdi-file-table-box-outline
+      title: 전체 작업
+      target: task_all
     - 
-      icon: mdi-volume-high
-      title: 오디오
-      workflow_class_name: AudioDataImport
-    - 
-      icon: mdi-video-check-outline
-      title: 비디오
-      workflow_class_name: VideoDataImport
+      icon: mdi-plus
+      title: 신규 작업
+      sub_menu:
+      - 
+        icon: mdi-border-all
+        title: 테이블
+        target: tabular_base
+      - 
+        icon: mdi-translate
+        title: 텍스트
+        target: text_base
+      - 
+        icon: mdi-image-outline
+        title: 이미지
+        target: image_base
+      - 
+        icon: mdi-volume-high
+        title: 오디오
+        target: audio_base
+      - 
+        icon: mdi-video-check-outline
+        title: 비디오
+        target: video_base
 
 # workflow_stage 정의
-workflow_stages:
-  stage_titles: 
-    - 데이터 입수
-    - 데이터 분석
-    - 데이터 가공
-    - AI모델 생성
-    - AI모델 평가
-
-## tabluar ##
-tabular_tab_menu:
+workflows:
   tabular:
-    header_title: Work Flow - 테이블 데이터 기반 AI모델 작업
-
-    
+    default: tabular_ai_training
+    target_area: work_area_contents
+    stages:
+      - 
+        title: 데이터 입수
+        key: tabular_data_import
+      - 
+        title: 데이터 분석
+        key: tabular_data_analyze
+      - 
+        title: 데이터 가공
+        key: tabular_data_processing
+      - 
+        title: AI모델 학습
+        key: tabular_ai_training
+      - 
+        title: AI모델 평가
+        key: tabular_ai_evaluation
+  text:
+    default: text_data_import
+    target_area: work_area_contents
+    stages:
+      - 
+        title: 데이터 입수
+        key: text_data_import
+      - 
+        title: 데이터 분석
+        key: text_data_analyze
+      - 
+        title: 데이터 가공
+        key: text_data_processing
+      - 
+        title: AI모델 학습
+        key: text_ai_training
+      - 
+        title: AI모델 평가
+        key: text_ai_evaluation
+  image:
+    default: image_data_import
+    target_area: work_area_contents
+    stages:
+      - 
+        title: 데이터 입수
+        key: image_data_import
+      - 
+        title: 데이터 분석
+        key: image_data_analyze
+      - 
+        title: 데이터 가공
+        key: image_data_processing
+      - 
+        title: AI모델 학습
+        key: image_ai_training
+      - 
+        title: AI모델 평가
+        key: image_ai_evaluation
+  audio:
+    default: audio_data_import
+    target_area: work_area_contents
+    stages:
+      - 
+        title: 데이터 입수
+        key: audio_data_import
+      - 
+        title: 데이터 분석
+        key: audio_data_analyze
+      - 
+        title: 데이터 가공
+        key: audio_data_processing
+      - 
+        title: AI모델 학습
+        key: audio_ai_training
+      - 
+        title: AI모델 평가
+        key: audio_ai_evaluation
+  video:
+    default: video_data_import
+    target_area: work_area_contents
+    stages:
+      - 
+        title: 데이터 입수
+        key: video_data_import
+      - 
+        title: 데이터 분석
+        key: video_data_analyze
+      - 
+        title: 데이터 가공
+        key: video_data_processing
+      - 
+        title: AI모델 학습
+        key: video_ai_training
+      - 
+        title: AI모델 평가
+        key: video_ai_evaluation
