@@ -19,6 +19,8 @@ class AppContext:
     work_area_contents: object = None
 
 ## workflow stages ##
+    tabular_tab_menu: object = None
+    tabular_contents: object = None
     tabular_base: object = None
     tabular_data_import: object = None
     tabular_data_analyze: object = None

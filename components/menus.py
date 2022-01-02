@@ -145,17 +145,19 @@ class TabtMenu(v.Col):
                     background-color:#f1f5f9 !important; \
                     border:1px solid #e2e8f0 !important; \
                     border-radius:20px 20px 0 0 / 80px 80px 0 0; \
-                    color: #000000 !important; \
+                    color: #5a5a5a !important; \
+                    font-weight:600; \
                     opacity:1;",
             "block":"max-width:198px; margin:0 2px !important; padding:0; background-color:#f1f5f9;",
         }
         inactive_style = {
             "tab":"height:36px; width:200px; \
                     margin:0 1px; \
-                    background-color:#e7e7e7; \
+                    background-color:#5e5e5e; \
                     border:1px solid #e2e8f0 !important; \
                     border-radius:20px 20px 0 0 / 80px 80px 0 0; \
-                    color: #7c7c7c; \
+                    color: #bfbfbf; \
+                    font-weight:600; \
                     opacity:1;",
             "block":"max-width:198px; margin:0 2px !important; padding:0; background-color:#f1f5f9; opacity:0;",
         }

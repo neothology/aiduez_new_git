@@ -49,7 +49,7 @@ class TopArea(v.AppBar):
         super().__init__(
             class_ = "top_area",
             color = "#ffffff",
-            style_ = "height:199px; box-shadow:none; border:0; border-bottom:1px solid #e2e8f0;",
+            style_ = "height:199px; padding:10px; box-shadow:none; border:0; border-bottom:1px solid #e2e8f0;",
             children = [
                 self.nav_icon, 
                 self.logo_image,
@@ -82,9 +82,10 @@ class SubArea(v.Container):
     def __init__(self, app_context, app_config, **kwargs):
         self.app_context = app_context
         self.app_config = app_config
+        self.context_key = kwargs.get('context_key')
 
         super().__init__(
-            class_ = "sub_area",
+            class_ = self.context_key,
             style_ = ""
         )
 
