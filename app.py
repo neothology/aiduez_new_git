@@ -1,4 +1,3 @@
-import ipyvuetify as v
 from dacite import from_dict
 from config import AppConfig
 from context import AppContext
@@ -13,16 +12,18 @@ class Aian:
         # initialize AppContext
         self.app_context = AppContext()
 
-        # initialize layout and components
-        self.background = get_or_create_class(self.app_config.class_path['BackGround'], self.app_context, self.app_config)
-        self.work_area = get_or_create_class(self.app_config.class_path['WorkArea'], self.app_context, self.app_config)
-        self.side_nav = get_or_create_class(self.app_config.class_path['SideNav'], self.app_context, self.app_config)
-        self.list_menu = get_or_create_class(self.app_config.class_path['ListMenu'], self.app_context, self.app_config)
-        self.top_area = get_or_create_class(self.app_config.class_path['TopArea'], self.app_context, self.app_config) # TopArea must be last to be initialized
+        # initialize layout
+        self.background = get_or_create_class('background', self.app_context, self.app_config)
+        self.top_area = get_or_create_class('top_area', self.app_context, self.app_config) 
+        self.work_area = get_or_create_class('work_area', self.app_context, self.app_config)
+        self.side_nav = get_or_create_class('side_nav', self.app_context, self.app_config)
+        self.top_area = get_or_create_class('top_area', self.app_context, self.app_config) 
 
-        # merge layout components into background
-        self.side_nav.children = [self.list_menu]
-    
+        # initialize components
+        self.side_nav_menu = get_or_create_class('list_menu', self.app_context, self.app_config, key='side_nav_menu')
+
+        # merge components into layouts
+        self.side_nav.children = [self.side_nav_menu]
         self.background.children = [self.top_area, self.work_area, self.side_nav]
 
         # when re-loaded, establish from thst last saved state
