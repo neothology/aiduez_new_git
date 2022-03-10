@@ -7,7 +7,7 @@ seaborn==0.11.2
 scikit-learn==1.0.1
 konlpy==0.5.2
 tweepy==4.4.0
-mlflow==1.22.0
+mlflow==1.23.1
 tqdm==4.62.3
 voila==0.2.16
 voila-vuetify==0.5.2
