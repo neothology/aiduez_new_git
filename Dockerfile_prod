@@ -1,4 +1,5 @@
-FROM tensorflow/tensorflow:latest-gpu-jupyter
+ARG REGISTRY_URL=
+FROM ${​​​​​​​REGISTRY_URL}​​​​​​​tensorflow/tensorflow:2.7.1-gpu-jupyter
 
 RUN apt-get update -yq \
  && apt-get install -yq --no-install-recommends \
@@ -6,9 +7,9 @@ RUN apt-get update -yq \
     vim \
     python3-pip
 
-RUN mkdir -p /opt/code
-COPY . /opt/code
-WORKDIR /opt/code
+RUN mkdir -p /opt/code/aiduez
+WORKDIR /opt/code/aiduez
+COPY . /opt/code/aiduez
 
 RUN pip install --upgrade pip \
  && pip install -r requirements.txt
@@ -18,5 +19,6 @@ RUN jupyter notebook --generate-config
 COPY custom/aiduez_config.yml /root/.aiduez/aiduez_config.yml
 COPY custom/custom.css /root/.jupyter/custom/custom.css
 COPY custom/index.html.j2 /usr/local/share/jupyter/nbconvert/templates/lab/index.html.j2
+COPY custom/configuration.py /usr/local/lib/python3.8/dist-packages/voila/configuration.py
 
-CMD [ "jupyter", "notebook", "--allow-root", "--NotebookApp.token=''", "--no-browser", "--ip=0.0.0.0" ]
+WORKDIR /aihub/workspace

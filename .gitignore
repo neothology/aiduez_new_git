@@ -158,3 +158,10 @@ token.txt
 README_sample.md
 
 __pycache__/
+
+# temporary files which can be created if a package is installed wit
+tmp/
+train_test/
+
+# vscode-workspace
+workspace.code-workspace

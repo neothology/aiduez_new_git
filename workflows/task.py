@@ -3,11 +3,10 @@ from utils import get_or_create_class
 
 
 class TaskRecent(v.Container):
-    navigation_drawer_props = {'temporary':False, 'permanent':True, 'v_model':True}
-    def __init__(self, app_context, app_config, **kwargs):
+    def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
-        self.app_config = app_config
-              
+        self.context_key = context_key
+
         super().__init__(
             style_ = "min-width:100%; min-height:100%; padding-left:266px;",
             children = ['"최근 작업" - 화면/기능 개발 중...'],
@@ -15,10 +14,10 @@ class TaskRecent(v.Container):
 
 class TaskFavorite(v.Container):
     navigation_drawer_props = {'temporary':False, 'permanent':True, 'v_model':True}
-    def __init__(self, app_context, app_config, **kwargs):
+    def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
-        self.app_config = app_config
-              
+        self.context_key = context_key
+
         super().__init__(
             style_ = "min-width:100%; min-height:100%; padding-left:266px;",
             children = ['"즐겨 찾기" - 화면/기능 개발 중...'],
@@ -26,9 +25,9 @@ class TaskFavorite(v.Container):
 
 class TaskAll(v.Container):
     navigation_drawer_props = {'temporary':False, 'permanent':True, 'v_model':True}
-    def __init__(self, app_context, app_config, **kwargs):
+    def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
-        self.app_config = app_config
+        self.context_key = context_key
               
         super().__init__(
             style_ = "min-width:100%; min-height:100%; padding-left:266px;",

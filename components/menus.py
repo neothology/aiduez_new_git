@@ -1,11 +1,12 @@
 import ipyvuetify as v
-from utils import get_or_create_class
+from utils import get_or_create_class, set_theme_style
+from pipeline import Pipeline
 
 class ListMenu(v.List):
 
-    def __init__(self, app_context, app_config, **kwargs):
+    def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
-        self.app_config = app_config
+        self.context_key = context_key
         self.menu_to_target = [] # to collect menus to be clicked
 
         def _make_sub_menu(sub_items: list) -> list:
@@ -14,22 +15,22 @@ class ListMenu(v.List):
                 class_ = "",
                 style_ = "",
                 children = [v.ListItem(
-                    class_ = item["target"],
+                    value = item["target"],
                     style_ = "padding-left:32px;",
                     active = False,
                     ripple = False,
                     children = [
                         v.ListItemIcon(
-                            style_ = "min-width:30px; max-width:30px; margin:0; padding:0; align-self:center;",
+                            style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_icon'),
                             children = [v.Icon(
-                                style_ = "color:#ffffff; font-size:20px;",
+                                style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_icon_icon'),
                                 children = [item['icon']])]
                         ),
                         v.ListItemContent(
-                            style_ = "padding-left:15px; color:#ffffff;",
+                            style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_contents'),
                             children = [
                                 v.ListItemTitle(
-                                    style_ = "font-size:0.85rem;",
+                                    style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_title'),
                                     children = [item['title']],
                                 ),
                             ],
@@ -41,7 +42,7 @@ class ListMenu(v.List):
             return sub_menu
 
         list_menu = []
-        for item in self.app_config.side_nav_menu['menu_list']:
+        for item in self.app_context.side_nav_menu_list['menu_list']:
             if item.get("sub_menu"):
                 list_menu.append(
                     v.ListGroup(
@@ -50,10 +51,10 @@ class ListMenu(v.List):
                         v_slots = [{
                             "name": "activator",
                             "children": v.ListItemContent(
-                                style_ = "padding-left:15px; color:#ffffff;",
+                                style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_contents'),
                                 children = [
                                     v.ListItemTitle(
-                                        style_ = "font-size:0.9rem;",
+                                        style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_title', style_type='small'),
                                         children = [item['title']]
                                     ),
                                 ],
@@ -64,15 +65,15 @@ class ListMenu(v.List):
                 ) 
             else:
                 list_item = v.ListItem(
-                                class_ = item['target'],
+                                value = item['target'],
                                 style_ = "",  
                                 active = False,
                                 ripple = False,
                                 children = [
                                     v.ListItemIcon(
-                                        style_ = "min-width:30px; max-width:30px; margin:0; padding:0; align-self:center;",
+                                        style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_icon'),
                                         children = [v.Icon(
-                                            style_ = "color:#ffffff; font-size:20px;",
+                                            style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_icon_icon'),
                                             children = [item['icon']]
                                             )]
                                     ),
@@ -80,7 +81,7 @@ class ListMenu(v.List):
                                         style_ = "padding-left:15px; color:#ffffff;",
                                         children = [
                                             v.ListItemTitle(
-                                                style_ = "font-size:0.9rem;",
+                                                style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_title'),
                                                 children = [item['title']],
                                             ),
                                         ],
@@ -97,45 +98,71 @@ class ListMenu(v.List):
                 self.menu_to_target.append(list_item)
             
         super().__init__(
-            style_ = "",
+            class_ = self.context_key,
+            style_ = set_theme_style(self.app_context, self.context_key),
             nav = True,
             color = "#0f172a",
             children =list_menu,
         )     
 
         self.last_activated_item = None
+         # code_add: run progress circular: with...
         def _proceed_to_target(item, event=None, data=None): 
+
+            task_type = item.value.split('_')[0] # code_add: to use different pipeline by task_type
+
+            # if 'New Task", create "Untitled" task
+            if task_type != 'task':
+                pipeline = Pipeline(self.app_context)
+                pipeline.create_new(task_type) # tabular, text, image, video, audio, etc.
+
+            # set 'active' to last activated item wihich is now deactivated
             if self.last_activated_item:
                 self.last_activated_item.disabled = False  
 
-            item.disabled = True # disable activated item
-            self.last_activated_item = item # keep last activated item
+            # disable clicked item and keep it as last activated item
+            item.disabled = True
+            self.last_activated_item = item
 
             # get target and set
-            target_area = get_or_create_class(self.app_config.side_nav_menu['target_area'], self.app_context, self.app_config)
-            target_instance = get_or_create_class(item.class_, self.app_context, self.app_config)
+            self.app_context.current_workflow = task_type  
+            target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area           
+            target_instance = get_or_create_class(item.value, self.app_context) # tabluar, text, image, video, audio, etc ~base
             target_area.children = [target_instance]
 
             # other actions
-            self.app_context.side_nav.temporary = target_instance.navigation_drawer_props['temporary']
-            self.app_context.side_nav.permanent = target_instance.navigation_drawer_props['permanent']
-            self.app_context.side_nav.v_model = target_instance.navigation_drawer_props['v_model']
-            self.app_context.current_workflow = item.class_
+            if task_type == 'task':
+                
+                # (1) change nav_bar props
+                self.app_context.side_nav.temporary = False
+                self.app_context.side_nav.permanent = True
+                self.app_context.side_nav.v_model = True
+
+                # (2) change top area props according to target
+                self.app_context.top_area.change_style('light')
+            else:
+
+                self.app_context.side_nav.temporary = True
+                self.app_context.side_nav.permanent = False
+                self.app_context.side_nav.v_model = False
+                self.app_context.top_area.change_style('default')
 
         # set default
-        default_target_name: str = self.app_config.side_nav_menu['default']
-        default_menu_item = list(filter(lambda x: x.class_ == default_target_name, self.menu_to_target))[0]
+        default_target_name: str = self.app_context.side_nav_menu_list['default']
+        default_menu_item = list(filter(lambda x: x.value == default_target_name, self.menu_to_target))[0]
         _proceed_to_target(default_menu_item)
 
         # set event listener
         for item in self.menu_to_target:
             item.on_event('click', _proceed_to_target)
 
-class TabtMenu(v.Col):
+        
 
-    def __init__(self, app_context, app_config, **kwargs):
+class TabMenu(v.Col):
+
+    def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
-        self.app_config = app_config
+        self.context_key = context_key
         self.tab_props = kwargs.get("tab_props")
 
         # define active/inactive css style
@@ -168,7 +195,7 @@ class TabtMenu(v.Col):
             children = [
                 v.Btn(
                     style_ = inactive_style["tab"],
-                    class_ = stage['key'],
+                    value = stage['target'],
                     children = stage['title'],
                     ) for stage in self.tab_props['stages']
             ],
@@ -180,8 +207,8 @@ class TabtMenu(v.Col):
             children = [v.Col(style_=inactive_style["block"]) for _ in range(len(self.tab_props['stages']))],
         )
 
-        # gather stagey['key'] for later use
-        self.tab_stage_keys = [stage['key'] for stage in self.tab_props['stages']]
+        # gather stagey['target'] for later use
+        self.tab_stage_targets = [stage['target'] for stage in self.tab_props['stages']]
 
         super().__init__(
             class_ = kwargs.get("context_key"),
@@ -196,27 +223,29 @@ class TabtMenu(v.Col):
             if self.last_activated_tab:
                 self.last_activated_tab.disabled = False 
                 self.last_activated_tab.style_ = inactive_style["tab"]
-                tab_no = self.tab_stage_keys.index(self.last_activated_tab.class_)
-                self.tab_menu_border_bottom_block.children[tab_no].style_ = inactive_style["block"]
+                tab_value = self.tab_stage_targets.index(self.last_activated_tab.value)
+                self.tab_menu_border_bottom_block.children[tab_value].style_ = inactive_style["block"]
                 
             # disable clicked tab
             tab.disabled = True
             tab.style_ = active_style["tab"]
-            tab_no = self.tab_stage_keys.index(tab.class_)
-            self.tab_menu_border_bottom_block.children[tab_no].style_ = active_style["block"]
+            tab_value = self.tab_stage_targets.index(tab.value)
+            self.tab_menu_border_bottom_block.children[tab_value].style_ = active_style["block"]
 
             # keep last activated item
             self.last_activated_tab = tab 
 
+            # add - run progress circular: with...
+
             # get target and set
-            target_area = get_or_create_class('sub_area', self.app_context, self.app_config, context_key = self.tab_props['target_area'])
-            target_instance = get_or_create_class(tab.class_, self.app_context, self.app_config)
+            setattr(self.app_context, f'{self.app_context.current_workflow}_workflow_stage', tab.value)
+            target_area = get_or_create_class('sub_area', self.app_context, context_key = self.tab_props['target_area']) # tabular_contents
+            target_instance = get_or_create_class(tab.value, self.app_context) # for example, tab.value = "tabular_ai_training"
             target_area.children = [target_instance]
-            self.app_context.current_workflow_stage = tab.class_
-        
+
         # set default
         default_tab_name: str = self.tab_props['default']
-        default_tab = list(filter(lambda x: x.class_ == default_tab_name, self.tab_menu.children))[0]
+        default_tab = list(filter(lambda x: x.value == default_tab_name, self.tab_menu.children))[0]
         _proceed_to_target(default_tab)
 
         for tab in self.tab_menu.children:

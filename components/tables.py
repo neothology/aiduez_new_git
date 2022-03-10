@@ -1,24 +1,60 @@
 import ipyvuetify as v
-from ipyvuetify.generated.Label import Label
+import traitlets
+      
+class PlainTable(v.VuetifyTemplate):
+    header = traitlets.Dict({}).tag(sync=True, allow_null=True)
+    items = traitlets.List([]).tag(sync=True, allow_null=True)
 
-############### left side menu ###############
+    @traitlets.default('template')
+    def _template(self):
+        return '''
+            <template>
+                <v-simple-table light
+                    style="margin-right:5px; border-radius:0; border-right:1px solid #e0e0e0; "
+                >
+                    <template v-slot:default>
+                        <thead>
+                            <tr style="height:33px; background-color:#f1f1f1;" >
+                                <th 
+                                    class="text-center"  
+                                    style="height:33px; font-size: 0.875rem; font-weight:500; color: rgb(100, 116, 139);"        
+                                    :colspan="header.colspan"
+                                >
+                                {{ header.text }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="item in items"
+                                :key="item[0]"
+                            >
+                                <td
+                                    v-for="elem in item"
+                                    :style="elem.style"
+                                >
+                                {{ elem.value }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-simple-table>
+            </template>
+        '''
 
-class DataTable:
-    def __init__(self, app_config, app_context, **kwargs):
-        self.app_config = app_config
-        self.app_context = app_context
-        self.kwargs = kwargs
-        
-        self.data = self.kwargs.get('data')
+    def __init__(
+        self, 
+        header:str = '', 
+        items:list = [], 
+        *args, 
+        **kwargs
+        ):
 
+        super().__init__(*args, **kwargs)
 
-        self.container = v.DataTable(
-            headers = self.kwargs.get('label'),
-            items = self.kwargs.get('items'),
-            color = self.kwargs.get('color'),
-            style_ = self.kwargs.get('style_'),
-            class_ = self.kwargs.get('class_'),
-        )
-        
-    def render(self):
-        return self.container
+        def _split_text_and_colspan(string:str):
+          splited = string.split('/')
+          return {'text':splited[0], 'colspan':splited[1]}
+        self.header = _split_text_and_colspan(header)
+        self.items = items
+

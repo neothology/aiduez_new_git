@@ -1,12 +1,21 @@
+envs: 
+  workspace_dir: /aihub/workspace
+  data_dir: /aihub/data
+  tmp_dir: tmp
+
 
 class_paths:
+  # components - layout & menu
   background: components.layouts.BackGround
   top_area: components.layouts.TopArea
   work_area: components.layouts.WorkArea
   side_nav: components.layouts.SideNav
   list_menu: components.menus.ListMenu
-  tab_menu:  components.menus.TabtMenu
+  tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
+
+  # other components
+  column_summary: components.data_profiler.ColumnSummary
 
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
@@ -16,7 +25,14 @@ class_paths:
   tabular_data_import: workflows.tabular.TabularDataImport
   tabular_data_analyze: workflows.tabular.TabularDataAnalyze
   tabular_data_processing: workflows.tabular.TabularDataProcessing
+
   tabular_ai_training: workflows.tabular.TabularAITraining
+  tabular_modeling_options: components.modeling.TabularModelingOptions
+  tabular_model: components.modeling.TabularModel
+  tabular_train_activator: components.modeling.TabularTrainActivator
+  tabular_train_result: components.modeling.TabularTrainResult
+  tabular_train_plots: components.modeling.TabularTrainPlots
+
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
   text_base: workflows.text.TextBase
@@ -46,9 +62,8 @@ class_paths:
   video_data_processing: workflows.video.VideoDataProcessing
   video_ai_training: workflows.video.VideoAITraining
   video_ai_evaluation: workflows.video.VideoAIEvaluation
-  
-# side_nav_menu 정의
-side_nav_menu:
+
+side_nav_menu_list:
   default: task_recent
   target_area: work_area
   menu_list:
@@ -89,100 +104,417 @@ side_nav_menu:
         title: 비디오
         target: video_base
 
-# workflow_stage 정의
-workflows:
+workflows_list:
+  task_recent:
+    default: task
+    target_area: work_area
+    stages:
+      - task_recent
+  task_favorite:
+    default: task
+    target_area: work_area
+    stages:
+      - task_favorite
+  task_all:
+    default: task
+    target_area: work_area
+    stages:
+      - task_all
   tabular:
     default: tabular_ai_training
-    target_area: work_area_contents
+    target_area: tabular_contents
     stages:
       - 
         title: 데이터 입수
-        key: tabular_data_import
+        target: tabular_data_import
       - 
         title: 데이터 분석
-        key: tabular_data_analyze
+        target: tabular_data_analyze
       - 
         title: 데이터 가공
-        key: tabular_data_processing
+        target: tabular_data_processing
       - 
         title: AI모델 학습
-        key: tabular_ai_training
+        target: tabular_ai_training
       - 
         title: AI모델 평가
-        key: tabular_ai_evaluation
+        target: tabular_ai_evaluation
   text:
     default: text_data_import
-    target_area: work_area_contents
+    target_area: text_contents
     stages:
       - 
         title: 데이터 입수
-        key: text_data_import
+        target: text_data_import
       - 
         title: 데이터 분석
-        key: text_data_analyze
+        target: text_data_analyze
       - 
         title: 데이터 가공
-        key: text_data_processing
+        target: text_data_processing
       - 
         title: AI모델 학습
-        key: text_ai_training
+        target: text_ai_training
       - 
         title: AI모델 평가
-        key: text_ai_evaluation
+        target: text_ai_evaluation
   image:
     default: image_data_import
-    target_area: work_area_contents
+    target_area: image_contents
     stages:
       - 
         title: 데이터 입수
-        key: image_data_import
+        target: image_data_import
       - 
         title: 데이터 분석
-        key: image_data_analyze
+        target: image_data_analyze
       - 
         title: 데이터 가공
-        key: image_data_processing
+        target: image_data_processing
       - 
         title: AI모델 학습
-        key: image_ai_training
+        target: image_ai_training
       - 
         title: AI모델 평가
-        key: image_ai_evaluation
+        target: image_ai_evaluation
   audio:
     default: audio_data_import
-    target_area: work_area_contents
+    target_area: audio_contents
     stages:
       - 
         title: 데이터 입수
-        key: audio_data_import
+        target: audio_data_import
       - 
         title: 데이터 분석
-        key: audio_data_analyze
+        target: audio_data_analyze
       - 
         title: 데이터 가공
-        key: audio_data_processing
+        target: audio_data_processing
       - 
         title: AI모델 학습
-        key: audio_ai_training
+        target: audio_ai_training
       - 
         title: AI모델 평가
-        key: audio_ai_evaluation
+        target: audio_ai_evaluation
   video:
     default: video_data_import
-    target_area: work_area_contents
+    target_area: video_contents
     stages:
       - 
         title: 데이터 입수
-        key: video_data_import
+        target: video_data_import
       - 
         title: 데이터 분석
-        key: video_data_analyze
+        target: video_data_analyze
       - 
         title: 데이터 가공
-        key: video_data_processing
+        target: video_data_processing
       - 
         title: AI모델 학습
-        key: video_ai_training
+        target: video_ai_training
       - 
         title: AI모델 평가
-        key: video_ai_evaluation
+        target: video_ai_evaluation
+
+# theme 정의
+theme:
+  ez_default:    
+    # layouts
+    background:
+      style: 
+        base: 
+          default: >
+            min-width:100%; max-width:none;
+            height: 1800px; margin:0px; padding:0;
+            background-color:#f1f5f9; z-index:0;
+            display:flex; justify-content:center;
+            overflow:auto;
+          dark: >
+            min-width:100%; max-width:none;
+            height: 1800px; margin:0px; padding:0;
+            background-color:#000000; z-index:0;
+            display:flex; justify-content:center;
+            overflow:auto;
+    side_nav:
+      style: 
+        base:
+          default: >
+            min-width:250px; height:1800px; 
+            padding:10px; z-index:1000; 
+            display:flex; flex-direction:column; 
+            background-color:#0f172a
+    top_area:
+      style: 
+        base:
+          default: >
+            height:199px; padding:10px; 
+            box-shadow:none; border:0; 
+            border-bottom:1px solid #e2e8f0; 
+            background-color: rgb(30, 41, 59);
+          light: >
+            height:199px; padding:10px; 
+            box-shadow:none; border:0; 
+            border-bottom:1px solid #e2e8f0; 
+            background-color: #ffffff;
+        nav_icon:
+          default: >
+            min-width:50px; max-width:50px; margin:0; padding:0;
+          light: >
+            min-width:50px; max-width:50px; margin:0; padding:0;
+        nav_icon_icon:
+          default: >
+            color:#ffffff;
+          light: >
+            color:#000000;
+        logo_image:
+          default: >
+            ""
+          light: >
+            ""
+    side_nav_menu:
+      style: 
+        base:
+          default: >
+            ""
+        list_item_icon:
+          default: >
+            min-width:30px; max-width:30px; 
+            margin:0; padding:0; align-self:center;
+        list_item_icon_icon:
+          default: >
+            color:#ffffff; font-size:20px;
+        list_item_contents:
+          default: >
+            padding-left:15px; color:#ffffff;
+        list_item_title:
+          default: >
+            font-size:0.9rem;
+          small: >
+            font-size:0.85rem;
+    work_area:
+      style: 
+        base:
+          default: >
+            min-width:1700px; max-width:1700px !important;
+            border-left:1px dashed #cccccc;
+            border-right:1px dashed #cccccc;
+            height: 1599px; top:200px;
+            background-color:#f1f5f9;
+            margin:0; padding:0;
+            position:absolute;
+
+# 학습 parameter 정의
+modeling_params:
+  ludwig:
+    config:
+      input:
+        dtype:
+          int64: 
+            values: [numerical, binary, category, date]
+            default: numerical
+          int32:
+            values: [numerical, binary, category, date]
+            default: numerical
+          float64: 
+            values: [numerical, category]
+            default: numerical
+          object: 
+            values: [category, binary, date, text, timeseries]
+            default: category
+          category: 
+            values: [category, binary, date, text, timeseries]
+            default: category
+          bool: 
+            values: [binary]
+            default: binary
+        encoder:
+          numerical: 
+            values: [passthrough, dense]
+            default: passthrough
+          binary: 
+            values: [passthrough]
+            default: passthrough
+          category: 
+            values: [dense, sparse]
+            default: dense
+          date: 
+            values: [embed, wave]
+            default: embed
+          text: 
+            values: [transformer, parallel_cnn, embed, stacked_cnn, stacked_parallel_cnn, rnn, cnnrnn, passthrough]
+            default: transformer
+          timeseries: 
+            values: [transformer, parallel_cnn, embed, stacked_cnn, stacked_parallel_cnn, rnn, cnnrnn, passthrough]
+            default: transformer
+        additional_config:
+          numerical:
+            passthrough: {}
+            dense:
+              activation: 
+                values: [relu, sigmoid, softmax, tanh]
+                default: relu
+              num_fc_layers: [0, 10, 1, 1] # min, max, step, default
+              fc_size: [1, 1024, 1, 256] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+          binary:
+            passthrough: {}
+          category:
+            dense:
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            sparse: {}
+          date:
+            embed:
+              num_fc_layers: [0, 10, 1, 1] # min, max, step, default
+              fc_size: [1, 1024, 1, 256] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            wave:
+              num_fc_layers: [0, 10, 1, 1] # min, max, step, default
+              fc_size: [1, 1024, 1, 256] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+          text:
+            transformer:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            parallel_cnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            embed:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            stacked_cnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            stacked_parallel_cnn:
+              representation:
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            rnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            cnnrnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            passthrough:
+          timeseries:
+            transformer:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            parallel_cnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            embed:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            stacked_cnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            stacked_parallel_cnn:
+              representation:
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            rnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, step, default
+            cnnrnn:
+              representation: 
+                values: [dense, sparse]
+                default: dense
+              embedding_size: [0, 1024, 1, 50] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            passthrough: {}
+      output:
+        dtype:
+          int64: 
+            values: [numerical, binary, category]
+            default: numerical
+          int32: 
+            values: [numerical, binary, category]
+            default: numerical
+          float64: 
+            values: [numerical, category]
+            default: numerical
+          object:
+            values: [category, binary]
+            default: category
+          category: 
+            values: [category, binary]
+            default: category
+          bool:
+            values: [binary]
+            default: binary
+        model_type:
+          numerical: 
+            values: [regressor]
+            default: regressor
+          binary: 
+            values: [classifier]
+            default: classifier
+          category:
+            values: [classifier]
+            default: classifier
+        additional_config:
+          numerical:
+            regressor:
+              activation: 
+                values: [relu, sigmoid, softmax, tanh]
+                default: relu
+              num_fc_layers: [0, 10, 1, 1] # min, max, step, default
+              fc_size: [1, 1024, 1, 256] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            classifier: {}
+          binary:
+            regressor: {}
+            classifier:
+              activation: 
+                values: [relu, sigmoid, softmax, tanh]
+                default: relu
+              num_fc_layers: [0, 10, 1, 1] # min, max, step, default
+              fc_size: [1, 1024, 1, 256] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+          category: 
+            regressor: {}
+            classifier:
+              activation: 
+                values: [relu, sigmoid, softmax, tanh]
+                default: softmax
+              num_fc_layers: [0, 10, 1, 1] # min, max, step, default
+              fc_size: [1, 1024, 1, 256] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default

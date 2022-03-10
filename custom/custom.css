@@ -1,17 +1,3 @@
-@font-face {
-    font-family: 'Nanum';
-    font-style: normal;
-    font-weight: normal;
-    src: local('NanumGothic');
-    src: url("../assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
-         url("../assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff'),
-         url("../assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype');
-}
-
-.vuetify-styles .v-application {
-    font-family: Roboto, sans-serif !important;
-}
-
 .container {
     width: 100% !important;
 } 
@@ -27,6 +13,22 @@ div.output_subarea {
 
 .v-navigation-drawer__border {
     background-color: none !important;
+}
+
+
+/* -------------------------------------------------------  */
+@font-face {
+    font-family: 'Nanum';
+    font-style: normal;
+    font-weight: normal;
+    src: local('NanumGothic');
+    src: url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
+         url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff'),
+         url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype');
+}
+
+.vuetify-styles .v-application {
+    font-family: Roboto, sans-serif !important;
 }
 
 .vuetify-styles .v-list-item--link:before {
@@ -78,12 +80,44 @@ div.output_subarea {
     opacity: 0.3 !important;
 }
 
-/* .vuetify-styles .tab_menu .v-btn:before {
-    background-color: #f1f5f9 ;
-} */
+.vuetify-styles .tabular_ai_training__modeling_options .v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
+    box-shadow: none !important;
+    border-bottom: 1px solid black;
+}
 
-/* .vuetify-styles .v-btn:not(.v-btn--text):not(.v-btn--outlined):hover:before {
-    opacity: 1;
-} */
+.vuetify-styles .v-card {
+    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 10%) 0px 1px 3px 0px, rgb(0 0 0 / 10%) 0px 1px 2px -1px !important;
+}
 
-/*------------------------------------------------------*/
+.vuetify-styles .tabular_ai_training__modeling_options .v-card__title{
+    align-items: stretch !important;
+}
+
+.vuetify-styles .tabular_ai_training__modeling_options .v-input {
+    align-items: flex-end !important;
+}
+
+@media (min-width: 1264px) {
+    .vuetify-styles .v-container {
+        max-width: unset!important;
+    }
+}
+
+@media (min-width: 960px) {
+    .vuetify-styles .v-container {
+        max-width: unset !important;
+    }
+}
+
+.vuetify-styles .theme--light .tabular_ai_training__train_result .output_scroll {
+    height: 100%;
+    box-shadow: none;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 40px;
+    padding-top: 10px;
+}
+
+.vuetify-styles .v-dialog {
+    overflow-y: hidden !important;
+}
