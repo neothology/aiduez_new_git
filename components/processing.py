@@ -5,7 +5,7 @@ from click import style
 import ipyvuetify as v
 from utils import get_or_create_class
 from components.tab import BaseTab
-from components.cards import BaseCard, SimpleHeaderCard
+from components.cards import BaseCard, SmallHeaderCard
 from components.forms import DataSelect, SimpleSlider
 from components.buttons import StatedBtn
 from components.layouts import IndexRow
@@ -67,7 +67,6 @@ class TabularSingleProcessing(v.Container):
         )
 
     def _get_column_sumary(self):
-        print(self.data.columns)
         initial_column_name = self.data.columns[0]
         column_summary = get_or_create_class(
             'column_summary',
@@ -121,7 +120,6 @@ class TabularSingleProcessingMenu(BaseCard):
         )
 
     def update(self):
-        # print(self.app_context)
         self.body_items= [self._make_single_processing_ui()]
 
     def _make_single_processing_ui(self) -> list:
@@ -330,7 +328,7 @@ class TabularSingleProcessingMenu(BaseCard):
         for option in additional_configs:
             if option['type'] == "slider":
                 additonal_config_ui.append(
-                    SimpleHeaderCard(
+                    SmallHeaderCard(
                         title = option['name'],
                         body=SimpleSlider(
                             range=option['values'],
@@ -339,7 +337,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 )
             elif option['type'] == 'select':
                 additonal_config_ui.append(
-                    SimpleHeaderCard(
+                    SmallHeaderCard(
                         title = option['name'],
                         body=v.Select(
                             items=option['values'],
