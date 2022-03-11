@@ -24,7 +24,11 @@ class_paths:
   tabular_base: workflows.tabular.TabularBase
   tabular_data_import: workflows.tabular.TabularDataImport
   tabular_data_analyze: workflows.tabular.TabularDataAnalyze
+
   tabular_data_processing: workflows.tabular.TabularDataProcessing
+  tabular_data_processing_tab: components.processing.TabularProcessingTab
+  tabular_data_single_processing: components.processing.TabularSingleProcessing
+  tabular_data_multiple_processing: components.processing.TabularMultipleProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
   tabular_modeling_options: components.modeling.TabularModelingOptions
@@ -133,6 +137,13 @@ workflows_list:
       - 
         title: 데이터 가공
         target: tabular_data_processing
+        menu_list: 
+        -
+          title: 단일 칼럼 변환
+          target: tabular_data_single_processing
+        -
+          title: 복합 칼럼 변환
+          target: tabular_data_multiple_processing
       - 
         title: AI모델 학습
         target: tabular_ai_training
@@ -302,6 +313,77 @@ theme:
             background-color:#f1f5f9;
             margin:0; padding:0;
             position:absolute;
+
+# 데이터가공 paramater 정의
+processing_params:
+  single_process:
+    config:
+      dtype:
+        int64:
+          fill:
+            values: [missing_num_imputer]
+            default: missing_num_imputer
+          transform:
+            values: [quantile_transformer, kbins_discretizer]
+            default: quantile_transformer
+          scale:
+            values: [standard_scaler, minmax_scaler]
+            default: standard_scaler
+        float64:
+          fill:
+            values: [missing_num_imputer]
+            default: missing_num_imputer
+          transform:
+            values: [quantile_transformer, kbins_discretizer]
+            default: quantile_transformer
+          scale:
+            values: [standard_scaler, minmax_scaler]
+            default: standard_scaler
+        object:
+          fill:
+            values: [missing_cat_imputer]
+            default: missing_cat_imputer
+          transform:
+            values: [ordinal_encoder]
+            default: ordinal_encoder
+          extract:
+            values: [re_extract]
+            default: re_extract
+          nlp:
+            values: [morpheme_analysis, noun_extract]
+            default: morpheme_analysis
+      additional_config:
+        quantile_transformer:
+          option:
+            -
+              name: output_distribution
+              type: select
+              values: ['uniform', 'normal']
+              default: 'uniform'
+            - 
+              name: n_quantiles
+              type: slider
+              values: [10, 1000, 1, 10] # min, max, step, default
+        kbins_discretizer:
+          option:
+            - 
+              name: n_bins
+              type: slider
+              values: [5, 1000, 1, 5] # min, max, step, default
+        missing_num_imputer:
+          option:
+            -
+              name: imputer
+              type: select
+              values: ['most_frequent', 'median', 'mean',  'constant']
+              default: most_frequent
+        missing_cat_imputer:
+          option:
+            -
+              name: imputer
+              type: select
+              values: ['most_frequent', 'constant']
+              default: most_frequent
 
 # 학습 parameter 정의
 modeling_params:
