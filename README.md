@@ -46,6 +46,9 @@ source /etc/bash.bashrc && voila /aihub/workspace/AIDUez.ipynb --ip 0.0.0.0 --po
 
 - Dokerfile:
   . Dev-Test-Production 하나로 합침
+
+- Branch 병합:
+  . feature/preprocessing -> main
 ```
 
 ```console
