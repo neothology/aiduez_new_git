@@ -31,15 +31,11 @@ class Pipeline:
         
     def create_new(self, task_type):
 
-        # check whether '/usr/tmp/.aiduez/workbook' exists and delete if it exists or create one
+        # check whether 'tmp' exists and delete if it exists or create one
         if os.path.exists(self.tmp_dir):
             delete_files_in_dir(self.tmp_dir)
         else:
             os.makedirs(self.tmp_dir)
-
-        # check whether 'workspace' exists and delete if it exists or create one
-        if not os.path.exists(self.workspace_dir):
-            os.makedirs(self.workspace_dir)
 
         # create new file(zip -> ezx) in workspace
         filename = generate_filename(self.workspace_dir)
@@ -50,7 +46,7 @@ class Pipeline:
         self.app_context.current_work_file = file
 
         # create mlflow experiment in tmp folder (will be zipped later)
-        mf.set_tracking_uri(os.path.join(self.tmp_dir, filename))
+        mf.set_tracking_uri(os.path.join(self.tmp_dir, 'mf_tracking'))
         self.mf_client = MlflowClient()
         self.mf_client.create_experiment(filename)
         self.app_context.mf_experiment_id = '1'

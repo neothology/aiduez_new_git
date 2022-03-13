@@ -1,5 +1,11 @@
 import ipyvuetify as v
-from matplotlib.style import context
+import logging
+from ludwig.api import LudwigModel
+import ipywidgets as widgets
+from IPython.display import display
+import shutil
+import os   
+import numpy as np
 from components.cards import BaseCard
 from utils import get_or_create_class
 from components.forms import DataSelect, DataSlider, LabeledSelect, SimpleSlider
@@ -7,12 +13,6 @@ from components.buttons import StatedBtn
 from components.layouts import IndexRow
 from components.cards import SmallHeaderCard
 from components.dialog import BaseDialog
-import logging
-from ludwig.api import LudwigModel
-import ipywidgets as widgets
-from IPython.display import display
-import shutil
-import os   
 from utils import delete_files_in_dir
 
 class TabularModel:
@@ -21,13 +21,15 @@ class TabularModel:
         app_context: object = None,
         context_key: str = None,
         config: dict = None,
-        output: object = None,
+        output: dict = None,
         logging_level: object = None,
         **kwargs
         ):
 
+        self.app_context = app_context
         self.config = config
-        self.output = output
+        self.output_logs = output['logs']
+        self.output_plots = output['plots']
         self.logging_level = logging_level
         self.data = app_context.current_data
         self.data_name = app_context.current_data_name
@@ -44,11 +46,10 @@ class TabularModel:
     def train(self):
         if os.path.isdir(self.output_model_directory):
             shutil.rmtree(self.output_model_directory)
-            self.output.clear_output()
+        config = self.app_context.tabular_ai_training__modeling_options.retrieve_config()
+        self.model = LudwigModel(config, logging_level = self.logging_level)
 
-        self.model = LudwigModel(self.config, logging_level = self.logging_level)
-
-        with self.output:
+        with self.output_logs:
             self.eval_stats, self.train_stats, self.preprocessed_data, self.output_dir = self.model.experiment(
                 dataset=self.data, 
                 experiment_name=self.data_name, 
@@ -57,6 +58,15 @@ class TabularModel:
                 skip_save_processed_input = True,
                 skip_save_logs = True,
             )
+            display(widgets.HTML("<br><br>"))
+
+        self.metadata = self.model.training_set_metadata
+
+        self.output_plots.children = [self.app_context.tabular_ai_training__train_result.make_plots(
+            self.train_stats,
+            self.eval_stats,
+            self.metadata,
+        )]
 
 class TabularTrainActivator(v.Row):
     def __init__(
@@ -74,30 +84,42 @@ class TabularTrainActivator(v.Row):
 
         self.train_activator = v.Btn(
             children = ['학습하기'],
+            disabled = True,
             style_ = self.style['button'],
+        )
+
+        self.target_yn = v.Html(
+            tag = 'h4',
+            children = ['출력 데이터가 없습니다'],
+            attributes = {
+                'style': 'padding-left:15px; padding-top:10px;',
+            },
         )
         
         def _activate_model_train(item, event=None, data=None):
-            config = self.app_context.tabular_ai_training__modeling_options.retrieve_config()
             train_result = self.app_context.tabular_ai_training__train_result
+            train_result.button_chart_view.hide()
+            train_result.button_chart_view.disabled = True
+
+            train_result.clear_contents()
+            train_result.children[0].children[1].children = [train_result.output_logs]
             train_result.show()
 
             self.model = get_or_create_class(
                 'tabular_model',
                 self.app_context,
-                config = config,
-                output = train_result.output_logs,
+                output = {'logs':train_result.output_logs, 'plots':train_result.output_plots},
                 logging_level = logging.INFO,
             )
             
-            self.model.train() 
-            train_result.organize_charts()
-            train_result.select_chart_view.disabled = False
+            self.model.train()
+            train_result.button_chart_view.disabled = False
+            train_result.button_chart_view.show()
 
         self.train_activator.on_event('click', _activate_model_train)
 
         super().__init__(
-            children = [self.train_activator],
+            children = [self.train_activator, self.target_yn],
             style_ = self.style['row'],
         )
 
@@ -122,7 +144,7 @@ class TabularTrainResult(BaseDialog):
         body_items = [self.output_logs]
 
         # select options
-        self.select_text_view = v.Btn(
+        self.button_text_view = v.Btn(
                     small = True,
                     plain = True,
                     depressed = True,
@@ -132,7 +154,7 @@ class TabularTrainResult(BaseDialog):
                     style_ = 'color:rgb(0,0,0, 0.87) !important;',
                 )
 
-        self.select_chart_view = v.Btn(
+        self.button_chart_view = v.Btn(
                     small = True,
                     plain = True,
                     depressed = True,
@@ -141,21 +163,25 @@ class TabularTrainResult(BaseDialog):
                     children = ['차트 보기'],
                     style_ = 'color:rgb(0,0,0, 0.87) !important;',
                 )
+        self.button_chart_view.hide()
 
-        def _on_select_chart_view(item, event=None, data=None):
-            pass
+        def _on_click_button_chart_view(item, event=None, data=None):
+            self.children[0].children[1].children = [self.output_plots]
+            self.button_chart_view.disabled = True
+            self.button_text_view.disabled = False
+            
 
-        def _on_select_text_view(item, event=None, data=None):
-            pass
+        def _on_click_button_text_view(item, event=None, data=None):
+            self.children[0].children[1].children = [self.output_logs]
+            self.button_text_view.disabled = True
+            self.button_chart_view.disabled = False
 
-
-        self.select_chart_view.on_event('click', _on_select_chart_view)
-        self.select_text_view.on_event('click', _on_select_text_view)
-
+        self.button_chart_view.on_event('click', _on_click_button_chart_view)
+        self.button_text_view.on_event('click', _on_click_button_text_view)
 
         self.selector = v.Row(
             style_ = "margin: 0px; width:100%; max-height:33px; padding:0 12px; background-color:#f1f1f1; border-top:1px solid #e0e0e0;",
-            children = [self.select_text_view, self.select_chart_view],
+            children = [self.button_text_view, self.button_chart_view],
         )
 
         super().__init__(
@@ -167,7 +193,7 @@ class TabularTrainResult(BaseDialog):
             header_title = '학습 결과',
             header_bottom = self.selector,
             body_items = body_items,
-            body_size = {'width': '90vw', 'height': ['80vh']},
+            body_size = {'width': '90vw', 'height': ['80vh', '80vh']},
             body_border_bottom = [True],
             body_background_color = ["rgb(255, 255, 255)"],
             align = 'center',
@@ -175,8 +201,11 @@ class TabularTrainResult(BaseDialog):
             close = True,
             class_ = context_key,
             app_context = self.app_context,
-            selector = self.selector,
         )    
+
+    def clear_contents(self):
+        self.output_logs.clear_output()
+        self.output_plots.children = [""]
 
     def show(self):
         self.value = 1
@@ -185,8 +214,176 @@ class TabularTrainResult(BaseDialog):
     def close(self):
         self.value = 0
 
-    def organize_charts(self):
-        pass
+    def make_plots(self, train_stats, eval_stats, meta_data):
+
+        def make_f1_score_plot(str2idx, str2freq, idx2str, per_class_stats):
+            import plotly.graph_objects as go
+            import plotly
+            from plotly.subplots import make_subplots
+            subplots = make_subplots(rows=1, cols=2, specs=[[{"secondary_y": True}, {"secondary_y": True}]], subplot_titles=[
+                                    "f1 score & frequency sorted by f1 score", "f1 score & frequency sorted by frequency"])
+            k=10
+            idx2freq = {str2idx[key]: val for key, val in str2freq.items()}
+            str2f1 = {label_f1:class_stats_dict['f1_score'] for label_f1,class_stats_dict in per_class_stats.items()}
+            idx2str=idx2str[::-1]
+            idx2f1 = [str2f1[label] for label in idx2str[:k]]
+
+            freq_sorted_by_freq = np.array(list(sorted(idx2freq,reverse=True))[:k], dtype=np.int32)
+            f1_sorted_by_freq = np.nan_to_num(np.array(idx2f1, dtype=np.float32))
+            label_sorted_by_freq = np.array(idx2str[:k])
+
+
+            str2f1_sorted_by_f1 = dict(sorted(str2f1.items(), key=lambda item:item[1],reverse=True))
+            str2freq = {key:str2freq[key] for key in str2f1_sorted_by_f1.keys()}
+            f1_sorted_by_f1 =  np.nan_to_num(np.array(list(str2f1_sorted_by_f1.values())[:k],dtype=np.float32))
+            freq_sorted_by_f1 = np.array(list(str2freq.values())[:k],dtype=np.int32)
+            label_sorted_by_f1 = np.array(list(str2f1_sorted_by_f1.keys())[:k])
+
+            colors = plotly.colors.DEFAULT_PLOTLY_COLORS
+            subplots.add_trace(go.Scatter(x=label_sorted_by_f1, y=f1_sorted_by_f1,
+                                        name="f1 score", line_color=colors[0], legendgroup=0), row=1, col=1)
+            subplots.add_trace(go.Scatter(x=label_sorted_by_f1, y=freq_sorted_by_f1, name="frequency",
+                                        line_color=colors[1], legendgroup=1), row=1, col=1, secondary_y=True)
+            subplots.add_trace(go.Scatter(x=label_sorted_by_freq, y=freq_sorted_by_freq, name="frequency",
+                                        line_color=colors[1], showlegend=False, legendgroup=1), row=1, col=2)
+            subplots.add_trace(go.Scatter(x=label_sorted_by_freq, y=f1_sorted_by_freq, name="f1 score",
+                                        line_color=colors[0], showlegend=False, legendgroup=0), row=1, col=2, secondary_y=True)
+
+            subplots.update_xaxes(type='category',tickangle =-45,row=1, col=1)
+            subplots.update_xaxes(type='category',tickangle =-45,row=1, col=2)
+            subplots.update_xaxes(type='category',row=1, col=2)
+            subplots.update_yaxes(title_text="f1 score", row=1, col=1)
+            subplots.update_yaxes(title_text="frequency", row=1,
+                                col=1, secondary_y=True)
+            subplots.update_yaxes(title_text="frequency", row=1, col=2)
+            subplots.update_yaxes(title_text="f1 score", row=1,
+                                col=2, secondary_y=True)
+
+            return go.FigureWidget(subplots)
+
+        def make_confusion_matrix_plot(confusion_matrix, feature_name, idx2str, per_class_stats):
+            import plotly.graph_objects as go
+            import plotly.figure_factory as ff
+            import plotly.express as px
+            import ipywidgets as widgets
+            from scipy.stats import entropy
+            top_n_classes = min(10, len(confusion_matrix))
+            confusion_matrix = np.array(confusion_matrix)
+            confusion_matrix = confusion_matrix[:top_n_classes, :top_n_classes]
+            labels = idx2str[:top_n_classes]
+            metrics = np.array([[per_class_stats[label]["recall"], per_class_stats[label]
+                                ["precision"], per_class_stats[label]["f1_score"]] for label in labels])
+            cm_labels = list(
+                map(lambda label: feature_name + ': ' + str(label), labels))
+            custom_data = np.stack([np.diag(metrics[:, index])
+                                    for index in range(metrics.shape[1])], axis=-1)
+            heatmap = ff.create_annotated_heatmap(z=confusion_matrix, annotation_text=confusion_matrix, x=cm_labels, y=cm_labels, customdata=custom_data,
+                                                hovertemplate="재현율: %{customdata[0]:.4f} <br>정밀도: %{customdata[1]:.4f} <br>F1 score: %{customdata[2]:.4f} <extra></extra>", colorscale="Viridis", showscale=True)
+            heatmap.update_layout(title={"text": f"Confusion Matrix of {feature_name}"}, xaxis={"title": "Predicted value",
+                                                                                                "tickangle": -45, "type": "category"}, yaxis={"title": "Actual value", "type": "category", "autorange": "reversed"})
+            entropies = [round(entropy(row), 4) if np.count_nonzero(
+                row) > 0 else 0 for row in confusion_matrix]
+            np_entropies = np.array(entropies)
+            asc_index = np.argsort(np_entropies)
+            asc_entropies = np_entropies[asc_index]
+            asc_labels = [labels[i] for i in asc_index]
+            entropy_barplot = px.bar(x=asc_entropies, y=asc_labels)
+            entropy_barplot.update_layout(title={"text": f"classes ranked by entropy of {feature_name} confusion Matrix row"}, xaxis={
+                                        "title": "Entropy by confusion matrix row : -sum(Pk*log(pk))"}, yaxis={"title": "classes", "type": "category"})
+            return widgets.HBox([go.FigureWidget(heatmap), go.FigureWidget(entropy_barplot)])
+
+        def make_roc_curve(roc_curve, feature_name):
+            fpr = roc_curve["false_positive_rate"]
+            tpr = roc_curve["true_positive_rate"]
+            import plotly.graph_objects as go
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=fpr, y=tpr, name="model classifier"))
+            fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="random classifier", line={
+                        "dash": "dash", "color": "black"}))
+            fig.update_layout(title={"text": f"ROC curve of {feature_name}"}, xaxis={
+                            "title": "False positive rate"}, yaxis={"title": "True positive rate"})
+            fig.update_traces(
+                hovertemplate="True positive rate: %{y}<br> False positive rate: %{x}<extra></extra>"
+            )
+            fig.update_xaxes(
+                range=[0, 1],
+                constrain="domain"
+            )
+            fig.update_yaxes(
+                scaleanchor="x",
+                scaleratio=1,
+            )
+
+            return go.FigureWidget(fig)
+
+        def make_eval_stats_plot_dict(eval_stats, meta_data) -> dict:
+            # initialize
+            eval_stats_plot_dict = {}
+            for feature_name, stats_dict in eval_stats.items():
+                eval_stats_plot_dict[feature_name] = {}
+                # idx2label is sorted by frequency already
+
+                confusion_matrix = stats_dict.get("confusion_matrix")
+                per_class_stats = stats_dict.get("per_class_stats")
+                roc_curve = stats_dict.get("roc_curve")
+
+                if confusion_matrix:
+                    idx2str = meta_data[feature_name].get("idx2str")
+                    idx2str = idx2str if idx2str else ["False", "True"]
+                    eval_stats_plot_dict[feature_name]["confusion_matrix"] = make_confusion_matrix_plot(
+                        confusion_matrix, feature_name, idx2str, per_class_stats)
+
+                    str2idx = meta_data[feature_name].get('str2idx')
+                    str2freq = meta_data[feature_name].get('str2freq')
+
+                    if str2idx:
+                        eval_stats_plot_dict[feature_name]["f1_score"] = make_f1_score_plot(
+                            str2idx, str2freq, idx2str, per_class_stats)
+
+                if roc_curve:
+                    eval_stats_plot_dict[feature_name]["roc_curve"] = make_roc_curve(
+                        roc_curve, feature_name)
+            return eval_stats_plot_dict
+
+        def _make_learning_curves_dict(train_stats) -> dict:
+            # initialize
+            import plotly.graph_objects as go
+            from plotly.subplots import make_subplots
+            import plotly
+            colors = plotly.colors.DEFAULT_PLOTLY_COLORS
+            learning_curves_dict = {}
+            # stats are Ordered dict
+            epoch = None
+            for eval_split_index, (eval_split, stats_dict) in enumerate(train_stats.items()):
+                for feature_name, metric_dict in stats_dict.items():
+                    showlegend = True
+                    subplots = learning_curves_dict.get(feature_name)
+                    if subplots is None:
+                        subplots = go.FigureWidget(
+                            make_subplots(rows=1, cols=len(metric_dict), x_title="epochs", subplot_titles=tuple(metric_name for metric_name in metric_dict.keys())))
+                        learning_curves_dict[feature_name] = subplots
+                        subplots.update_layout(
+                            title_text="출력 데이터 : "+feature_name)
+                    for metric_index, metric in enumerate(metric_dict.values(), start=1):
+                        if epoch is None:
+                            epoch = [epoch+1 for epoch in range(len(metric))]
+                        subplots.add_trace(go.Scatter(x=epoch, y=metric, name=eval_split, mode="lines", legendgroup=eval_split,
+                                                    line_color=colors[eval_split_index], showlegend=showlegend), row=1, col=metric_index)
+                        showlegend = False
+
+            return learning_curves_dict
+
+        self.learning_curves = _make_learning_curves_dict(train_stats)
+        self.eval_plots = make_eval_stats_plot_dict(eval_stats, meta_data)
+        import ipywidgets as widgets
+        plot_list = []
+        for _, figure_widget in self.learning_curves.items():
+            plot_list.append(figure_widget)
+        for _, metric_dict in self.eval_plots.items():
+            for _, metric_figure in metric_dict.items():
+                plot_list.append(metric_figure)
+        return widgets.VBox(plot_list)
+
 
 class TabularModelingOptions(BaseCard):
     def __init__(
@@ -283,6 +480,20 @@ class TabularModelingOptions(BaseCard):
                 _change_data_types(index)
             else:
                 _ignore_data_row(index)
+
+            # check if output column is 
+            train_ready = False
+            for i in range(len(in_out_ignore_buttons)):
+                if in_out_ignore_buttons[i].v_slots[0]['children'][0].state == 'output':
+                    train_ready = True
+                    break
+            
+            
+            self.app_context.tabular_ai_training__train_activator.train_activator.disabled = not train_ready
+            if train_ready:
+                self.app_context.tabular_ai_training__train_activator.target_yn.hide()
+            else:
+                self.app_context.tabular_ai_training__train_activator.target_yn.show()
 
         def _make_tooltip_button(index):
             btn = StatedBtn(

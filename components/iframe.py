@@ -1,5 +1,4 @@
 import ipyvuetify as v
-from IPython.display import IFrame
 
 class ChartFrame(v.Col):
     def __init__(

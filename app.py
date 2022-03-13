@@ -1,5 +1,5 @@
 from context import AppContext
-from utils import read_config, get_or_create_class
+from utils import get_or_create_class
 
 class Aian:
     def __init__(self, **kwargs):
@@ -8,7 +8,7 @@ class Aian:
         self.app_context = AppContext(
             theme = kwargs.get('theme') if kwargs.get('theme') else 'ez_default',
         ) 
-        
+       
         # initialize layout
         self.background = get_or_create_class('background', self.app_context)
         self.top_area = get_or_create_class('top_area', self.app_context)
@@ -25,7 +25,6 @@ class Aian:
 
         # when re-loaded, establish from thst last saved state
         # ...
-
 
     def start(self):
         return self.background

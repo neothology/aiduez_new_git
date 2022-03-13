@@ -1,12 +1,12 @@
-# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/8/22)</span>
+# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/11/22)</span>
 
-## Development <span style="font-size:1.2rem; font-weight:lighter">(local에서 개발)</span>
+## Development
 
 - Docker Image 만들기
 
 ```console
 # 소스 코드 Clone후에 도커 이미지(dev) 빌드
--$ docker build -t (image name) -f Dockerfile_dev .  
+-$ docker build -t (image name) .  
 ```
 
 - Jupyter Notebook
@@ -15,44 +15,47 @@
 # Container 실행
 -$ docker run -itd -p 8888:8888 -v (source code path for volume mount):/opt/code/aiduez --name (container name) (image name) /bin/bash
 
-
 # Container 접속 후, Jupyter Notebook 실행
--$ cd /opt/code/aiduez
--$ jupyter notebook --ip 0.0.0.0 --allow-root
+-$ jupyter notebook --ip 0.0.0.0 --notebook-dir /aihub/workspace --allow-root --no-browser
 
-# jupyter 'HomePage'에서 'app.ipynb' 실행
+# jupyter 'HomePage'에서 'AIDUez.ipynb' 실행
 ```
-
 - Voila
 
- <img alt="Run Voila in notebook" src="assets/images/README_voila.png" style="border: 1px solid #eee; border-radius: 4px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+<img alt="Run Voila in notebook" src="assets/images/README_voila.png" style="border: 1px solid #eee; border-radius: 4px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
 
-## Test <span style="font-size:1.2rem; font-weight:lighter">(AIDU에 올리고 Jupyter Notebook으로 실행)</span>
+<br>
 
-- "dockerfile_test" 사용해서 Dspace-Nexus에 이미지 생성 > aidu repogitory 등록
+## Production
 
-- 기존 ez yaml 변경 없이 실행
-
-```console
-voila /opt/code/aiduez/app.ipynb --no-browser --ip 0.0.0.0 
-```
-
-## Production <span style="font-size:1.2rem; font-weight:lighter">(AIDU에 올리고 Voila로 실행)</span>
-
-- "dockerfile_prod" 사용해서 Dspace-Nexus에 이미지 생성 > aidu repogitory 등록
+- Dspace: Jenkins > Nexus에 이미지 생성 > AIDU repogitory 등록
 
 - OKD Ez실행 yaml에 아래와 같이 적용
 
 ```console
-voila /opt/code/aiduez/app.ipynb --no-browser --ip 0.0.0.0 
+source /etc/bash.bashrc && voila /aihub/workspace/AIDUez.ipynb --ip 0.0.0.0 --port 8888 --no-browser
 ```
+<br>
 
-## *Update history
+### (Update history)
+
+```console
+(3/13/22)
+- Tabula AI Training:
+  . 훈련 결과 - 차트 부분 추가
+
+- Dokerfile:
+  . Dev-Test-Production 하나로 합침
+```
 
 ```console
 (3/8/22)
-- XXX: 
-  . XXX 
+- notebook 실행 위치 및 tmp 위치 변경: 
+  . notebook 실행 위치: /opt/code/aiduez -> /aihub/workspace 
+  . tmp 위치: /opt/code/aiduez/tmp -> /aihub/workspace/tmp
+
+- notebook으로 ez3.0 실행하는 방식 변경:
+  . 'app.ipynb' 실행 -> javascript로 자동 실행('new'클릭)
 ```
 
 ```console
@@ -61,4 +64,5 @@ voila /opt/code/aiduez/app.ipynb --no-browser --ip 0.0.0.0
   . Container 실행 시 '-p 8888:8888' 추가 
   . Jupyter 실행 시 '--ip 0.0.0.0' 추가
 ```
+
 

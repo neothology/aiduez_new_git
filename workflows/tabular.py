@@ -62,6 +62,7 @@ class TabularAITraining(v.Container):
         self.train_button = get_or_create_class(
             'tabular_train_activator',
             self.app_context,
+            context_key = 'tabular_ai_training__train_activator',
             title = '학습하기'
         )
 

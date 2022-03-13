@@ -61,6 +61,7 @@ class ListMenu(v.List):
                             ),
                         }],
                         children = _make_sub_menu(item['sub_menu']),
+                        style_ = 'margin-bottom:8px; margin-left:-2px;',
                     )
                 ) 
             else:
@@ -96,7 +97,18 @@ class ListMenu(v.List):
                 )
 
                 self.menu_to_target.append(list_item)
-            
+
+        # # add save button
+        # btn_save = v.Btn(
+        #     children = "저장하기",
+        # )
+
+        # list_menu.append(
+        #     v.Row(
+        #         children = [btn_save],
+        #     )
+        # )
+
         super().__init__(
             class_ = self.context_key,
             style_ = set_theme_style(self.app_context, self.context_key),
