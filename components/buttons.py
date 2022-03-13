@@ -9,5 +9,6 @@ class StatedBtn(v.Btn):
             v_on = kwargs.get('v_on'),
             icon = kwargs.get('icon'),
             style_ = kwargs.get('style_'),
+            color = kwargs.get('color'),
             children = children,
         )
