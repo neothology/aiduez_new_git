@@ -165,3 +165,6 @@ train_test/
 
 # vscode-workspace
 workspace.code-workspace
+
+# ipynb file for test
+test.ipynb
