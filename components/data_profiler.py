@@ -235,7 +235,7 @@ class ColumnSummary(BaseCard):
         self._make_chart_data(self.data_name, col) 
         table_headers, table_data_list, chart = self._make_output_data(col)
 
-        self.card_body[0].children[0].children = [
+        self.app_context.tabular_ai_training__column_summary.card_body[0].children[0].children = [
             PlainTable(header=header, items=items) for header, items in zip(table_headers, table_data_list)
             ] + [chart]
  

@@ -43,12 +43,6 @@ class AppContext:
     # tabular data analyze objects
     tabular_data_analyze: object = None
 
-    #tabular data processing objects
-    tabular_data_processing: object = None
-    tabular_data_processing_tab: object = None
-    tabular_data_single_processing: object = None
-    tabular_data_processing_column_summary: object = None
-
     # tabilar ai training objects
     tabular_ai_training: object = None
     tabular_ai_training__train_activator: object = None
@@ -113,6 +107,5 @@ class AppContext:
         self.workflows_list: dict = app_config['workflows_list']
         self.theme_values: dict = app_config['theme'][self.theme]
         self.env_values: dict = app_config['envs']
-        self.processing_params: dict = app_config['processing_params']
         self.modeling_params: dict = app_config['modeling_params']
 

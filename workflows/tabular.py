@@ -40,28 +40,10 @@ class TabularDataAnalyze(v.Container):
 
 class TabularDataProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
-        self.app_context = app_context
-        self.context_key = context_key
-        self.data = app_context.current_data
-
-        # code_will_be_removed: load test data for tabular modeling
-        self.app_context.current_data_name = ('titanic_train')
-        import pandas as pd
-        self.app_context.current_data = pd.read_csv('data/titanic_train.csv')
-
-        # vertical tab
-        self.processing_tab = get_or_create_class(
-            'tabular_data_processing_tab',
-            app_context=self.app_context,
-            context_key='tabular_data_processing_tab',
-        )
 
         super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [
-                self.processing_tab,
-            ],
+            style_ = "min-width:100%; min-height:100%;",
+            children = []
         )
 
 class TabularAITraining(v.Container):

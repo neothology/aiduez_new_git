@@ -41,11 +41,6 @@ class BaseCard(v.Card):
             'card_footer': "background-color:rgb(248, 250, 252); padding:0; height:20px;",
         }
 
-        if kwargs.get('style'):
-            for key, val in kwargs.get('style').items():
-                self.style[key] = val
-
-
     # card header ------------------------------------------------------------
         # card title
         self.title = v.Col(

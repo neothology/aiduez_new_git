@@ -98,14 +98,13 @@ class IndexRow(v.Row):
         self,
         app_context:object = None,
         context_key:str = "",
-        class_: str = "modeling-options-row",
         index:int = 0,
         **kwargs
         ):
         
         self.index = index
         super().__init__(
-            class_ = class_,
+            class_ = 'modeling-option-row',
             children = kwargs.get('children'),
             style_ = kwargs.get('style_'),
         )
