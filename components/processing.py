@@ -1,7 +1,8 @@
 from faulthandler import disable
-from re import M
+from re import L, M
 from turtle import width
 from click import style
+from components.dialog import BaseDialog
 import ipyvuetify as v
 from utils import get_or_create_class
 from components.tab import BaseTab
@@ -49,6 +50,11 @@ class TabularSingleProcessing(v.Container):
             title="단일칼럼변환"
         )
 
+        self.processing_dialog = get_or_create_class(
+            'tabular_data_single_processing_dialog',
+            app_context=self.app_context,
+            context_key= 'tabular_data_single_processing_dialog'
+        )
         # column summary
         self.column_summary = self._get_column_sumary()
 
@@ -58,9 +64,11 @@ class TabularSingleProcessing(v.Container):
             children = [
                 v.Col(
                     class_="d-lg",
-                    children=[self.processing_menu,
-                    v.Spacer(style_="height:20px"),
-                    self.column_summary,
+                    children=[
+                        self.processing_menu,
+                        self.processing_dialog,
+                        v.Spacer(style_="height:20px"),
+                        self.column_summary,
                     ]
                 )
             ],
@@ -156,7 +164,8 @@ class TabularSingleProcessingMenu(BaseCard):
                 class_="align-center",
                 index = str(i),
                 children = [
-                    delete_column_buttons[i], column_names[i], pandas_data_types[i], processing_method_buttons[i]['fill'],
+                    delete_column_buttons[i], column_names[i], pandas_data_types[i],
+                    processing_method_buttons[i]['fill'],
                     processing_method_buttons[i]['transform'], processing_method_buttons[i]['extract'],
                     processing_method_buttons[i]['scale'], processing_method_buttons[i]['nlp'],
                 ],
@@ -213,7 +222,22 @@ class TabularSingleProcessingMenu(BaseCard):
         config= self.app_context.processing_params['single_process']['config']
 
         dialog_buttons = []
-        for col in self.data.columns:
+        def _activate_process_dialog(widget=None, event=None, data=None):
+            column = self.data[widget.v_model["column_name"]]
+            process = widget.v_model["process"]
+            # dialog = self.app_context.tabular_data_single_processing_dialog
+            dialog = get_or_create_class(
+                'tabular_data_single_processing_dialog',
+                app_context=self.app_context,
+            )
+            # TabularSingleProcessingDialog(app_context=self.app_context, context_key=self.context_key, column=column, process=process)
+            def _close_dialog(widget, event=None, data=None):
+                widget.value = 0
+
+            dialog.on_event('click:outside', _close_dialog)
+            dialog.show(column=column, process=process)
+
+        for col_name in self.data.columns:
             process_type_dialog = {
                 'fill': None,
                 'transform': None,
@@ -222,104 +246,147 @@ class TabularSingleProcessingMenu(BaseCard):
                 'nlp': None,
             }
 
-            dtype = self.data[col].dtype.name
+            dtype = self.data[col_name].dtype.name
             for process in process_type_dialog.keys():
                 disabled = True
-                method_items = []
-                method_value = ''
                 if process in config['dtype'][dtype].keys():
-                    disabled = False
-                    method_items = config['dtype'][dtype][process]['values']
-                    method_value = config['dtype'][dtype][process]['default']
-                    additional_config_ui = self._make_additonal_config_ui(method_value)
-                process_type_dialog[process] = v.Dialog(
-                    width="700",
-                    v_slots=[{
-                        'name': 'activator',
-                        'variable': col+'_'+process,
-                        'children': v.Btn(
-                            class_ ="mx-2",
-                            color="blue-grey lighten-5  ",
-                            v_on=f"{col+'_'+process}.on",
-                            disabled=disabled,
-                            children=[process]
-                        )
-                    }],
-                    children=[
-                        v.Card(children=[
-                            v.CardTitle(
-                                class_='headline grey lighten-2',
-                                primary_title=True,
-                                children=[
-                                    f"{col.upper()} {process.upper()}",
-                                    v.Spacer(),
-                                    v.Btn(
-                                        icon=True,
-                                        on=f"{col}+'_'+{process}.value = false",
-                                        children=[v.Icon(children=['mdi-close'])]
-                                    )
-                                ],
-                            ),
-                            v.CardText(children=[
-                                # method selector
-                                v.Row(
-                                    children=[
-                                        v.Select(
-                                            label='Method',
-                                            items=method_items,
-                                            value=method_value,
-                                        )
-                                    ]
-                                ),
-                                # additional config
-                                v.Row(children=[v.Col(children=[ui]) for ui in additional_config_ui]),
-
-                                # result area
-                                v.Row(children=[
-                                    v.Col(children=[
-                                        v.Card(children=[
-                                            v.CardTitle(
-                                                class_="headline",
-                                                primary_title=True,
-                                                children=["Before"]
-                                            ),
-                                            v.CardText(children=["Before Contents"])
-                                        ])
-                                    ]),
-                                    v.Icon(
-                                        large=True,
-                                        children=["mdi-arrow-right-bold"]
-                                    ),
-                                    v.Col(children=[
-                                        v.Card(children=[
-                                            v.CardTitle(
-                                                class_="headline",
-                                                primary_title=True,
-                                                children=["After"]
-                                            ),
-                                            v.CardText(children=["After Contents"])
-                                        ])
-                                    ]),                                
-                                ])
-                            ]),
-                            v.CardActions(children=[
-                                v.Spacer(),
-                                v.Btn(
-                                    color="blue lighten-3",
-                                    children=["저장"],
-                                ),
-                                v.Btn(
-                                    color="green lighten-3",
-                                    children=["새 칼럼 생성"]
-                                )
-                            ])
-                        ])
-                    ]
+                    disabled=False
+                process_type_dialog[process] = v.Btn(
+                    v_model={'column_name': col_name, 'process': process},
+                    class_='mx-2',
+                    color="blue-grey lighten-5",
+                    disabled=disabled,
+                    children=[process],
                 )
+
+                process_type_dialog[process].on_event('click', _activate_process_dialog)       
 
             dialog_buttons.append(process_type_dialog)
 
         return dialog_buttons
+
+    def _make_additonal_config_ui(self, method) -> list:
+        config= self.app_context.processing_params['single_process']['config']
+        additional_configs = config['additional_config'][method]['option'] if method in config['additional_config'].keys() else []
+        additonal_config_ui = []
+        for option in additional_configs:
+            if option['type'] == "slider":
+                additonal_config_ui.append(
+                    SmallHeaderCard(
+                        title = option['name'],
+                        body=SimpleSlider(
+                            range=option['values'],
+                        ),
+                    )
+                )
+            elif option['type'] == 'select':
+                additonal_config_ui.append(
+                    SmallHeaderCard(
+                        title = option['name'],
+                        body=v.Select(
+                            items=option['values'],
+                            value=option['default']
+                        ),
+                    )
+                )   
+        return additonal_config_ui
+
+class TabularSingleProcessingDialog(v.Dialog):
+    def __init__(self, app_context, context_key, width=700) -> None:
+        self.app_context = app_context
+
+        self.children = ''
+
+        super().__init__(
+            children=self.children,
+            width=width,
+            value=0,
+        )
+
+    def close(self):
+        self.value=0
+
+    def show(self, column, process):
+        config= self.app_context.processing_params['single_process']['config']
+        dtype = column.dtype.name
+
+        method_value = config['dtype'][dtype][process]['default'] if process in config['dtype'][dtype].keys() else []        
+        method_items = config['dtype'][dtype][process]['values'] if process in config['dtype'][dtype].keys() else ''
+
+        additional_config_ui = self._make_additonal_config_ui(method_value)
+        close_btn = v.Btn(
+            icon=True,
+            children=[v.Icon(children=['mdi-close'])],
+        )
+        def _close_dialog(item, event=None, data=None):
+            self.value = 0
+            
+        close_btn.on_event('click', _close_dialog)
+        self.children = [v.Card(children=[
+            v.CardTitle(
+                class_='headline grey lighten-2',
+                primary_title=True,
+                children=[
+                    f"{column.name.upper()} {process.upper()}",
+                    v.Spacer(),
+                    close_btn,
+                ],
+            ),
+            v.CardText(children=[
+                # method selector
+                v.Row(
+                    children=[
+                        v.Select(
+                            label='Method',
+                            items=method_items,
+                            value=method_value,
+                        )
+                    ]
+                ),
+                # additional config
+                v.Row(children=[v.Col(children=[ui]) for ui in additional_config_ui]),
+
+                # result area
+                v.Row(children=[
+                    v.Col(children=[
+                        v.Card(children=[
+                            v.CardTitle(
+                                class_="headline",
+                                primary_title=True,
+                                children=["Before"]
+                            ),
+                            v.CardText(children=["Before Contents"])
+                        ])
+                    ]),
+                    v.Icon(
+                        large=True,
+                        children=["mdi-arrow-right-bold"]
+                    ),
+                    v.Col(children=[
+                        v.Card(children=[
+                            v.CardTitle(
+                                class_="headline",
+                                primary_title=True,
+                                children=["After"]
+                            ),
+                            v.CardText(children=["After Contents"])
+                        ])
+                    ]),                                
+                ])
+            ]),
+            v.CardActions(children=[
+                v.Spacer(),
+                v.Btn(
+                    color="blue lighten-3",
+                    children=["저장"],
+                ),
+                v.Btn(
+                    color="green lighten-3",
+                    children=["새 칼럼 생성"]
+                )
+            ])
+        ])]
+        self.value = 1
 
     def _make_additonal_config_ui(self, method) -> list:
         config= self.app_context.processing_params['single_process']['config']
