@@ -20,6 +20,7 @@ class AppContext:
     current_data_name: str = ''
     current_data: object = None
     current_workflow: str = None
+    current_workfile: object = None
 
 ## base layout object ##
     background: object = None
@@ -34,6 +35,7 @@ class AppContext:
     tabular_tab_menu: object = None
     tabular_contents: object = None
     tabular_workflow_stage: str = None
+    tabular_model: object = None
 
     # tabular data import objects
     tabular_data_import: object = None
@@ -46,10 +48,19 @@ class AppContext:
     # tabular data analyze objects
     tabular_data_analyze: object = None
 
+    #tabular data processing objects
+    tabular_data_processing: object = None
+    tabular_data_processing_tab: object = None
+    tabular_data_single_processing: object = None
+    tabular_data_processing_column_summary: object = None
+
     # tabilar ai training objects
     tabular_ai_training: object = None
+    tabular_ai_training__train_activator: object = None
     tabular_ai_training__modeling_options: object = None
     tabular_ai_training__column_summary: object = None
+    tabular_ai_training__train_result: object = None
+    tabular_ai_training__train_plots: object = None
 
     tabular_ai_evaluation: object = None
     # --------------------------------------------------
@@ -107,5 +118,6 @@ class AppContext:
         self.workflows_list: dict = app_config['workflows_list']
         self.theme_values: dict = app_config['theme'][self.theme]
         self.env_values: dict = app_config['envs']
+        self.processing_params: dict = app_config['processing_params']
         self.modeling_params: dict = app_config['modeling_params']
 

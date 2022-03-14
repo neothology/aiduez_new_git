@@ -1,7 +1,7 @@
 envs: 
   workspace_dir: /aihub/workspace
   data_dir: /aihub/data
-  tmp_dir: tmp
+  tmp_dir: /aihub/workspace/tmp
 
 
 class_paths:
@@ -17,7 +17,6 @@ class_paths:
   # other components
   column_summary: components.data_profiler.ColumnSummary
 
-
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
   task_all: workflows.task.TaskAll
@@ -31,13 +30,15 @@ class_paths:
   tabular_data_import_edap: components.import.TabularEDAPImport
   tabular_data_import_pod: components.import.TabularPodImport
 
-
-
   tabular_data_analyze: workflows.tabular.TabularDataAnalyze
   tabular_data_processing: workflows.tabular.TabularDataProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
   tabular_modeling_options: components.modeling.TabularModelingOptions
+  tabular_model: components.modeling.TabularModel
+  tabular_train_activator: components.modeling.TabularTrainActivator
+  tabular_train_result: components.modeling.TabularTrainResult
+  tabular_train_plots: components.modeling.TabularTrainPlots
 
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
@@ -247,13 +248,13 @@ theme:
             height: 1800px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
             display:flex; justify-content:center;
-            overflow:auto;
+            overflow:auto; left:0;
           dark: >
             min-width:100%; max-width:none;
             height: 1800px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
             display:flex; justify-content:center;
-            overflow:auto;
+            overflow:auto; left:0;
     side_nav:
       style: 
         base:
@@ -374,66 +375,66 @@ modeling_params:
                 default: relu
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
           binary:
             passthrough: {}
           category:
             dense:
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             sparse: {}
           date:
             embed:
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             wave:
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
           text:
             transformer:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             parallel_cnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             embed:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             stacked_cnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             stacked_parallel_cnn:
               representation:
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             rnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             cnnrnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             passthrough:
           timeseries:
             transformer:
@@ -441,43 +442,43 @@ modeling_params:
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             parallel_cnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             embed:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             stacked_cnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             stacked_parallel_cnn:
               representation:
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             rnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, step, default
             cnnrnn:
               representation: 
                 values: [dense, sparse]
                 default: dense
               embedding_size: [0, 1024, 1, 50] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             passthrough: {}
       output:
         dtype:
@@ -517,7 +518,7 @@ modeling_params:
                 default: relu
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             classifier: {}
           binary:
             regressor: {}
@@ -527,7 +528,7 @@ modeling_params:
                 default: relu
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
           category: 
             regressor: {}
             classifier:
@@ -536,4 +537,4 @@ modeling_params:
                 default: softmax
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
-              drop_out: [0.00, 0.99, 0.01, 0] # min, max, step, default
+              dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
