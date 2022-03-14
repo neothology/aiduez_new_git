@@ -1,7 +1,7 @@
 envs: 
   workspace_dir: /aihub/workspace
   data_dir: /aihub/data
-  tmp_dir: tmp
+  tmp_dir: /aihub/workspace/tmp
 
 
 class_paths:
@@ -240,13 +240,13 @@ theme:
             height: 1800px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
             display:flex; justify-content:center;
-            overflow:auto;
+            overflow:auto; left:0;
           dark: >
             min-width:100%; max-width:none;
             height: 1800px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
             display:flex; justify-content:center;
-            overflow:auto;
+            overflow:auto; left:0;
     side_nav:
       style: 
         base:

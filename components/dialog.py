@@ -29,12 +29,10 @@ class BaseDialog(v.Dialog):
             close = close,
             class_ = kwargs.get('class_'),
             app_context = kwargs.get('app_context'),
-            selector = kwargs.get('selector'),
         )
 
         super().__init__(
             persistent = True,
             children = [children],
             width = body_size.get('width'),
-
         )

@@ -102,6 +102,7 @@ class ColumnSummary(BaseCard):
                 fig = go.Figure(data=[go.Histogram(x=col.dropna(), nbinsx=bins)])
                 fig.update_layout(template = 'plotly_white', bargap=0.01)
                 fig.write_html(self.summary_data['chart_src'])
+                # fig.write_html(self.summary_data['chart_src_rel'])
                 # fig = go.Figure(data=[go.Histogram(x=col.dropna().values, nbins=bins)])
 
             # bar chart for object/categorical
@@ -120,6 +121,7 @@ class ColumnSummary(BaseCard):
                 fig = px.bar(main_values,  orientation='h', template='plotly_white')
                 fig.update_layout(showlegend=False, bargap=0.01)
                 fig.write_html(self.summary_data['chart_src'])
+                # fig.write_html(self.summary_data['chart_src_rel'])
                 self.summary_data['chart_title'] = "Bar 차트"
 
             # bar chart for datetime
@@ -203,7 +205,7 @@ class ColumnSummary(BaseCard):
 
         chart = ChartFrame(
             title = self.summary_data['chart_title'],
-            src = self.summary_data['chart_src'],
+            src = os.path.relpath(self.summary_data['chart_src'], self.app_context.env_values['workspace_dir']),
             size = {'width':'100%'}
         )
 
