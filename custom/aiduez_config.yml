@@ -22,9 +22,15 @@ class_paths:
   task_all: workflows.task.TaskAll
 
   tabular_base: workflows.tabular.TabularBase
-  tabular_data_import: workflows.tabular.TabularDataImport
-  tabular_data_analyze: workflows.tabular.TabularDataAnalyze
 
+  tabular_data_import: workflows.tabular.TabularDataImport
+  tabular_data_import_tab: components.import.TabularImportTab
+  tabular_data_import_aidu: components.import.TabularAIDUImport
+  tabular_data_import_local: components.import.TabularLocalImport
+  tabular_data_import_edap: components.import.TabularEDAPImport
+  tabular_data_import_pod: components.import.TabularPodImport
+
+  tabular_data_analyze: workflows.tabular.TabularDataAnalyze
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_tab: components.processing.TabularProcessingTab
   tabular_data_single_processing: components.processing.TabularSingleProcessing
@@ -132,6 +138,19 @@ workflows_list:
       - 
         title: 데이터 입수
         target: tabular_data_import
+        menu_list:
+          -
+            title: AIDU에서 가져오기
+            target: tabular_data_import_aidu
+          -
+            title: PC에서 가져오기
+            target: tabular_data_import_local
+          -
+            title: EDAP에서 가져오기
+            target: tabular_data_import_edap
+          -
+            title: Pod에서 가져오기
+            target: tabular_data_import_pod 
       - 
         title: 데이터 분석
         target: tabular_data_analyze
@@ -139,12 +158,12 @@ workflows_list:
         title: 데이터 가공
         target: tabular_data_processing
         menu_list: 
-        -
-          title: 단일 칼럼 변환
-          target: tabular_data_single_processing
-        -
-          title: 복합 칼럼 변환
-          target: tabular_data_multiple_processing
+          -
+            title: 단일 칼럼 변환
+            target: tabular_data_single_processing
+          -
+            title: 복합 칼럼 변환
+            target: tabular_data_multiple_processing
       - 
         title: AI모델 학습
         target: tabular_ai_training
@@ -393,7 +412,7 @@ processing_params:
               name: value
               type: text
               value: ""
-# 학습 parameter 정의
+ # 학습 parameter 정의
 modeling_params:
   ludwig:
     config:

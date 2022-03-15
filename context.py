@@ -37,8 +37,13 @@ class AppContext:
     tabular_workflow_stage: str = None
     tabular_model: object = None
 
-    # tabilar data import objects
+    # tabular data import objects
     tabular_data_import: object = None
+    tabular_data_import_tab: object = None
+    tabular_data_import_aidu: object = None
+    tabular_data_import_local: object = None
+    tabular_data_import_edap: object = None
+    tabular_data_import_pod: object = None
 
     # tabular data analyze objects
     tabular_data_analyze: object = None
