@@ -26,9 +26,20 @@ class TabularBase(v.Container):
 
 class TabularDataImport(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+
+        self.import_tab = get_or_create_class(
+            'tabular_data_import_tab',
+            app_context = self.app_context,
+            context_key = 'tabular_data_import_tab'
+        )
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
-            children = []
+            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column",
+            children = [
+                self.import_tab,
+                
+            ],
         )
 
 class TabularDataAnalyze(v.Container):
