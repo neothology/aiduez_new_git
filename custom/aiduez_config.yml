@@ -378,6 +378,10 @@ processing_params:
               type: select
               values: ['most_frequent', 'median', 'mean',  'constant']
               default: most_frequent
+            - 
+              name: value
+              type: text
+              value: ""
         missing_cat_imputer:
           option:
             -
@@ -385,7 +389,10 @@ processing_params:
               type: select
               values: ['most_frequent', 'constant']
               default: most_frequent
-
+            - 
+              name: value
+              type: text
+              value: ""
 # 학습 parameter 정의
 modeling_params:
   ludwig:

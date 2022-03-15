@@ -1,8 +1,9 @@
+from random import sample
 import ipyvuetify as v
 from utils import get_or_create_class
 from components.tab import BaseTab
 from components.cards import BaseCard, SmallHeaderCard
-from components.forms import DataSelect, SimpleSlider
+from components.forms import DataSelect, LabeledSelect, SimpleSlider, DataSlider
 from components.buttons import StatedBtn
 from components.layouts import IndexRow
 
@@ -36,7 +37,6 @@ class TabularSingleProcessing(v.Container):
         self.app_context.current_data_name = ('titanic_train')
         import pandas as pd
         self.app_context.current_data = pd.read_csv('data/titanic_train.csv')
-
         self.data = app_context.current_data
 
         self.processing_menu = TabularSingleProcessingMenu(
@@ -218,7 +218,7 @@ class TabularSingleProcessingMenu(BaseCard):
 
         dialog_buttons = []
         def _activate_process_dialog(widget=None, event=None, data=None):
-            column = self.data[widget.v_model["column_name"]]
+            column_name = widget.v_model["column_name"]
             process = widget.v_model["process"]
             # dialog = self.app_context.tabular_data_single_processing_dialog
             dialog = get_or_create_class(
@@ -230,7 +230,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 widget.value = 0
 
             dialog.on_event('click:outside', _close_dialog)
-            dialog.show(column=column, process=process)
+            dialog.show(column_name=column_name, process=process)
 
         for col_name in self.data.columns:
             process_type_dialog = {
@@ -249,7 +249,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 process_type_dialog[process] = v.Btn(
                     v_model={'column_name': col_name, 'process': process},
                     class_='mx-2',
-                    color="blue-grey lighten-5",
+                    color='blue lighten-5',
                     disabled=disabled,
                     children=[process],
                 )
@@ -260,115 +260,52 @@ class TabularSingleProcessingMenu(BaseCard):
 
         return dialog_buttons
 
-    def _make_additonal_config_ui(self, method) -> list:
-        config= self.app_context.processing_params['single_process']['config']
-        additional_configs = config['additional_config'][method]['option'] if method in config['additional_config'].keys() else []
-        additonal_config_ui = []
-        for option in additional_configs:
-            if option['type'] == "slider":
-                additonal_config_ui.append(
-                    SmallHeaderCard(
-                        title = option['name'],
-                        body=SimpleSlider(
-                            range=option['values'],
-                        ),
-                    )
-                )
-            elif option['type'] == 'select':
-                additonal_config_ui.append(
-                    SmallHeaderCard(
-                        title = option['name'],
-                        body=v.Select(
-                            items=option['values'],
-                            value=option['default']
-                        ),
-                    )
-                )   
-        return additonal_config_ui
-
 class TabularSingleProcessingDialog(v.Dialog):
     def __init__(self, app_context, context_key, width=700) -> None:
         self.app_context = app_context
 
-        self.children = ''
-
-        super().__init__(
-            children=self.children,
-            width=width,
-            value=0,
-        )
-
-    def close(self):
-        self.value=0
-
-    def show(self, column, process):
-        config= self.app_context.processing_params['single_process']['config']
-        dtype = column.dtype.name
-
-        method_value = config['dtype'][dtype][process]['default'] if process in config['dtype'][dtype].keys() else []        
-        method_items = config['dtype'][dtype][process]['values'] if process in config['dtype'][dtype].keys() else ''
-
-        additional_config_ui = self._make_additonal_config_ui(method_value)
-        close_btn = v.Btn(
+        self.dialog_contents = ''
+        self.method = ''
+        self.process = ''
+        
+        # close button
+        self.close_btn = v.Btn(
             icon=True,
             children=[v.Icon(children=['mdi-close'])],
         )
-        def _close_dialog(item, event=None, data=None):
+        def _close_dialog(widget, event=None, data=None):
             self.value = 0
             
-        close_btn.on_event('click', _close_dialog)
-        self.children = [v.Card(children=[
+        self.close_btn.on_event('click', _close_dialog)
+
+        # method selector
+        self.method_selector = v.Select(
+            v_model=self.method,
+            label='Method',
+            items=[],
+            value=self.method,
+        )
+
+        def _change_method(widget, event=None, data=None):
+            self.method = widget.v_model
+
+        self.method_selector.on_event('change', _change_method)
+        
+        # additional configs value
+        self.additional_config_values = dict()
+
+        # dialog contents
+        self.dialog_contents = v.Card(children=[
             v.CardTitle(
                 class_='headline grey lighten-2',
                 primary_title=True,
                 children=[
-                    f"{column.name.upper()} {process.upper()}",
+                    "Card Title",
                     v.Spacer(),
-                    close_btn,
+                    self.close_btn,
                 ],
             ),
-            v.CardText(children=[
-                # method selector
-                v.Row(
-                    children=[
-                        v.Select(
-                            label='Method',
-                            items=method_items,
-                            value=method_value,
-                        )
-                    ]
-                ),
-                # additional config
-                v.Row(children=[v.Col(children=[ui]) for ui in additional_config_ui]),
-
-                # result area
-                v.Row(children=[
-                    v.Col(children=[
-                        v.Card(children=[
-                            v.CardTitle(
-                                class_="headline",
-                                primary_title=True,
-                                children=["Before"]
-                            ),
-                            v.CardText(children=["Before Contents"])
-                        ])
-                    ]),
-                    v.Icon(
-                        large=True,
-                        children=["mdi-arrow-right-bold"]
-                    ),
-                    v.Col(children=[
-                        v.Card(children=[
-                            v.CardTitle(
-                                class_="headline",
-                                primary_title=True,
-                                children=["After"]
-                            ),
-                            v.CardText(children=["After Contents"])
-                        ])
-                    ]),                                
-                ])
-            ]),
+            v.CardText(children=[self.method_selector]),
             v.CardActions(children=[
                 v.Spacer(),
                 v.Btn(
@@ -380,35 +317,225 @@ class TabularSingleProcessingDialog(v.Dialog):
                     children=["새 칼럼 생성"]
                 )
             ])
-        ])]
+        ])
+
+        super().__init__(
+            children=[self.dialog_contents],
+            width=width,
+            value=0,
+        )
+
+    def close(self):
+        self.value=0
+
+    def show(self, column_name, process):
+        self.process = process
+        config= self.app_context.processing_params['single_process']['config']
+        column = self.app_context.current_data[column_name]
+
+        self.column_statistic = dict()
+
+        dtype = column.dtype.name
+
+        if dtype in ["float64", "int64"]:
+            self.column_statistic = {
+                "most_frequent": column.mode()[0],
+                "median": column.median(),
+                "mean": column.mean(),
+                "constant": 0,
+            }
+        elif dtype == "object":
+            self.column_statistic = {
+                "most_frequent": column.mode()[0],
+                "constant": "",
+            }
+
+        method_value = config['dtype'][dtype][process]['default'] if process in config['dtype'][dtype].keys() else []        
+        method_items = config['dtype'][dtype][process]['values'] if process in config['dtype'][dtype].keys() else ''
+
+        self.method_selector.items = method_items
+        self.method_selector.value = method_value
+        self.method_selector.v_model = method_value
+        
+        self.additional_config_ui = self._make_additonal_config_ui(method_value, column_name)
+    
+        self.before_contents = self._make_before_contents(column_name)
+        self.after_contents = self._make_processed_contents(column_name)
+
+        # Card Title
+        self.dialog_contents.children[0].children = [
+            f"{column.name.upper()} - {process.upper()}",
+            v.Spacer(),
+            self.close_btn,
+        ]
+
+        # Card Text
+        self.dialog_contents.children[1].children = [
+            # method selector
+            v.Row(children=[self.method_selector]),
+            # additional config
+            v.Row(children=[v.Col(children=[ui]) for ui in self.additional_config_ui.values()]),
+            # result area
+            v.Row(children=[
+                v.Col(children=[
+                    v.Card(children=[
+                        v.CardTitle(
+                            class_="headline",
+                            primary_title=True,
+                            children=["Before"]
+                        ),
+                        self.before_contents
+                    ])
+                ]),
+                v.Icon(
+                    large=True,
+                    children=["mdi-arrow-right-bold"]
+                ),
+                v.Col(children=[self.after_contents
+                    # v.Card(children=[
+                    #     v.CardTitle(
+                    #         class_="headline",
+                    #         primary_title=True,
+                    #         children=["After"]
+                    #     ),
+                    #     self.after_contents
+                    # ])
+                ]),                                
+            ])
+        ]
+
         self.value = 1
 
-    def _make_additonal_config_ui(self, method) -> list:
+    def _make_additonal_config_ui(self, method, column_name) -> dict:
         config= self.app_context.processing_params['single_process']['config']
         additional_configs = config['additional_config'][method]['option'] if method in config['additional_config'].keys() else []
-        additonal_config_ui = []
+        additonal_config_ui = {}
+
         for option in additional_configs:
+            self.additional_config_values[option["name"]] = ""
             if option['type'] == "slider":
-                additonal_config_ui.append(
-                    SmallHeaderCard(
-                        title = option['name'],
-                        body=SimpleSlider(
-                            range=option['values'],
-                        ),
-                    )
+                widget = DataSlider(
+                    index=0,
+                    v_model=self.additional_config_values[option["name"]],
+                    label=option['name'],
+                    range=option['values'],
+                    dense=True,
                 )
+                additonal_config_ui[option['name']] = widget
+
             elif option['type'] == 'select':
-                additonal_config_ui.append(
-                    SmallHeaderCard(
-                        title = option['name'],
-                        body=v.Select(
-                            items=option['values'],
-                            value=option['default']
-                        ),
-                    )
-                )   
+                self.additional_config_values[option["name"]] = option['default']
+                widget = v.Select(
+                    label=option['name'],
+                    items=option['values'],
+                    v_model=self.additional_config_values[option["name"]]
+                )
+                def _change_select(widget, event=None, data=None):
+                    self.additional_config_values[widget.label] = widget.v_model
+                    if self.process == "fill" and "value" in self.additional_config_values.keys():
+                        self.additional_config_ui["value"].v_model = self.column_statistic[widget.v_model]
+                        self.additional_config_values["value"] = self.column_statistic[widget.v_model]
+                        if widget.v_model == "constant":
+                            self.additional_config_ui["value"].disabled=False
+                        else:
+                            self.additional_config_ui["value"].disabled=True
+
+                        self.after_contents = self._make_processed_contents(column_name)
+                        # result area
+                        self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                        
+                    # print(self.additional_config_values[widget.label], self.additional_config_values["value"])
+                widget.on_event('change', _change_select)
+                additonal_config_ui[option['name']] = widget
+
+            elif option['type'] == 'text':
+                self.additional_config_values[option["name"]] = option['value']
+                widget = v.TextField(
+                    label="value",
+                    placeholder="기입 후 Enter키를 눌러주세요",
+                    hint="기입 후 Enter키를 눌러주세요",
+                    disabled=True,
+                    v_model=self.additional_config_values[option["name"]]
+                )
+                def _change_text(widget, event=None, data=None):
+                    self.additional_config_values[widget.label] = widget.v_model
+                    self.column_statistic[self.additional_config_values["imputer"]] = widget.v_model
+                    self.after_contents = self._make_processed_contents(column_name)
+                    self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                widget.on_event('change', _change_text)
+                additonal_config_ui[option['name']] = widget
         return additonal_config_ui
-    
+
+    def get_sample_data(self, column_name):
+        column = self.app_context.current_data[column_name]
+        if self.process == "fill":
+            # column = self.app_context.current_data[column_name]
+            sample_data = column[column.isna()]
+            if len(sample_data) > 20:
+                sample_data = sample_data[:20]            
+        else: 
+            if len(column) > 20:
+                sample_data = column[:20]
+
+        return sample_data
+
+    def _make_before_contents(self, column_name):
+        contents = v.CardText(
+            class_='text-center',
+            children=["Before Contents"]
+        )
+        children = []
+        sample_data = self.get_sample_data(column_name)
+        if self.process == "fill" and len(sample_data) == 0:
+            children = ["Null 값이 없습니다!"]
+        else:
+            children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_data.values]
+
+        contents.children = children
+        return contents
+
+    def processing_data(self, column_name, target="all"):
+        '''
+        target: ["all", "sample"]
+        '''
+        if target == "sample":
+            sample_data = self.get_sample_data(column_name)
+        else:
+            sample_data = self.app_context.current_data[column_name]
+
+        if self.process == "fill":
+            imputer_value = self.column_statistic[self.additional_config_values["imputer"]]
+            self.additional_config_ui["value"].v_model = imputer_value
+            sample_data = sample_data.fillna(imputer_value)
+            print(imputer_value)
+
+        return sample_data
+
+    def _make_processed_contents(self, column_name):
+        processed_result = v.CardText(
+            class_='text-center',
+            children=["After Contents"]
+        )
+        sample_processed_data = self.processing_data(column_name, target="sample")
+
+        if self.process == "fill" and len(sample_processed_data) == 0:
+            children = ["Null 값이 없습니다!"]
+        else:
+            children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
+
+        processed_result.children = children
+        
+        contents = v.Card(children=[
+            v.CardTitle(
+                class_="headline",
+                primary_title=True,
+                children=["After"]
+            ),
+            processed_result
+        ])
+        return contents
+
+
 class TabularMultipleProcessing(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
