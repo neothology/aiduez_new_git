@@ -32,6 +32,9 @@ class_paths:
 
   tabular_data_analyze: workflows.tabular.TabularDataAnalyze
   tabular_data_processing: workflows.tabular.TabularDataProcessing
+  tabular_data_processing_tab: components.processing.TabularProcessingTab
+  tabular_data_single_processing: components.processing.TabularSingleProcessing
+  tabular_data_multiple_processing: components.processing.TabularMultipleProcessing  
 
   tabular_ai_training: workflows.tabular.TabularAITraining
   tabular_modeling_options: components.modeling.TabularModelingOptions

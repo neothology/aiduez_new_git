@@ -46,11 +46,14 @@ class Pipeline:
         self.app_context.current_work_file = file
 
         # create mlflow experiment in tmp folder (will be zipped later)
-        mf.set_tracking_uri(os.path.join(self.tmp_dir, 'mf_tracking'))
+        mf_tracking_uri_base = os.path.join(self.tmp_dir, 'mf_tracking')
+        mf_tracking_filename = filename.split('.')[0]
+        os.makedirs(mf_tracking_uri_base)
+        mf.set_tracking_uri(os.path.join(mf_tracking_uri_base, mf_tracking_filename))
         self.mf_client = MlflowClient()
-        self.mf_client.create_experiment(filename)
+        self.mf_client.create_experiment(mf_tracking_filename)
         self.app_context.mf_experiment_id = '1'
-        self.app_context.mf_experiment_name = filename 
+        self.app_context.mf_experiment_name = mf_tracking_filename
 
         # code_add: re-check whether (1) Untitled in workspace, (2) Untitled in tmp dir
 
