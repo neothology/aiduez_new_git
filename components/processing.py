@@ -1,4 +1,4 @@
-from random import sample
+import re
 import ipyvuetify as v
 from utils import get_or_create_class
 from components.tab import BaseTab
@@ -6,6 +6,7 @@ from components.cards import BaseCard, SmallHeaderCard
 from components.forms import DataSelect, LabeledSelect, SimpleSlider, DataSlider
 from components.buttons import StatedBtn
 from components.layouts import IndexRow
+import re
 
 class TabularProcessingTab(BaseTab):
     def __init__(self, app_context, context_key, **kwags) -> None:
@@ -265,8 +266,8 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.app_context = app_context
 
         self.dialog_contents = ''
-        self.method = ''
         self.process = ''
+        self.method = ''
         
         # close button
         self.close_btn = v.Btn(
@@ -288,6 +289,7 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         def _change_method(widget, event=None, data=None):
             self.method = widget.v_model
+            print(self.method)
 
         self.method_selector.on_event('change', _change_method)
         
@@ -356,6 +358,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.method_selector.items = method_items
         self.method_selector.value = method_value
         self.method_selector.v_model = method_value
+        self.method = method_value
         
         self.additional_config_ui = self._make_additonal_config_ui(method_value, column_name)
     
@@ -444,7 +447,6 @@ class TabularSingleProcessingDialog(v.Dialog):
                         # result area
                         self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
                         
-                    # print(self.additional_config_values[widget.label], self.additional_config_values["value"])
                 widget.on_event('change', _change_select)
                 additonal_config_ui[option['name']] = widget
 
@@ -459,7 +461,11 @@ class TabularSingleProcessingDialog(v.Dialog):
                 )
                 def _change_text(widget, event=None, data=None):
                     self.additional_config_values[widget.label] = widget.v_model
-                    self.column_statistic[self.additional_config_values["imputer"]] = widget.v_model
+                    if self.process == "fill":
+                        self.column_statistic[self.additional_config_values["imputer"]] = widget.v_model
+                    elif self.process == "extract" and self.method == "re_extract":
+                        self.additional_config_values["regex"] = widget.v_model
+                        
                     self.after_contents = self._make_processed_contents(column_name)
                     self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
                 widget.on_event('change', _change_text)
@@ -507,8 +513,16 @@ class TabularSingleProcessingDialog(v.Dialog):
             imputer_value = self.column_statistic[self.additional_config_values["imputer"]]
             self.additional_config_ui["value"].v_model = imputer_value
             sample_data = sample_data.fillna(imputer_value)
-            print(imputer_value)
 
+        elif self.process == "extract" and self.method == "re_extract":
+            regex = self.additional_config_values["regex"]
+            self.additional_config_ui["regex"].v_model = regex
+            self.additional_config_ui["regex"].disabled = False
+            try:
+                sample_data = sample_data.apply(lambda x:" ".join(re.findall(regex, x)))
+            except:
+                sample_data = None
+            
         return sample_data
 
     def _make_processed_contents(self, column_name):
@@ -520,6 +534,8 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         if self.process == "fill" and len(sample_processed_data) == 0:
             children = ["Null 값이 없습니다!"]
+        elif self.process == "extract" and sample_processed_data is None:
+            children = ["정규표현식이 올바르지 않습니다!"]
         else:
             children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
 

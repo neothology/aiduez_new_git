@@ -412,6 +412,12 @@ processing_params:
               name: value
               type: text
               value: ""
+        re_extract:
+          option:
+            -
+              name: regex
+              type: text
+              value: '(.*)'
  # 학습 parameter 정의
 modeling_params:
   ludwig:
