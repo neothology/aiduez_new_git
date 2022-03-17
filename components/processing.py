@@ -8,9 +8,10 @@ from components.buttons import StatedBtn
 from components.layouts import IndexRow
 import re
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, OrdinalEncoder, KBinsDiscretizer, quantile_transform
 import plotly.express as px
 import os
+import ipywidgets
 
 class TabularProcessingTab(BaseTab):
     def __init__(self, app_context, context_key, **kwags) -> None:
@@ -273,9 +274,10 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.process = ''
         self.method = ''
         self.column_name = ''
-        self.char_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{self.app_context.current_data_name}"
-        if not os.path.exists(self.char_file_dir):
-            os.makedirs(self.char_file_dir)
+        self.column_dtype = ''
+        self.chart_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{self.app_context.current_data_name}"
+        if not os.path.exists(self.chart_file_dir):
+            os.makedirs(self.chart_file_dir)
         # close button
         self.close_btn = v.Btn(
             icon=True,
@@ -304,6 +306,11 @@ class TabularSingleProcessingDialog(v.Dialog):
         # additional configs value
         self.additional_config_values = dict()
 
+        # ui
+        self.additional_config_ui = None
+        self.before_contents = None
+        self.after_contents = None
+
         # dialog contents
         self.dialog_contents = v.Card(children=[
             v.CardTitle(
@@ -331,7 +338,6 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         super().__init__(
             class_="d-flex",
-            style_="height:100%; width:100%;",
             children=[self.dialog_contents],
             min_width=700,
             max_width=1200,
@@ -347,23 +353,23 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         self.column_statistic = dict()
 
-        dtype = column.dtype.name
+        self.column_dtype = column.dtype.name
 
-        if dtype in ["float64", "int64"]:
+        if self.column_dtype in ["float64", "int64"]:
             self.column_statistic = {
                 "most_frequent": column.mode()[0],
                 "median": column.median(),
                 "mean": column.mean(),
                 "constant": 0,
             }
-        elif dtype == "object":
+        elif self.column_dtype == "object":
             self.column_statistic = {
                 "most_frequent": column.mode()[0],
                 "constant": "",
             }
 
-        method_value = config['dtype'][dtype][process]['default'] if process in config['dtype'][dtype].keys() else []        
-        method_items = config['dtype'][dtype][process]['values'] if process in config['dtype'][dtype].keys() else ''
+        method_value = config['dtype'][self.column_dtype][process]['default'] if process in config['dtype'][self.column_dtype].keys() else []        
+        method_items = config['dtype'][self.column_dtype][process]['values'] if process in config['dtype'][self.column_dtype].keys() else ''
 
         self.method_selector.items = method_items
         self.method_selector.value = method_value
@@ -378,7 +384,6 @@ class TabularSingleProcessingDialog(v.Dialog):
     def show(self):
         # print(f"[show] self.column_name={self.column_name}, self.process={self.process}")
         self.additional_config_ui = self._make_additonal_config_ui(self.method, self.column_name)
-    
         self.before_contents = self._make_before_contents(self.column_name)
         self.after_contents = self._make_processed_contents(self.column_name)
 
@@ -411,18 +416,51 @@ class TabularSingleProcessingDialog(v.Dialog):
     def _make_additonal_config_ui(self, method, column_name) -> dict:
         config= self.app_context.processing_params['single_process']['config']
         additional_configs = config['additional_config'][method]['option'] if method in config['additional_config'].keys() else []
-        additonal_config_ui = {}
+        additonal_config_ui = {}    # 추가 설정 UI
 
         for option in additional_configs:
             self.additional_config_values[option["name"]] = ""
             if option['type'] == "slider":
-                widget = DataSlider(
+                self.additional_config_values[option["name"]] = option['values'][3]
+                '''
+                widget = DataSlSimpleSliderider(
                     index=0,
                     v_model=self.additional_config_values[option["name"]],
                     label=option['name'],
                     range=option['values'],
                     dense=True,
                 )
+                '''
+                slider = v.Slider(
+                    min = option['values'][0],
+                    max = option['values'][1],
+                    step = option['values'][2],
+                    v_model = option['values'][3],
+                    label=option['name'],
+                    value=option['name'],
+                    dense = True,
+                    hide_details = True,
+                    style_ = "padding:0; height:25px; \
+                        margin: 15px 2px 0 8px;",
+                )
+                counter = v.TextField(
+                    v_model = option['values'][3],
+                    value=option['name'],
+                    filled = True,
+                    dense = True,
+                    hide_details = True,
+                    style_ = "max-width:90px; padding:3px",
+                )
+                ipywidgets.jslink((slider, 'v_model'), (counter, 'v_model'))
+                def _on_change_slider(widget, event=None, data=None):
+                    self.additional_config_values[widget.value] = widget.v_model
+                    self.after_contents = self._make_processed_contents(column_name)
+                    # result area
+                    self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                            
+                slider.on_event("change", _on_change_slider)
+                counter.on_event("change", _on_change_slider)
+                widget = v.Row(children=[slider, counter])
                 additonal_config_ui[option['name']] = widget
 
             elif option['type'] == 'select':
@@ -445,7 +483,13 @@ class TabularSingleProcessingDialog(v.Dialog):
                         self.after_contents = self._make_processed_contents(column_name)
                         # result area
                         self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
-                        
+                    elif self.process == "transform":
+                        self.additional_config_values[widget.label] = widget.v_model
+
+                        self.after_contents = self._make_processed_contents(column_name)
+                        # result area
+                        self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+
                 widget.on_event('change', _change_select)
                 additonal_config_ui[option['name']] = widget
 
@@ -472,14 +516,17 @@ class TabularSingleProcessingDialog(v.Dialog):
                 additonal_config_ui[option['name']] = widget
         return additonal_config_ui
 
-    def get_sample_data(self, column_name, target="sample"):
+    def get_sample_data(self, column_name, n=1000):
+        '''
+        n 의 값이 -1이면 전체를 가지고 옴
+        '''
         sample_data = self.app_context.current_data[column_name]
-        if target == "sample":
+        if n != -1:
             if self.process == "fill":
                 sample_data = sample_data[sample_data.isna()]
 
-            if len(sample_data) > 20:
-                sample_data = sample_data[:20]
+            if len(sample_data) > n:
+                sample_data = sample_data[:n]                
 
         return sample_data
 
@@ -491,31 +538,17 @@ class TabularSingleProcessingDialog(v.Dialog):
             style_=f"width:100%; height:100%; padding:0; display:flex; flex-direction:column; "
         )
 
-        if self.process == 'scale':
-            sample_data = self.get_sample_data(column_name, target="all")
-        else:
-            sample_data = self.get_sample_data(column_name, target="sample")
+        if self.process in ['scale', 'transform'] and self.method != 'ordinal_encoder':
+            sample_data = self.get_sample_data(column_name, n=-1)
+        else :
+            sample_data = self.get_sample_data(column_name, n=20)
 
         if self.process == "fill" and len(sample_data) == 0:
             children = ["Null 값이 없습니다!"]
 
-        elif self.process == "scale":
-            char_file_name = self.char_file_dir + f"/{self.column_name}_{self.method}_before.html"
-            if not os.path.exists(char_file_name):
-                fig = px.histogram(sample_data, width=500, height=300)
-                fig.update_layout(showlegend=False)
-                fig.write_html(char_file_name)
-            chart = v.Html(
-                class_="mx-auto",
-                tag = 'iframe',
-                attributes = {
-                    'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
-                    'style': "border:none; width:100%; height:350px;",
-
-                },
-            )
+        elif self.process == "scale" or (self.process == "transform" and self.method != "ordinal_encoder"):
+            chart = self._make_histogram(sample_data, suffix="before")
             children = [chart]
-            # children = [v.Col(children=[chart], style_="height:100%; width:100%")]
         else:
             children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_data.values]
 
@@ -523,7 +556,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         
         contents = v.Card(
             # class_="d-flex",
-            style_="width=100%; height=100%",
+            style_="width:100%; height:100%",
             children=[
                 v.CardTitle(
                     class_="headline justify-center",
@@ -539,24 +572,31 @@ class TabularSingleProcessingDialog(v.Dialog):
         '''
         target: ["all", "sample"]
         '''
-        if self.process == "scale":
-            sample_data = self.get_sample_data(column_name, target="all")
+        if self.process in ['scale', 'transform']:
+            sample_data = self.get_sample_data(column_name, n=-1)
         else:
-            sample_data = self.get_sample_data(column_name, target="sample")
+            sample_data = self.get_sample_data(column_name, n=20)
 
         if self.process == "fill":
             imputer_value = self.column_statistic[self.additional_config_values["imputer"]]
-            self.additional_config_ui["value"].v_model = imputer_value
-            sample_data = sample_data.fillna(imputer_value)
+            try:
+                if self.column_dtype.startswith("float"):
+                    imputer_value = float(imputer_value)
+                elif self.column_dtype.startswith("int"):
+                    imputer_value = int(imputer_value)
+                self.additional_config_ui["value"].v_model = imputer_value
+                sample_data = sample_data.fillna(imputer_value)
+            except:
+                sample_data = None
 
         elif self.process == "extract" and self.method == "re_extract":
             regex = self.additional_config_values["regex"]
-            self.additional_config_ui["regex"].v_model = regex
             self.additional_config_ui["regex"].disabled = False
             try:
                 sample_data = sample_data.apply(lambda x:" ".join(re.findall(regex, x)))
             except:
                 sample_data = None
+
         elif self.process == "scale":
             if self.method == 'standard_scaler':
                 scaler = StandardScaler()
@@ -564,6 +604,22 @@ class TabularSingleProcessingDialog(v.Dialog):
                 scaler = MinMaxScaler()
             sample_data = pd.Series(scaler.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)
 
+        elif self.process == "transform":
+            if self.method == "ordinal_encoder":
+                encoder = OrdinalEncoder()
+                sample_data = pd.Series(encoder.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)            
+            elif self.method == "quantile_transformer":
+                output_distribution = self.additional_config_values["output_distribution"]
+                n_quantiles = self.additional_config_values["n_quantiles"]
+                sample_data = pd.Series(quantile_transform(sample_data.values.reshape(-1, 1), output_distribution=output_distribution, n_quantiles=n_quantiles).reshape(-1), name=sample_data.name, index=sample_data.index)            
+            elif self.method == "kbins_discretizer":
+                n_bins = self.additional_config_values["n_bins"]
+                strategy = self.additional_config_values["strategy"]
+                try:
+                    kbins = KBinsDiscretizer(n_bins=n_bins, encode="ordinal", strategy=strategy)
+                    sample_data = pd.Series(kbins.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)            
+                except:
+                    sample_data = None
         return sample_data
 
     def _make_processed_contents(self, column_name):
@@ -574,29 +630,25 @@ class TabularSingleProcessingDialog(v.Dialog):
         )
 
         sample_processed_data = self.processing_data(column_name)
-
-        if self.process == "fill" and len(sample_processed_data) == 0:
+        children = []
+        if self.process == "fill" and sample_processed_data is None:
+            children = ["데이터 타입에 맞게 입력해주세요!"]
+        elif self.process == "fill" and len(sample_processed_data) == 0:
             children = ["Null 값이 없습니다!"]
-
         elif self.process == "extract" and sample_processed_data is None:
             children = ["정규표현식이 올바르지 않습니다!"]
-
+        elif self.process == "transform" and self.method == "kbins_discretizer" and sample_processed_data is None:
+            children = ["먼저, Null 값을 제거해주세요!"]
         elif self.process == "scale":
-            char_file_name = self.char_file_dir + f"/{self.column_name}_{self.method}_processed.html"
-            if not os.path.exists(char_file_name):
-                fig = px.histogram(sample_processed_data, width=500, height=300)
-                fig.update_layout(showlegend=False)
-                fig.write_html(char_file_name)
-            chart = v.Html(
-                class_="mx-auto",
-                tag = 'iframe',
-                attributes = {
-                    'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
-                    'style': "border:none; width:100%; height:350px;",
-
-                },
-            )
+            chart = self._make_histogram(sample_processed_data, suffix="processed")
             children = [chart]
+        elif self.process == "transform":
+            if self.method == "ordinal_encoder":
+                sample_processed_data = sample_processed_data[:20] if len(sample_processed_data) > 20 else sample_processed_data
+                children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
+            else:
+                chart = self._make_histogram(sample_processed_data, suffix="processed")
+                children = [chart]                
         else:
             children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
 
@@ -612,6 +664,20 @@ class TabularSingleProcessingDialog(v.Dialog):
         ])
         return contents
 
+    def _make_histogram(self, sample_data, suffix):
+        char_file_name = self.chart_file_dir + f"/{self.column_name}_{self.method}_{suffix}.html"
+        fig = px.histogram(sample_data, width=500, height=300)
+        fig.update_layout(showlegend=False)
+        fig.write_html(char_file_name)
+        chart = v.Html(
+            class_="mx-auto",
+            tag = 'iframe',
+            attributes = {
+                'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
+                'style': "border:none; width:100%; height:350px;",
+            },
+        )
+        return chart 
 
 class TabularMultipleProcessing(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):

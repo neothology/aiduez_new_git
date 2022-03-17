@@ -386,6 +386,11 @@ processing_params:
               values: [10, 1000, 1, 10] # min, max, step, default
         kbins_discretizer:
           option:
+            -
+              name: strategy
+              type: select
+              values: ['quantile', 'uniform', 'kmeans']
+              default: 'quantile'
             - 
               name: n_bins
               type: slider
