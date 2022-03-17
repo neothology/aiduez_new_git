@@ -1,4 +1,4 @@
-# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/14/22)</span>
+# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/15/22)</span>
 
 ## Development
 
@@ -33,39 +33,8 @@
 - OKD Ez실행 yaml에 아래와 같이 적용
 
 ```console
-source /etc/bash.bashrc && voila /aihub/workspace/AIDUez.ipynb --ip 0.0.0.0 --port 8888 --no-browser
+source /etc/bash.bashrc && voila /aihub/workspace/AIDUez.ipynb --port 8888 --no-browser --enable_nbextensions False 
 ```
 <br>
-
-### (Update history)
-
-```console
-(3/13/22)
-- Tabula AI Training:
-  . 훈련 결과 - 차트 부분 추가
-
-- Dokerfile:
-  . Dev-Test-Production 하나로 합침
-
-- Branch 병합:
-  . feature/preprocessing -> main
-```
-
-```console
-(3/8/22)
-- notebook 실행 위치 및 tmp 위치 변경: 
-  . notebook 실행 위치: /opt/code/aiduez -> /aihub/workspace 
-  . tmp 위치: /opt/code/aiduez/tmp -> /aihub/workspace/tmp
-
-- notebook으로 ez3.0 실행하는 방식 변경:
-  . 'app.ipynb' 실행 -> javascript로 자동 실행('new'클릭)
-```
-
-```console
-(3/1/22)
-- localhost에서 Jupyter Notebook 접속 에러 나는 현상 발생에 따른 README 수정: 
-  . Container 실행 시 '-p 8888:8888' 추가 
-  . Jupyter 실행 시 '--ip 0.0.0.0' 추가
-```
 
 
