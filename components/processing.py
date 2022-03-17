@@ -7,6 +7,10 @@ from components.forms import DataSelect, LabeledSelect, SimpleSlider, DataSlider
 from components.buttons import StatedBtn
 from components.layouts import IndexRow
 import re
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+import plotly.express as px
+import os
 
 class TabularProcessingTab(BaseTab):
     def __init__(self, app_context, context_key, **kwags) -> None:
@@ -231,7 +235,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 widget.value = 0
 
             dialog.on_event('click:outside', _close_dialog)
-            dialog.show(column_name=column_name, process=process)
+            dialog.initialize(column_name=column_name, process=process)
 
         for col_name in self.data.columns:
             process_type_dialog = {
@@ -262,13 +266,16 @@ class TabularSingleProcessingMenu(BaseCard):
         return dialog_buttons
 
 class TabularSingleProcessingDialog(v.Dialog):
-    def __init__(self, app_context, context_key, width=700) -> None:
+    def __init__(self, app_context, context_key) -> None:
         self.app_context = app_context
 
         self.dialog_contents = ''
         self.process = ''
         self.method = ''
-        
+        self.column_name = ''
+        self.char_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{self.app_context.current_data_name}"
+        if not os.path.exists(self.char_file_dir):
+            os.makedirs(self.char_file_dir)
         # close button
         self.close_btn = v.Btn(
             icon=True,
@@ -288,9 +295,10 @@ class TabularSingleProcessingDialog(v.Dialog):
         )
 
         def _change_method(widget, event=None, data=None):
+            # print(f"[_change_method] self.method={self.method}")
             self.method = widget.v_model
-            print(self.method)
-
+            self.show()
+            
         self.method_selector.on_event('change', _change_method)
         
         # additional configs value
@@ -322,16 +330,18 @@ class TabularSingleProcessingDialog(v.Dialog):
         ])
 
         super().__init__(
+            class_="d-flex",
+            style_="height:100%; width:100%;",
             children=[self.dialog_contents],
-            width=width,
+            min_width=700,
+            max_width=1200,
             value=0,
         )
 
-    def close(self):
-        self.value=0
-
-    def show(self, column_name, process):
+    def initialize(self, column_name, process):
+        # print(f"[initialize] column_name={column_name}, process={process}")
         self.process = process
+        self.column_name = column_name
         config= self.app_context.processing_params['single_process']['config']
         column = self.app_context.current_data[column_name]
 
@@ -359,15 +369,22 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.method_selector.value = method_value
         self.method_selector.v_model = method_value
         self.method = method_value
-        
-        self.additional_config_ui = self._make_additonal_config_ui(method_value, column_name)
+
+        self.show()
+
+    def close(self):
+        self.value=0
+
+    def show(self):
+        # print(f"[show] self.column_name={self.column_name}, self.process={self.process}")
+        self.additional_config_ui = self._make_additonal_config_ui(self.method, self.column_name)
     
-        self.before_contents = self._make_before_contents(column_name)
-        self.after_contents = self._make_processed_contents(column_name)
+        self.before_contents = self._make_before_contents(self.column_name)
+        self.after_contents = self._make_processed_contents(self.column_name)
 
         # Card Title
         self.dialog_contents.children[0].children = [
-            f"{column.name.upper()} - {process.upper()}",
+            f"{self.column_name.upper()} - {self.process.upper()}",
             v.Spacer(),
             self.close_btn,
         ]
@@ -380,30 +397,12 @@ class TabularSingleProcessingDialog(v.Dialog):
             v.Row(children=[v.Col(children=[ui]) for ui in self.additional_config_ui.values()]),
             # result area
             v.Row(children=[
-                v.Col(children=[
-                    v.Card(children=[
-                        v.CardTitle(
-                            class_="headline",
-                            primary_title=True,
-                            children=["Before"]
-                        ),
-                        self.before_contents
-                    ])
-                ]),
+                v.Col(children=[self.before_contents]),
                 v.Icon(
                     large=True,
                     children=["mdi-arrow-right-bold"]
                 ),
-                v.Col(children=[self.after_contents
-                    # v.Card(children=[
-                    #     v.CardTitle(
-                    #         class_="headline",
-                    #         primary_title=True,
-                    #         children=["After"]
-                    #     ),
-                    #     self.after_contents
-                    # ])
-                ]),                                
+                v.Col(children=[self.after_contents]),                                
             ])
         ]
 
@@ -468,46 +467,82 @@ class TabularSingleProcessingDialog(v.Dialog):
                         
                     self.after_contents = self._make_processed_contents(column_name)
                     self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                
                 widget.on_event('change', _change_text)
                 additonal_config_ui[option['name']] = widget
         return additonal_config_ui
 
-    def get_sample_data(self, column_name):
-        column = self.app_context.current_data[column_name]
-        if self.process == "fill":
-            # column = self.app_context.current_data[column_name]
-            sample_data = column[column.isna()]
+    def get_sample_data(self, column_name, target="sample"):
+        sample_data = self.app_context.current_data[column_name]
+        if target == "sample":
+            if self.process == "fill":
+                sample_data = sample_data[sample_data.isna()]
+
             if len(sample_data) > 20:
-                sample_data = sample_data[:20]            
-        else: 
-            if len(column) > 20:
-                sample_data = column[:20]
+                sample_data = sample_data[:20]
 
         return sample_data
 
     def _make_before_contents(self, column_name):
-        contents = v.CardText(
+        before_result = v.CardText(
             class_='text-center',
-            children=["Before Contents"]
+            children=["Before Contents"],
+            overflow=True,
+            style_=f"width:100%; height:100%; padding:0; display:flex; flex-direction:column; "
         )
-        children = []
-        sample_data = self.get_sample_data(column_name)
+
+        if self.process == 'scale':
+            sample_data = self.get_sample_data(column_name, target="all")
+        else:
+            sample_data = self.get_sample_data(column_name, target="sample")
+
         if self.process == "fill" and len(sample_data) == 0:
             children = ["Null 값이 없습니다!"]
+
+        elif self.process == "scale":
+            char_file_name = self.char_file_dir + f"/{self.column_name}_{self.method}_before.html"
+            if not os.path.exists(char_file_name):
+                fig = px.histogram(sample_data, width=500, height=300)
+                fig.update_layout(showlegend=False)
+                fig.write_html(char_file_name)
+            chart = v.Html(
+                class_="mx-auto",
+                tag = 'iframe',
+                attributes = {
+                    'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
+                    'style': "border:none; width:100%; height:350px;",
+
+                },
+            )
+            children = [chart]
+            # children = [v.Col(children=[chart], style_="height:100%; width:100%")]
         else:
             children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_data.values]
 
-        contents.children = children
+        before_result.children = children
+        
+        contents = v.Card(
+            # class_="d-flex",
+            style_="width=100%; height=100%",
+            children=[
+                v.CardTitle(
+                    class_="headline justify-center",
+                    primary_title=True,
+                    children=["Before"]
+                ),
+                before_result
+        ])
+
         return contents
 
-    def processing_data(self, column_name, target="all"):
+    def processing_data(self, column_name):
         '''
         target: ["all", "sample"]
         '''
-        if target == "sample":
-            sample_data = self.get_sample_data(column_name)
+        if self.process == "scale":
+            sample_data = self.get_sample_data(column_name, target="all")
         else:
-            sample_data = self.app_context.current_data[column_name]
+            sample_data = self.get_sample_data(column_name, target="sample")
 
         if self.process == "fill":
             imputer_value = self.column_statistic[self.additional_config_values["imputer"]]
@@ -522,20 +557,46 @@ class TabularSingleProcessingDialog(v.Dialog):
                 sample_data = sample_data.apply(lambda x:" ".join(re.findall(regex, x)))
             except:
                 sample_data = None
-            
+        elif self.process == "scale":
+            if self.method == 'standard_scaler':
+                scaler = StandardScaler()
+            elif self.method == 'minmax_scaler':
+                scaler = MinMaxScaler()
+            sample_data = pd.Series(scaler.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)
+
         return sample_data
 
     def _make_processed_contents(self, column_name):
         processed_result = v.CardText(
             class_='text-center',
-            children=["After Contents"]
+            children=["After Contents"],
+            style_=f"width:100%; height:100%; padding:0; display:flex; flex-direction:column; "
         )
-        sample_processed_data = self.processing_data(column_name, target="sample")
+
+        sample_processed_data = self.processing_data(column_name)
 
         if self.process == "fill" and len(sample_processed_data) == 0:
             children = ["Null 값이 없습니다!"]
+
         elif self.process == "extract" and sample_processed_data is None:
             children = ["정규표현식이 올바르지 않습니다!"]
+
+        elif self.process == "scale":
+            char_file_name = self.char_file_dir + f"/{self.column_name}_{self.method}_processed.html"
+            if not os.path.exists(char_file_name):
+                fig = px.histogram(sample_processed_data, width=500, height=300)
+                fig.update_layout(showlegend=False)
+                fig.write_html(char_file_name)
+            chart = v.Html(
+                class_="mx-auto",
+                tag = 'iframe',
+                attributes = {
+                    'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
+                    'style': "border:none; width:100%; height:350px;",
+
+                },
+            )
+            children = [chart]
         else:
             children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
 
@@ -543,7 +604,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         
         contents = v.Card(children=[
             v.CardTitle(
-                class_="headline",
+                class_="headline justify-center",
                 primary_title=True,
                 children=["After"]
             ),
