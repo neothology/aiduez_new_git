@@ -1,8 +1,29 @@
 from dataclasses import dataclass
 from utils import read_config
+from pipeline import Pipeline
+from IPython.display import display
+import ipywidgets as widgets
+from pathlib import Path
+import warnings
+import os
 
 @dataclass
 class AppContext:
+
+    
+    # Pipline 적용시 수정예정
+    def validatePipe(self, name, type):
+        NoErr = [True, ""]
+
+        if type == 'add_data':
+            return NoErr    
+
+    def addData(self, dataname, df):
+        self.df = df
+        numCol = len(self.df.columns)
+        colDtypes = ','.join([str(dtype) for dtype in df.dtypes.values])   
+        df.to_csv(f"/opt/code/aiduez/data/{dataname}.csv", index = False)
+
 
 ## set env as dev or prod
     env: str = None
@@ -44,6 +65,8 @@ class AppContext:
     tabular_data_import_local: object = None
     tabular_data_import_edap: object = None
     tabular_data_import_pod: object = None
+
+    
 
     # tabular data analyze objects
     tabular_data_analyze: object = None
@@ -121,3 +144,7 @@ class AppContext:
         self.processing_params: dict = app_config['processing_params']
         self.modeling_params: dict = app_config['modeling_params']
 
+    
+    
+    # def createJob(self, currPjtName, data_name):
+    #     self.info = [True, "작업 생성 완료"]

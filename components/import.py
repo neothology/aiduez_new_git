@@ -1,9 +1,21 @@
-from os import get_exec_path
+import os
 import ipyvuetify as v
 from utils import get_or_create_class
 from components.tab import BaseTab
-from components.cards import BaseCard, SimpleHeaderCard
+from components.cards import BaseCard
 from components.dialog import BaseDialog
+from pathlib import Path
+from IPython.core.display import HTML
+from IPython.display import display, clear_output
+from ipywidgets.widgets import widget_float
+from ipywidgets.widgets.widget_layout import Layout
+import pandas as pd
+
+from components.globals import html_UI_seperator
+import ipywidgets as widgets
+from components.cell import AppCell
+from .upload.upload_widgets import EncodingWidgets, SeperatorWidgets, UploadWidgets,EDAPWidgets
+#from .upload.uploadContext import AppContext
 
 ######
 # 버튼 생성 로직, 데이터 인코딩/구분자 선택 기능 모듈화 진행할 것!
@@ -34,197 +46,172 @@ class TabularImportTab(BaseTab):
             vertical=True,
             centered=True,
         )
-class TabularAIDUImport(BaseCard):
+class TabularAIDUImport(BaseCard, AppCell):
+    
+
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
         self.context_key = context_key
         title = "AIDU에서 가져오기"
+        from .upload.upload_utils import make_path_select_options
+
         
         
-        self.data_upload = v.Container(
-            children=[
-                v.Row(
-                    children=[
-                        #데이터 조회
-                        v.Col(
-                            style_= 'font-size: 1rem; font-weight: bold; color; rgb(30, 41, 59);',
-                            children=[
-                                'AIDU 플랫폼에 업로드한 데이터',
-                                v.Card(
-                                    outlined = False,
-                                    style_ = 'width: 800px; height:200px; overflow: auto;',
-                                    children=[
-                                        'Data will be fill in this place'
-                                    ]
-                                )
-                            ]
-                        ),
-                        # 디자인 더미
-                        v.Col(
-                            children=[]
-                        ),
-                        # 인코딩
-                        v.Col(
-                            style_ = 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
-                            children=[
-                                '데이터 인코딩 선택',
-                                v.RadioGroup(
-                                    v_model = None,
-                                    children=[
-                                        v.Radio(label = 'UTF-8'),
-                                        v.Radio(label = 'CP949(한글)'),
-                                        v.Radio(label = 'EUC-KR(한글)')
-                                    ]
-                                )                                
-                            ]
-                        ),
-                        # 구분자
-                        v.Col(
-                            style_= 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
-                            children=[
-                                '데이터 구분자',
-                                v.RadioGroup(
-                                    v_model = None,
-                                    style_= 'font-size: 0.5rem;',
-                                    children=[
-                                        v.Radio(label = 'Comma: ","'),
-                                        v.Radio(label = 'Tab: " "'),
-                                        v.Radio(label = 'Pipe: "|"')
-                                    ]
-                                )
-                            ]
-                        )
-                    ]
-                ),
-                v.Row(
-                    style_ = 'padding-top: 15px',
-                    children=[
-                       
-                        v.Layout(children = [
-                            v.Spacer(),
-                            v.Btn(color = 'primary', class_='ma-2 white--text', children = [
-                                '데이터 가져오기',
-                                v.Icon(right = True, children=['mdi-cloud-upload']),
-                            ]),
-                        ])
-                    ]
-                )
-            ]
-        )
 
-        self.uploaded_data = v.Container(
-            children=[
-                v.Card(children = [
-                    "Upload Data"
-                ])
-            ]
-        )
+        self.button = v.Btn(color = 'primary', class_= 'ma-2 white--text', children = ['데이터 가져오기', v.Icon(right = True, children = ['mdi-cloud-upload'])])
+        # data_options = make_path_select_options(Path(os.sep, "aihub","data"),recursive=True, extensions=None)
+        # data_options = make_path_select_options(Path(os.sep, "opt","code","aiduez","data"),recursive=True, extensions=None)
+        data_options = os.listdir('data')
+        workspace_data_options = make_path_select_options(os.getcwd(), recursive=False, extensions=['.csv','.tsv'])
+        # self.data_select = widgets.Select(options = data_options, value = None,rows =7)
+        self.data_select = v.Select(label = 'Data',items = data_options, value = None,rows =7)
+        # self.workspace_data_select = widgets.Select(options = workspace_data_options,value=None,rows= 7)
+        self.workspace_data_select = v.Select(items = [workspace_data_options],value=None,rows= 7)
+        self.data_select.observe(self.on_data_select,names="value")
+        self.workspace_data_select.observe(self.on_data_select, names="value")
+        self.button.on_event('click', self.on_clicked)
+        self.encoding_widgets = EncodingWidgets()
+        self.upload_widgets = UploadWidgets()
+        self.seperator_widgets = SeperatorWidgets()
+        self.selected_datapath =None
+        aidu_box = v.Card(children = [
+            v.Html(
+                tag = 'h5', 
+                children = ["AIDU 플랫폼에 업로드한 데이터"]
+            ), 
+            self.data_select
+        ])
+        # workspace_box = widgets.VBox([widgets.HTML("<h5> 현재 경로에 생성한 데이터 (csv, tsv) </h5>"), self.workspace_data_select])
+        workspace_box = v.Container(children = [
+            v.Html(
+                tag = 'h5',
+                children = ["현재 경로에 생성한 데이터 (csv, tsv)"]
+            ),
+            self.workspace_data_select
+        ])
+        # with self.output:
+        #     display(widgets.VBox([widgets.HBox([aidu_box, workspace_box]), widgets.HTML(html_UI_seperator), widgets.HBox([self.encoding_widgets(), self.seperator_widgets()]), widgets.HTML(html_UI_seperator), self.upload_widgets(), self.button ]))
 
+        self.aidu_upload = v.Container(children = [
+            v.Row(children = [
+                v.Col(children = [aidu_box]),
+                v.Col(children = [workspace_box])
+                ]
+                
+            ),
+            v.Row(children = [
+                v.Col(children =[self.encoding_widgets()]),
+                v.Col(children =[self.seperator_widgets()])
+                ]
+                
+            ),
+
+            v.Row(style_ = 'padding-top:150px', children = [self.upload_widgets()]),
+            v.Row(style_='padding-top:50px', children = [self.button])
+            # v.Row(children = [aidu_box]),
+            # v.Row(children = [workspace_box]),
+            # v.Row(children = [self.encoding_widgets()]),
+            # v.Row(children = [self.seperator_widgets()],),
+            # v.Row(children = [self.upload_widgets()]),
+            # v.Row(children = [self.button])
+
+        ])
+
+
+
+   
+        
         super().__init__(
             class_=context_key,
             header_title=title,
             
             body_items=[
-                self.data_upload,
-                self.uploaded_data
+                
+                self.aidu_upload
 
             ],
             body_size={
                 "width": ["lg", "100px"],
-                "height":["340px", "100px"],
+                "height":["540px", "100px"],
             },
             body_border_bottom = [True, True],
             body_background_color = ["rgb(255, 255, 255)", "rgb(248, 250, 252)"],
             align='center'
         )
+    def on_data_select(self, change):
+            self.button.disabled = False
+            self.selected_datapath = change["new"]
+    # def on_clicked(self,btn):
+    #     data_name = os.path.splitext(self.selected_datapath.name)[0]
+    #     info = self.context.validatePipe(data_name, 'add_data')
+    #     uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding,sep = self.seperator_widgets.seperator, filepath = self.selected_datapath)
+    #     if uploaded_data is not None:
+    #         self.context.createJob(self.context.currPjtName, data_name)
+    #         self.context.addData(self.context.currJobID, data_name, uploaded_data)    
+    #         self.context.getCellOf('form-ctx-summary').redraw() 
+    #         self.upload_widgets.complete(data_name)        
+    #     self.data_select.value = None
+    #     self.workspace_data_select.value = None
+    #     self.button.disabled = True
 
-class TabularLocalImport(BaseCard):
+    def on_clicked(self,widget, event, data):
+        data_name = os.path.splitext(self.selected_datapath.name)[0]
+        info = self.app_context.validatePipe(data_name, 'add_data')
+        uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding,sep = self.seperator_widgets.seperator, filepath = self.selected_datapath)
+        if uploaded_data is not None:
+            # self.context.createJob(self.context.currPjtName, data_name)
+            # self.context.addData(self.context.currJobID, data_name, uploaded_data)    
+            # self.context.getCellOf('form-ctx-summary').redraw()
+            self.app_context.addData(data_name,uploaded_data) 
+            self.upload_widgets.complete(data_name)        
+        self.data_select.value = None
+        self.workspace_data_select.value = None
+        self.button.disabled = True
+
+class TabularLocalImport(BaseCard, AppCell):
+ 
+
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
         self.context_key = context_key
         title = "PC에서 업로드하기"
         
-        self.data_upload = v.Container(
-            children=[
-                v.Row(
-                    children=[
-                        # 인코딩
-                        v.Col(
-                            style_ = 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
-                            children=[
-                                '데이터 인코딩 선택',
-                                v.RadioGroup(
-                                    v_model = None,
-                                    children=[
-                                        v.Radio(label = 'UTF-8'),
-                                        v.Radio(label = 'CP949(한글)'),
-                                        v.Radio(label = 'EUC-KR(한글)'),
-                                        v.Row(
-                                            style_ = 'padding-top: 15px',
-                                            children=[
-                       
-                                                v.Layout(children = [
-
-                                                    v.Tooltip(right=True, v_slots =[{
-                                                        'name': 'activator',
-                                                        'variable': 'tooltip',
-                                                        'children': v.Btn(v_on='tooltip.on', color = 'primary', class_='ma-2 white--text', children = [
-                                                            'PC에서 업로드',
-                                                            v.Icon(right = True, children = ['mdi-cloud-upload']),
-                                                        ]),
-                                                    }], children=[
-                                                        'DRM 해제 문서만 업로드 가능'
-                                                        ])
-                            
-                                                
-                                            ])
-                                            ]
-                                        )
-                                    ]
-                                )                                
-                            ]
-                        ),
-                        # 구분자
-                        v.Col(
-                            style_= 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
-                            children=[
-                                '데이터 구분자',
-                                v.RadioGroup(
-                                    v_model = None,
-                                    style_= 'font-size: 0.5rem;',
-                                    children=[
-                                        v.Radio(label = 'Comma: ","'),
-                                        v.Radio(label = 'Tab: " "'),
-                                        v.Radio(label = 'Pipe: "|"')
-                                    ]
-                                )
-                            ]
-                        ),
-                        v.Col(
-                            children=[],
-                        ),
-                        v.Col(
-                            children=[]
-                        )
+        self.matchedDataNames = []
+        self.unmatchedDataNames = []
+        self.upload_box = widgets.VBox()
+        self.reset_uploader()
+        self.encoding_widgets = EncodingWidgets()
+        self.seperator_widgets = SeperatorWidgets()
+        self.upload_widgets = UploadWidgets()
+       
+        self.local_upload = v.Container(
+            children = [
+                v.Row(children=[
+                    v.Col(
+                        children = [self.encoding_widgets()]
+                    ),
+                    v.Col(
+                        children = [self.seperator_widgets()]
+                    ),
+                
                     ]
-                ),
+                ), 
+                
+                v.Divider(),
+                v.Row(style_ = 'padding-top : 150px', children = [self.upload_widgets()]),
+                
+                v.Row(style_ = 'padding-top : 40px', children = [self.upload_box])
                 
             ]
         )
-
-        self.uploaded_data = v.Container(
-            children=[
-                v.Card(children = [
-                    "Upload Data"
-                ])
-            ]
-        )
+        
         super().__init__(
             class_=context_key,
             header_title=title,
             body_items=[
-                self.data_upload,
-                self.uploaded_data
+                # self.data_upload,
+                # self.uploaded_data
+                self.local_upload
             ],
             body_size={
                 "width":"lg",
@@ -234,6 +221,47 @@ class TabularLocalImport(BaseCard):
             body_background_color = ["rgb(255, 255, 255)", "rgb(248, 250, 252)"],
             align='center'
         )
+    def _handle_uploaded(self, change):
+            
+            uploaded_dict = change["new"]
+            file_name = list(uploaded_dict.keys())[0]
+            data_name = os.path.splitext(file_name)[0]
+            info = self.app_context.validatePipe(data_name, 'add_data')
+            content = uploaded_dict[file_name]['content']
+            uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding, sep = self.seperator_widgets.seperator, content=content)
+            if uploaded_data is not None:
+                # Pipline 작업 할 것
+                # self.app_context.createJob(self.app_context.currPjtName, data_name)
+                # self.app_context.addData(self.context.currJobID, data_name, uploaded_data)
+                # self.app_context.getCellOf('form-ctx-summary').redraw()
+                self.app_context.addData(data_name, uploaded_data)
+                self.upload_widgets.complete(data_name)
+              
+
+            self.reset_uploader()
+
+
+    def reset_uploader(self):
+        
+        uploader = widgets.FileUpload(
+            description = '데이터 업로드',
+            accept='.csv,.csv_,.tsv',  # Accepted file extension e.g. '.txt', '.pdf', 'image/*', 'image/*,.pdf'
+            multiple=False,  # True to accept multiple files upload else False
+        )
+                
+        uploaderBtn = v.Tooltip(right=True, v_slots =[{
+            'name': 'activator',
+            'variable': 'tooltip',
+            'children': v.Btn(v_on='tooltip.on', color = 'primary', class_='ma-2 white--text', children = [
+               
+                uploader
+                ]),
+            }], children=[
+            'DRM 해제 문서만 업로드 가능'
+        ]) 
+        uploader.observe(self._handle_uploaded, names='value')
+        self.upload_box.children = [uploaderBtn]
+
 class TabularEDAPImport(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
