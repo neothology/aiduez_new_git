@@ -1,6 +1,5 @@
 import ipyvuetify as v
 from utils import get_or_create_class, set_theme_style
-from pipeline import Pipeline
 
 class ListMenu(v.List):
 
@@ -123,11 +122,6 @@ class ListMenu(v.List):
 
             task_type = item.value.split('_')[0] # code_add: to use different pipeline by task_type
 
-            # if 'New Task", create "Untitled" task
-            if task_type != 'task':
-                pipeline = Pipeline(self.app_context)
-                pipeline.create_new(task_type) # tabular, text, image, video, audio, etc.
-
             # set 'active' to last activated item wihich is now deactivated
             if self.last_activated_item:
                 self.last_activated_item.disabled = False  
@@ -172,9 +166,10 @@ class ListMenu(v.List):
 
 class TabMenu(v.Col):
 
-    def __init__(self, app_context, context_key, **kwargs):
+    def __init__(self, app_context, context_key, target_area, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+        self.target_area = target_area
         self.tab_props = kwargs.get("tab_props")
 
         # define active/inactive css style
@@ -219,7 +214,7 @@ class TabMenu(v.Col):
             children = [v.Col(style_=inactive_style["block"]) for _ in range(len(self.tab_props['stages']))],
         )
 
-        # gather stagey['target'] for later use
+        # gather stage['target'] for later use
         self.tab_stage_targets = [stage['target'] for stage in self.tab_props['stages']]
 
         super().__init__(
@@ -251,9 +246,8 @@ class TabMenu(v.Col):
 
             # get target and set
             setattr(self.app_context, f'{self.app_context.current_workflow}_workflow_stage', tab.value)
-            target_area = get_or_create_class('sub_area', self.app_context, context_key = self.tab_props['target_area']) # tabular_contents
             target_instance = get_or_create_class(tab.value, self.app_context) # for example, tab.value = "tabular_ai_training"
-            target_area.children = [target_instance]
+            self.target_area.children = [target_instance]
 
         # set default
         default_tab_name: str = self.tab_props['default']

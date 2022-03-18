@@ -40,7 +40,7 @@ class TabularSingleProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.data = app_context.current_data
+        self.data = self.app_context.tabular_dataset.current_data
 
         self.processing_menu = TabularSingleProcessingMenu(
             app_context=self.app_context,
@@ -84,7 +84,7 @@ class TabularSingleProcessing(v.Container):
         return column_summary
 
     def update_display(self):
-        self.data = self.app_context.current_data
+        self.data = self.app_context.tabular_dataset.current_data
         self.processing_menu.update()
         # column summary
         self.column_summary = self._get_column_sumary()
@@ -103,7 +103,7 @@ class TabularSingleProcessing(v.Container):
 class TabularSingleProcessingMenu(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
-        self.data = app_context.current_data
+        self.data = self.app_context.tabular_dataset.current_data
         self.context_key = context_key
 
         self.style = {
@@ -204,7 +204,7 @@ class TabularSingleProcessingMenu(BaseCard):
         def _on_click_delete_column_button(btn, event=None, data=None):
             index= int(btn.index)
             self.data = self.data.drop(self.data.columns[index], axis=1)
-            self.app_context.current_data = self.data
+            self.app_context.tabular_dataset.current_data = self.data
             tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
             tabular_data_single_processing.update_display()
             

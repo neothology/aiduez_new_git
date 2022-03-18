@@ -1,8 +1,6 @@
 envs: 
   workspace_dir: /aihub/workspace
-  data_dir: /aihub/data
   tmp_dir: /aihub/workspace/tmp
-
 
 class_paths:
   # components - layout & menu
@@ -14,14 +12,19 @@ class_paths:
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
 
-  # other components
+  # other common components
   column_summary: components.data_profiler.ColumnSummary
+  pipeline: pipeline.Pipeline
 
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
   task_all: workflows.task.TaskAll
 
+  # workflow-tabular
   tabular_base: workflows.tabular.TabularBase
+  tabular_dataset: components.dataset.TabularDataset
+  tabular_data_context: components.dataset.TabularDataContext
+  tabular_model: components.modeling.TabularModel
 
   tabular_data_import: workflows.tabular.TabularDataImport
   tabular_data_import_tab: components.import.TabularImportTab
@@ -39,11 +42,9 @@ class_paths:
 
   tabular_ai_training: workflows.tabular.TabularAITraining
   tabular_modeling_options: components.modeling.TabularModelingOptions
-  tabular_model: components.modeling.TabularModel
   tabular_train_activator: components.modeling.TabularTrainActivator
   tabular_train_result: components.modeling.TabularTrainResult
-  tabular_train_plots: components.modeling.TabularTrainPlots
-
+  
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
   text_base: workflows.text.TextBase
