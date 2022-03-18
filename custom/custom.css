@@ -1,0 +1,123 @@
+.container {
+    width: 100% !important;
+} 
+
+div.output_subarea {
+    padding: 0px !important;
+    margin-top: 10px !important;
+}
+
+.background {
+    border:1px solid #cccccc;
+}
+
+.v-navigation-drawer__border {
+    background-color: none !important;
+}
+
+
+/* -------------------------------------------------------  */
+@font-face {
+    font-family: 'Nanum';
+    font-style: normal;
+    font-weight: normal;
+    src: local('NanumGothic');
+    src: url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
+         url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff'),
+         url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype');
+}
+
+.vuetify-styles .v-application {
+    font-family: Roboto, sans-serif !important;
+}
+
+.vuetify-styles .v-list-item--link:before {
+    border-radius: inherit
+}
+
+.vuetify-styles .theme--light.v-list-item:hover:before {
+    background-color: #ffffff !important;
+    opacity: 0.08 !important;
+}
+
+.vuetify-styles .theme--light.v-list-item--active:before {
+    background-color: #0f172a !important;
+}
+
+.vuetify-styles .theme--light.v-list-item--disabled:before {
+    background-color: #ffffff !important;
+    opacity: 0.08 !important;
+}
+
+.v-list-group__header__prepend-icon {
+    margin-right: 6px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    align-self: auto !important;
+}
+
+.v-list-group__header__prepend-icon .v-icon {
+    color: #e2e2e2de !important;
+}
+
+.v-list-group__header__append-icon .v-icon.mdi-chevron-down {
+    color: #e2e2e2de !important;
+}
+
+.vuetify-styles .col {
+    margin: 0 !important;
+}
+
+.vuetify-styles .theme--light.v-btn-toggle:not(.v-btn-toggle--group) {
+    background: none !important;
+}
+
+.vuetify-styles .tab_menu .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active:before {
+    opacity: 0;
+}
+
+.vuetify-styles .v-btn:not(.v-btn--text):not(.v-btn--outlined):hover:before {
+    opacity: 0.3 !important;
+}
+
+.vuetify-styles .tabular_ai_training__modeling_options .v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
+    box-shadow: none !important;
+    border-bottom: 1px solid black;
+}
+
+.vuetify-styles .v-card {
+    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 10%) 0px 1px 3px 0px, rgb(0 0 0 / 10%) 0px 1px 2px -1px !important;
+}
+
+.vuetify-styles .tabular_ai_training__modeling_options .v-card__title{
+    align-items: stretch !important;
+}
+
+.vuetify-styles .tabular_ai_training__modeling_options .v-input {
+    align-items: flex-end !important;
+}
+
+@media (min-width: 1264px) {
+    .vuetify-styles .v-container {
+        max-width: unset!important;
+    }
+}
+
+@media (min-width: 960px) {
+    .vuetify-styles .v-container {
+        max-width: unset !important;
+    }
+}
+
+.vuetify-styles .theme--light .tabular_ai_training__train_result .output_scroll {
+    height: 100%;
+    box-shadow: none;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 40px;
+    padding-top: 10px;
+}
+
+.vuetify-styles .v-dialog {
+    overflow-y: hidden !important;
+}
