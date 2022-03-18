@@ -89,12 +89,16 @@ class TabularSingleProcessing(v.Container):
         # column summary
         self.column_summary = self._get_column_sumary()
 
-        self.children = [v.Col(
-                    class_="d-lg",
-                    children=[self.processing_menu,
+        self.children = [
+            v.Col(
+                class_="d-lg",
+                children=[
+                    self.processing_menu,
+                    self.processing_dialog,
                     v.Spacer(style_="height:20px"),
                     self.column_summary,
-        ])]
+                ]
+        )]
 
 class TabularSingleProcessingMenu(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
@@ -156,7 +160,7 @@ class TabularSingleProcessingMenu(BaseCard):
         ]
 
         # (4) process method button -------------------------------------------------
-        processing_method_buttons = self._make_processing_dialog_buttons()
+        processing_buttons = self._make_processing_dialog_buttons()
 
         self.processing_options_rows = [
             IndexRow(
@@ -164,9 +168,8 @@ class TabularSingleProcessingMenu(BaseCard):
                 index = str(i),
                 children = [
                     delete_column_buttons[i], column_names[i], pandas_data_types[i],
-                    processing_method_buttons[i]['fill'],
-                    processing_method_buttons[i]['transform'], processing_method_buttons[i]['extract'],
-                    processing_method_buttons[i]['scale'], processing_method_buttons[i]['nlp'],
+                    processing_buttons[i]['fill'], processing_buttons[i]['transform'], processing_buttons[i]['extract'],
+                    processing_buttons[i]['scale'], processing_buttons[i]['nlp'],
                 ],
                 style_ = "min-height:61px; margin:0;",
             ) for i in range(num_rows)
@@ -224,12 +227,8 @@ class TabularSingleProcessingMenu(BaseCard):
         def _activate_process_dialog(widget=None, event=None, data=None):
             column_name = widget.v_model["column_name"]
             process = widget.v_model["process"]
-            # dialog = self.app_context.tabular_data_single_processing_dialog
-            dialog = get_or_create_class(
-                'tabular_data_single_processing_dialog',
-                app_context=self.app_context,
-            )
-            # TabularSingleProcessingDialog(app_context=self.app_context, context_key=self.context_key, column=column, process=process)
+            dialog = self.app_context.tabular_data_single_processing_dialog
+            
             def _close_dialog(widget, event=None, data=None):
                 widget.value = 0
 
@@ -268,11 +267,15 @@ class TabularSingleProcessingDialog(v.Dialog):
     def __init__(self, app_context, context_key) -> None:
         self.app_context = app_context
 
-        self.dialog_contents = ''
         self.process = ''
         self.method = ''
         self.column_name = ''
         self.column_dtype = ''
+        self.suffix = {
+            "missing_num_imputer": "IM", "missing_cat_imputer": "IM", "re_extract": "RE",
+            "standard_scaler": "SS", "minmax_scaler": "MS", "ordinal_encoder": "OE",
+            "quantile_transformer": "QT", "kbins_discretizer": "KD", "형태소 분석": "MA", "명사 추출": "NE",
+        }
         self.chart_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{self.app_context.current_data_name}"
         if not os.path.exists(self.chart_file_dir):
             os.makedirs(self.chart_file_dir)
@@ -295,7 +298,6 @@ class TabularSingleProcessingDialog(v.Dialog):
         )
 
         def _change_method(widget, event=None, data=None):
-            # print(f"[_change_method] self.method={self.method}")
             self.method = widget.v_model
             self.show()
             
@@ -305,9 +307,25 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.additional_config_values = dict()
 
         # ui
+        self.dialog_contents = None
         self.additional_config_ui = None
         self.before_contents = None
         self.after_contents = None
+        
+        save_btn = v.Btn(
+            color="success",
+            children=["새 칼럼으로 저장"]
+        )
+
+        def _on_click_save(widget, event=None, data=None):
+            before_coulumn = self.get_sample_data(column_name=self.column_name, n=-1)
+            processed_column = self.processing_data(before_coulumn)
+            self.app_context.current_data[self.column_name + "_" + self.suffix[self.method]] = processed_column
+            tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
+            tabular_data_single_processing.update_display()
+            self.value = 0
+            
+        save_btn.on_event('click', _on_click_save)
 
         # dialog contents
         self.dialog_contents = v.Card(children=[
@@ -320,17 +338,10 @@ class TabularSingleProcessingDialog(v.Dialog):
                     self.close_btn,
                 ],
             ),
-            v.CardText(children=[self.method_selector]),
+            v.CardText(class_="py-0", children=[self.method_selector]),
             v.CardActions(children=[
                 v.Spacer(),
-                v.Btn(
-                    color="blue lighten-3",
-                    children=["저장"],
-                ),
-                v.Btn(
-                    color="green lighten-3",
-                    children=["새 칼럼 생성"]
-                )
+                save_btn                
             ])
         ])
 
@@ -343,7 +354,6 @@ class TabularSingleProcessingDialog(v.Dialog):
         )
 
     def initialize(self, column_name, process):
-        # print(f"[initialize] column_name={column_name}, process={process}")
         self.process = process
         self.column_name = column_name
         config= self.app_context.processing_params['single_process']['config']
@@ -380,7 +390,6 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.value=0
 
     def show(self):
-        # print(f"[show] self.column_name={self.column_name}, self.process={self.process}")
         self.additional_config_ui = self._make_additonal_config_ui(self.method, self.column_name)
         self.before_contents = self._make_before_contents(self.column_name)
         self.after_contents = self._make_processed_contents(self.column_name)
@@ -400,16 +409,19 @@ class TabularSingleProcessingDialog(v.Dialog):
             v.Row(children=[v.Col(children=[ui]) for ui in self.additional_config_ui.values()]),
             # result area
             v.Row(children=[
-                v.Col(children=[self.before_contents]),
+                # before contents
+                v.Col(class_="py-0", children=[self.before_contents]),
+                # arrow icon
                 v.Icon(
                     large=True,
                     children=["mdi-arrow-right-bold"]
                 ),
-                v.Col(children=[self.after_contents]),                                
+                # after contents
+                v.Col(class_="py-0", children=[self.after_contents]),                                
             ])
         ]
-
         self.value = 1
+
 
     def _make_additonal_config_ui(self, method, column_name) -> dict:
         config= self.app_context.processing_params['single_process']['config']
@@ -420,15 +432,6 @@ class TabularSingleProcessingDialog(v.Dialog):
             self.additional_config_values[option["name"]] = ""
             if option['type'] == "slider":
                 self.additional_config_values[option["name"]] = option['values'][3]
-                '''
-                widget = DataSlSimpleSliderider(
-                    index=0,
-                    v_model=self.additional_config_values[option["name"]],
-                    label=option['name'],
-                    range=option['values'],
-                    dense=True,
-                )
-                '''
                 slider = v.Slider(
                     min = option['values'][0],
                     max = option['values'][1],
@@ -566,14 +569,7 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         return contents
 
-    def processing_data(self, column_name):
-        '''
-        target: ["all", "sample"]
-        '''
-        if self.process in ['scale', 'transform']:
-            sample_data = self.get_sample_data(column_name, n=-1)
-        else:
-            sample_data = self.get_sample_data(column_name, n=20)
+    def processing_data(self, column):
 
         if self.process == "fill":
             imputer_value = self.column_statistic[self.additional_config_values["imputer"]]
@@ -583,49 +579,49 @@ class TabularSingleProcessingDialog(v.Dialog):
                 elif self.column_dtype.startswith("int"):
                     imputer_value = int(imputer_value)
                 self.additional_config_ui["value"].v_model = imputer_value
-                sample_data = sample_data.fillna(imputer_value)
+                column = column.fillna(imputer_value)
             except:
-                sample_data = None
+                column = None
 
         elif self.process == "extract" and self.method == "re_extract":
             regex = self.additional_config_values["regex"]
             self.additional_config_ui["regex"].disabled = False
             try:
-                sample_data = sample_data.apply(lambda x:" ".join(re.findall(regex, x)))
+                column = column.apply(lambda x:" ".join(re.findall(regex, x)))
             except:
-                sample_data = None
+                column = None
 
         elif self.process == "scale":
             if self.method == 'standard_scaler':
                 scaler = StandardScaler()
             elif self.method == 'minmax_scaler':
                 scaler = MinMaxScaler()
-            sample_data = pd.Series(scaler.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)
+            column = pd.Series(scaler.fit_transform(column.values.reshape(-1, 1)).reshape(-1), name=column.name, index=column.index)
 
         elif self.process == "transform":
             if self.method == "ordinal_encoder":
                 encoder = OrdinalEncoder()
-                sample_data = pd.Series(encoder.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)            
+                column = pd.Series(encoder.fit_transform(column.values.reshape(-1, 1)).reshape(-1), name=column.name, index=column.index)            
             elif self.method == "quantile_transformer":
                 output_distribution = self.additional_config_values["output_distribution"]
                 n_quantiles = self.additional_config_values["n_quantiles"]
-                sample_data = pd.Series(quantile_transform(sample_data.values.reshape(-1, 1), output_distribution=output_distribution, n_quantiles=n_quantiles).reshape(-1), name=sample_data.name, index=sample_data.index)            
+                column = pd.Series(quantile_transform(column.values.reshape(-1, 1), output_distribution=output_distribution, n_quantiles=n_quantiles).reshape(-1), name=column.name, index=column.index)            
             elif self.method == "kbins_discretizer":
                 n_bins = self.additional_config_values["n_bins"]
                 strategy = self.additional_config_values["strategy"]
                 try:
                     kbins = KBinsDiscretizer(n_bins=n_bins, encode="ordinal", strategy=strategy)
-                    sample_data = pd.Series(kbins.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)            
+                    column = pd.Series(kbins.fit_transform(column.values.reshape(-1, 1)).reshape(-1), name=column.name, index=column.index)            
                 except:
-                    sample_data = None
+                    column = None
         elif self.process == "nlp":
             nlp_package = {
                 "komoran": Komoran(),
                 "hannanum": Hannanum(),
             }
             nlp_package = nlp_package[self.additional_config_values["package"]]
-            sample_data = sample_data.apply(lambda x: self.nlp_processing(string=x, nlp_package=nlp_package, nlp_method=self.method))
-        return sample_data
+            column = column.apply(lambda x: self.nlp_processing(string=x, nlp_package=nlp_package, nlp_method=self.method))
+        return column
 
     def _make_processed_contents(self, column_name):
         processed_result = v.CardText(
@@ -634,7 +630,12 @@ class TabularSingleProcessingDialog(v.Dialog):
             style_=f"width:100%; height:100%; padding:0; display:flex; flex-direction:column; "
         )
 
-        sample_processed_data = self.processing_data(column_name)
+        if self.process in ['scale', 'transform']:
+            sample_data = self.get_sample_data(column_name, n=-1)
+        else:
+            sample_data = self.get_sample_data(column_name, n=20)
+
+        sample_processed_data = self.processing_data(sample_data)
         children = []
         if self.process == "fill" and sample_processed_data is None:
             children = ["데이터 타입에 맞게 입력해주세요!"]
