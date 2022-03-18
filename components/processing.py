@@ -12,6 +12,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, OrdinalEncoder, 
 import plotly.express as px
 import os
 import ipywidgets
+from konlpy.tag import Komoran, Hannanum
 
 class TabularProcessingTab(BaseTab):
     def __init__(self, app_context, context_key, **kwags) -> None:
@@ -39,10 +40,6 @@ class TabularSingleProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-        # code_will_be_deleted: load test data for tabular modeling
-        self.app_context.current_data_name = ('titanic_train')
-        import pandas as pd
-        self.app_context.current_data = pd.read_csv('data/titanic_train.csv')
         self.data = app_context.current_data
 
         self.processing_menu = TabularSingleProcessingMenu(
@@ -129,7 +126,8 @@ class TabularSingleProcessingMenu(BaseCard):
         )
 
     def update(self):
-        self.body_items= [self._make_single_processing_ui()]
+        self.processing_ui= self._make_single_processing_ui()
+        self.update_body_items(body_items=[self.processing_ui])
 
     def _make_single_processing_ui(self) -> list:
         num_rows = len(self.data.columns)
@@ -184,7 +182,7 @@ class TabularSingleProcessingMenu(BaseCard):
         for row in self.processing_options_rows:
             row.on_event('click', _on_click_processing_options_rows)
 
-        self.processing_options_body = v.List(
+        processing_options_body = v.List(
             class_ = self.context_key + " align-center",
             style_ = self.style['processing_options_body'],
             children = [
@@ -195,7 +193,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 ) for row in self.processing_options_rows
             ],    
         )
-        return self.processing_options_body
+        return processing_options_body
 
     def _make_delete_column_buttons(self) -> list:
         delete_column_buttons = []
@@ -483,7 +481,7 @@ class TabularSingleProcessingDialog(v.Dialog):
                         self.after_contents = self._make_processed_contents(column_name)
                         # result area
                         self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
-                    elif self.process == "transform":
+                    else:
                         self.additional_config_values[widget.label] = widget.v_model
 
                         self.after_contents = self._make_processed_contents(column_name)
@@ -620,6 +618,13 @@ class TabularSingleProcessingDialog(v.Dialog):
                     sample_data = pd.Series(kbins.fit_transform(sample_data.values.reshape(-1, 1)).reshape(-1), name=sample_data.name, index=sample_data.index)            
                 except:
                     sample_data = None
+        elif self.process == "nlp":
+            nlp_package = {
+                "komoran": Komoran(),
+                "hannanum": Hannanum(),
+            }
+            nlp_package = nlp_package[self.additional_config_values["package"]]
+            sample_data = sample_data.apply(lambda x: self.nlp_processing(string=x, nlp_package=nlp_package, nlp_method=self.method))
         return sample_data
 
     def _make_processed_contents(self, column_name):
@@ -648,7 +653,7 @@ class TabularSingleProcessingDialog(v.Dialog):
                 children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
             else:
                 chart = self._make_histogram(sample_processed_data, suffix="processed")
-                children = [chart]                
+                children = [chart]
         else:
             children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
 
@@ -678,6 +683,21 @@ class TabularSingleProcessingDialog(v.Dialog):
             },
         )
         return chart 
+
+    def nlp_processing(self, string, nlp_package, nlp_method):
+        """
+        :param string: string for nlp
+        :param nlp_package: "tag.Komoran()", "tag.Kkma()", "tag.Hannanum()", "tag.Okt()"
+        :param nlp_method: "nouns", "morphs"
+        """
+        try:
+            if nlp_method == "형태소 분석":
+                result = ' '.join(nlp_package.morphs(string))
+            elif nlp_method == "명사 추출":
+                result = ' '.join(nlp_package.nouns(string))
+        except:
+            result = string
+        return result
 
 class TabularMultipleProcessing(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):

@@ -370,8 +370,8 @@ processing_params:
             values: [re_extract]
             default: re_extract
           nlp:
-            values: [morpheme_analysis, noun_extract]
-            default: morpheme_analysis
+            values: [형태소 분석, 명사 추출]
+            default: 형태소 분석
       additional_config:
         quantile_transformer:
           option:
@@ -423,6 +423,20 @@ processing_params:
               name: regex
               type: text
               value: '(.*)'
+        형태소 분석:
+          option:
+            -
+              name: package
+              type: select
+              values: ['komoran', 'hannanum']
+              default: komoran
+        명사 추출:
+          option:
+            -
+              name: package
+              type: select
+              values: ['komoran', 'hannanum']
+              default: komoran
  # 학습 parameter 정의
 modeling_params:
   ludwig:
