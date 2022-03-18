@@ -18,7 +18,11 @@ RUN apt-get update -yq \
     wget \
     vim \
     python3-pip \
-    python3-tk
+    python3-tk \
+    g++ \
+    openjdk-8-jdk \
+    python3-dev \
+    curl
 
 RUN mkdir -p /opt/code/aiduez \
     && mkdir -p /aihub/workspace \
