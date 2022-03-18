@@ -276,7 +276,7 @@ class TabularSingleProcessingDialog(v.Dialog):
             "standard_scaler": "SS", "minmax_scaler": "MS", "ordinal_encoder": "OE",
             "quantile_transformer": "QT", "kbins_discretizer": "KD", "형태소 분석": "MA", "명사 추출": "NE",
         }
-        self.chart_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{self.app_context.current_data_name}"
+        self.chart_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{app_context.tabular_dataset.current_data_name}"
         if not os.path.exists(self.chart_file_dir):
             os.makedirs(self.chart_file_dir)
         # close button
@@ -320,7 +320,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         def _on_click_save(widget, event=None, data=None):
             before_coulumn = self.get_sample_data(column_name=self.column_name, n=-1)
             processed_column = self.processing_data(before_coulumn)
-            self.app_context.current_data[self.column_name + "_" + self.suffix[self.method]] = processed_column
+            self.app_context.tabular_dataset.current_data[self.column_name + "_" + self.suffix[self.method]] = processed_column
             tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
             tabular_data_single_processing.update_display()
             self.value = 0
@@ -357,7 +357,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.process = process
         self.column_name = column_name
         config= self.app_context.processing_params['single_process']['config']
-        column = self.app_context.current_data[column_name]
+        column = self.app_context.tabular_dataset.current_data[column_name]
 
         self.column_statistic = dict()
 
@@ -521,7 +521,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         '''
         n 의 값이 -1이면 전체를 가지고 옴
         '''
-        sample_data = self.app_context.current_data[column_name]
+        sample_data = self.app_context.tabular_dataset.current_data[column_name]
         if n != -1:
             if self.process == "fill":
                 sample_data = sample_data[sample_data.isna()]
