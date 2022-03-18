@@ -31,8 +31,8 @@ class TabularModel:
         self.output_logs = output['logs']
         self.output_plots = output['plots']
         self.logging_level = logging_level
-        self.data = app_context.current_data
-        self.data_name = app_context.current_data_name
+        self.data = app_context.tabular_dataset.current_data
+        self.data_name = app_context.tabular_dataset.current_data_name
         self.model_name = 'latest'
         self.output_directory = 'train_test'
         self.output_model_directory = os.path.join(self.output_directory, f'{self.data_name}_{self.model_name}')
@@ -394,13 +394,13 @@ class TabularModelingOptions(BaseCard):
         **kwargs,
         ):   
 
+        self.app_context = app_context
+        self.data = app_context.tabular_dataset.current_data
+
         self.style = {
             'column_options_body': "padding:0px;",
             'column_options_body_item': "min-height:62px; padding:0", 
         }
-
-        self.app_context = app_context
-        self.data = app_context.current_data
 
         # re-structure data for column-wise configuration
         num_rows = len(self.data.columns)
@@ -841,3 +841,6 @@ class TabularModelingOptions(BaseCard):
         self.train_config["training"]["learning_rate"] = self.train_parameter.children[4].children[1].children[0].v_model
 
         return self.train_config
+
+    def update_data(self):
+        pass

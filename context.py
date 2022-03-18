@@ -17,10 +17,11 @@ class AppContext:
 
 ## common variabls for general use ##
     current_user: dict = None
-    current_data_name: str = ''
-    current_data: object = None
     current_workflow: str = None
     current_workfile: object = None
+    current_model: object = None
+
+    pipeline: object = None
 
 ## base layout object ##
     background: object = None
@@ -36,6 +37,8 @@ class AppContext:
     tabular_contents: object = None
     tabular_workflow_stage: str = None
     tabular_model: object = None
+    tabular_dataset: object = None
+    tabular_data_context: object = None
 
     # tabular data import objects
     tabular_data_import: object = None

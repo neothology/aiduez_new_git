@@ -8,7 +8,7 @@ class Aian:
         self.app_context = AppContext(
             theme = kwargs.get('theme') if kwargs.get('theme') else 'ez_default',
         ) 
-       
+
         # initialize layout
         self.background = get_or_create_class('background', self.app_context)
         self.top_area = get_or_create_class('top_area', self.app_context)
