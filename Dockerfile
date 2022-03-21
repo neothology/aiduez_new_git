@@ -17,7 +17,12 @@ RUN apt-get update -yq \
  && apt-get install -yq --no-install-recommends \
     wget \
     vim \
-    python3-pip
+    python3-pip \
+    python3-tk \
+    g++ \
+    openjdk-8-jdk \
+    python3-dev \
+    curl
 
 RUN mkdir -p /opt/code/aiduez \
     && mkdir -p /aihub/workspace \
@@ -47,5 +52,6 @@ COPY custom/custom.css /root/.jupyter/custom/custom.css
 COPY custom/custom.js /root/.jupyter/custom/custom.js
 COPY custom/index.html.j2 /usr/local/share/jupyter/nbconvert/templates/lab/index.html.j2
 COPY custom/configuration.py /usr/local/lib/python3.8/dist-packages/voila/configuration.py
+COPY custom/api.py /usr/local/lib/python3.8/dist-packages/ludwig/api.py
 
 WORKDIR /aihub/workspace

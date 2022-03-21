@@ -1,3 +1,4 @@
+from typing import Dict
 import ipyvuetify as v
 import logging
 from ludwig.api import LudwigModel
@@ -5,9 +6,9 @@ import ipywidgets as widgets
 from IPython.display import display
 import shutil
 import os   
+import json
 import numpy as np
 from components.cards import BaseCard
-from utils import get_or_create_class
 from components.forms import DataSelect, DataSlider, LabeledSelect, SimpleSlider
 from components.buttons import StatedBtn
 from components.layouts import IndexRow
@@ -20,54 +21,84 @@ class TabularModel:
         self, 
         app_context: object = None,
         context_key: str = None,
-        config: dict = None,
-        output: dict = None,
-        logging_level: object = None,
         **kwargs
         ):
 
         self.app_context = app_context
-        self.config = config
-        self.output_logs = output['logs']
-        self.output_plots = output['plots']
-        self.logging_level = logging_level
-        self.data = app_context.current_data
-        self.data_name = app_context.current_data_name
-        self.model_name = 'latest'
-        self.output_directory = 'train_test'
-        self.output_model_directory = os.path.join(self.output_directory, f'{self.data_name}_{self.model_name}')
+        self.context_key = context_key
+        self.current_exp_and_model_name = ''
 
-        # temporary for testing
-        if os.path.exists(self.output_directory):
-            delete_files_in_dir(self.output_directory)
-        else:
-            os.makedirs(self.output_directory)
-
-    def train(self):
-        if os.path.isdir(self.output_model_directory):
-            shutil.rmtree(self.output_model_directory)
+    def train(self, output_logs, output_plots, **kwargs):
         config = self.app_context.tabular_ai_training__modeling_options.retrieve_config()
-        self.model = LudwigModel(config, logging_level = self.logging_level)
+        self.output_logs = output_logs
+        self.output_plots = output_plots
+        self.current_model = LudwigModel(config, logging_level = logging.INFO)
+        self.data_name = self.app_context.tabular_dataset.current_data_name
+        self.current_model_name = 'latest'
+        self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
+        self.dataset = self.app_context.tabular_dataset.current_data
+        self.output_directory =  self.app_context.tabular_workbook.current_models_dir # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models
+
+        self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
+        
+        # clear output directory if model_name is 'latest'
+        if self.current_model_name == 'latest':
+            delete_files_in_dir(self.output_directory)
 
         with self.output_logs:
-            self.eval_stats, self.train_stats, self.preprocessed_data, self.output_dir = self.model.experiment(
-                dataset=self.data, 
-                experiment_name=self.data_name, 
-                model_name=self.model_name,
-                output_directory=self.output_directory,
+            self.eval_stats, self.train_stats, self.preprocessed_data, self.output_dir = self.current_model.experiment(
+                dataset = self.dataset,
+                experiment_name = self.data_name, 
+                model_name = self.current_model_name,
+                output_directory = self.output_directory,
                 skip_save_processed_input = True,
                 skip_save_logs = True,
             )
             display(widgets.HTML("<br><br>"))
 
-        self.metadata = self.model.training_set_metadata
+        self.metadata = self.current_model.training_set_metadata # dict
 
         self.output_plots.children = [self.app_context.tabular_ai_training__train_result.make_plots(
-            self.train_stats,
-            self.eval_stats,
-            self.metadata,
+            self.train_stats, # train_statistics.json
+            self.eval_stats, # test_statistics.json
+            self.metadata, # model/training_set_metadata.json
         )]
 
+        # save output_logs
+        # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models/_latest
+        self.train_result_dir = f'{self.output_directory}/{self.data_name}_{self.current_model_name}'
+        ludwig_log_file = os.path.join('/aihub/workspace/tmp/ludwig.log')
+        result_logs_file =  os.path.join(self.train_result_dir, 'result_logs.txt')
+        shutil.move(ludwig_log_file, result_logs_file) 
+
+        # save modeling options
+        self.work_state_dir = self.app_context.tabular_workbook.current_work_state_dir
+        self.app_context.tabular_ai_training__modeling_options.save_config(self.work_state_dir)
+        self.app_context.tabular_ai_training__modeling_options.save_config(self.train_result_dir)
+
+        # set model in model_save_dialog text_field
+        self.app_context.tabular_ai_training__train_result.children[0].model_save_body.v_model = self.current_exp_and_model_name
+
+        self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
+        self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
+        self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
+
+    def save_as(self, model_name: str):
+        from_dir = self.train_result_dir
+        to_dir = f'{self.output_directory}/{model_name}'
+        if from_dir == to_dir:
+            raise Exception('from_dir and to_dir are same')
+        shutil.copytree(from_dir, to_dir)
+
+    def load_model(self, model_name: str):
+        self.current_model_name = model_name
+        self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
+        self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
+        self.train_result_dir = f'{self.output_directory}/{self.data_name}_{self.current_model_name}'
+        self.app_context.tabular_ai_training__train_result.children[0].model_save_body.v_model = self.current_exp_and_model_name
+        self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
+        self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
+        self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
 class TabularTrainActivator(v.Row):
     def __init__(
         self,
@@ -95,24 +126,23 @@ class TabularTrainActivator(v.Row):
                 'style': 'padding-left:15px; padding-top:10px;',
             },
         )
-        
+
         def _activate_model_train(item, event=None, data=None):
+
             train_result = self.app_context.tabular_ai_training__train_result
             train_result.button_chart_view.hide()
             train_result.button_chart_view.disabled = True
 
             train_result.clear_contents()
             train_result.children[0].children[1].children = [train_result.output_logs]
-            train_result.show()
 
-            self.model = get_or_create_class(
-                'tabular_model',
-                self.app_context,
-                output = {'logs':train_result.output_logs, 'plots':train_result.output_plots},
-                logging_level = logging.INFO,
-            )
+            train_result.show()
             
-            self.model.train()
+            self.model = self.app_context.tabular_model
+            self.model.train(
+                output_logs = train_result.output_logs,
+                output_plots = train_result.output_plots,
+            )
             train_result.button_chart_view.disabled = False
             train_result.button_chart_view.show()
 
@@ -124,6 +154,7 @@ class TabularTrainActivator(v.Row):
         )
 
 class TabularTrainResult(BaseDialog):
+
     def __init__(
         self, 
         app_context:object = None,
@@ -190,18 +221,28 @@ class TabularTrainResult(BaseDialog):
                 # 'variable': 'x',
                 # 'children': train_button,
                 }],
-            header_title = '학습 결과',
+            header_title_main = '학습 결과',
+            header_title_sub = '모델명: ',
             header_bottom = self.selector,
             body_items = body_items,
-            body_size = {'width': '90vw', 'height': ['80vh', '80vh']},
+            body_size = {'width': '90vw', 'height': ['80vh']},
             body_border_bottom = [True],
             body_background_color = ["rgb(255, 255, 255)"],
             align = 'center',
-            more = False,
+            more = True,
             close = True,
+            save = True,
             class_ = context_key,
             app_context = self.app_context,
         )    
+
+        # make call-back function for saving
+
+
+        # self.save_button.on_event(
+        #     'click', 
+        #     self.app_context.tabular_model.save_as('model_name'),
+        #     )
 
     def clear_contents(self):
         self.output_logs.clear_output()
@@ -394,17 +435,17 @@ class TabularModelingOptions(BaseCard):
         **kwargs,
         ):   
 
+        self.app_context = app_context
+        self.data = app_context.tabular_dataset.current_data
+    
         self.style = {
             'column_options_body': "padding:0px;",
             'column_options_body_item': "min-height:62px; padding:0", 
         }
 
-        self.app_context = app_context
-        self.data = app_context.current_data
-
         # re-structure data for column-wise configuration
         num_rows = len(self.data.columns)
-        config= self.app_context.modeling_params['ludwig']['config']
+        self.config= self.app_context.modeling_params['ludwig']['config']
 
         # column options header ----------------------------------------------------------
         column_options_header_texts = [
@@ -423,39 +464,39 @@ class TabularModelingOptions(BaseCard):
 
         # column options body -------------------------------------------------------------
 
-         # reset data options body_rows when data is changed
+        # reset data options body_rows when data is changed
         def _ignore_data_row(index):
-            data_types[index].items = []
-            data_types[index].v_model = None
-            encoder_or_model_types[index].items = []
-            encoder_or_model_types[index].v_model = None
+            self.data_types[index].items = []
+            self.data_types[index].v_model = None
+            self.encoder_or_model_types[index].items = []
+            self.encoder_or_model_types[index].v_model = None
             self.column_options_rows[index].children[5].children = []
 
         def _change_additional_options(index: int):
-            in_out_ignore = in_out_ignore_buttons[index].v_slots[0]['children'][0].state
-            data_type = data_types[index].v_model
-            encoder_or_model_type = encoder_or_model_types[index].v_model
+            in_out_ignore = self.in_out_ignore_buttons[index].v_slots[0]['children'][0].state
+            data_type = self.data_types[index].v_model
+            encoder_or_model_type = self.encoder_or_model_types[index].v_model
             additional_option_dict = _get_additional_option(in_out_ignore, data_type, encoder_or_model_type)
             self.column_options_rows[index].children[5].children = _make_additional_option_widget_row(index, additional_option_dict)
 
         def _change_encoder_or_model_type(index: int):
-            in_out_ignore = in_out_ignore_buttons[index].v_slots[0]['children'][0].state
-            data_type = data_types[index].v_model
+            in_out_ignore = self.in_out_ignore_buttons[index].v_slots[0]['children'][0].state
+            data_type = self.data_types[index].v_model
             encoder_or_model_type = "encoder" if in_out_ignore == "input" else "model_type"
 
-            encoder_or_model_types[index].items = config[in_out_ignore][encoder_or_model_type][data_type]['values'] 
-            encoder_or_model_types[index].v_model = config[in_out_ignore][encoder_or_model_type][data_type]['default'] 
-            encoder_or_model_types[index].readonly = True if len(encoder_or_model_types[index].items) == 1 else False
+            self.encoder_or_model_types[index].items = self.config[in_out_ignore][encoder_or_model_type][data_type]['values'] 
+            self.encoder_or_model_types[index].v_model = self.config[in_out_ignore][encoder_or_model_type][data_type]['default'] 
+            self.encoder_or_model_types[index].readonly = True if len(self.encoder_or_model_types[index].items) == 1 else False
 
             _change_additional_options(index)
 
         def _change_data_types(index: int):
-            in_out_ingore = in_out_ignore_buttons[index].v_slots[0]['children'][0].state
+            in_out_ingore = self.in_out_ignore_buttons[index].v_slots[0]['children'][0].state
             pandas_data_type = pandas_data_types[index].v_model
 
-            data_types[index].items = config[in_out_ingore]['dtype'][pandas_data_type]['values']
-            data_types[index].v_model = config[in_out_ingore]['dtype'][pandas_data_type]['default']
-            data_types[index].readonly = True if len(data_types[index].items) == 1 else False
+            self.data_types[index].items = self.config[in_out_ingore]['dtype'][pandas_data_type]['values']
+            self.data_types[index].v_model = self.config[in_out_ingore]['dtype'][pandas_data_type]['default']
+            self.data_types[index].readonly = True if len(self.data_types[index].items) == 1 else False
 
             _change_encoder_or_model_type(index)
 
@@ -473,8 +514,8 @@ class TabularModelingOptions(BaseCard):
             # change state, icon & text
             item.state = new['state']
             item.children[0].children = [new['icon']]
-            in_out_ignore_buttons[index].children = [new['text']]
-            
+            self.in_out_ignore_buttons[index].children = [new['text']]
+
             # change subordinate data
             if item.state != 'ignore':
                 _change_data_types(index)
@@ -483,11 +524,10 @@ class TabularModelingOptions(BaseCard):
 
             # check if output column is 
             train_ready = False
-            for i in range(len(in_out_ignore_buttons)):
-                if in_out_ignore_buttons[i].v_slots[0]['children'][0].state == 'output':
+            for i in range(len(self.in_out_ignore_buttons)):
+                if self.in_out_ignore_buttons[i].v_slots[0]['children'][0].state == 'output':
                     train_ready = True
                     break
-            
             
             self.app_context.tabular_ai_training__train_activator.train_activator.disabled = not train_ready
             if train_ready:
@@ -507,7 +547,7 @@ class TabularModelingOptions(BaseCard):
             btn.on_event('click', _on_click_in_out_ignore)
             return btn
 
-        in_out_ignore_buttons = [
+        self.in_out_ignore_buttons = [
             v.Tooltip(
                 right=True, 
                 v_slots=[{
@@ -540,14 +580,14 @@ class TabularModelingOptions(BaseCard):
         ]
 
         # (4) data_type for modeling -------------------------------------------------
-        data_types = [
+        self.data_types = [
             DataSelect(
                 index = str(i),
-                items = config['input']['dtype'][dtype.v_model]['values'],
-                v_model = config['input']['dtype'][dtype.v_model]['default'],
+                items = self.config['input']['dtype'][dtype.v_model]['values'],
+                v_model = self.config['input']['dtype'][dtype.v_model]['default'],
                 dense = True,
                 style_ = "max-width:150px; margin-right:24px;",
-                readonly = True if len(config['input']['dtype'][dtype.v_model]['values']) == 1 else False
+                readonly = True if len(self.config['input']['dtype'][dtype.v_model]['values']) == 1 else False
             ) for i, dtype in enumerate(pandas_data_types)
         ]
 
@@ -555,34 +595,34 @@ class TabularModelingOptions(BaseCard):
             index = int(item.index)
             _change_encoder_or_model_type(index)
 
-        for item in data_types:
+        for item in self.data_types:
             item.on_event('change', _on_select_data_type)
 
         # (5) input: encoder / output: model type--------------------------------
-        encoder_or_model_types = [
+        self.encoder_or_model_types = [
             DataSelect(
                 index = str(i),
-                items = config['input']['encoder'][dtype.v_model]['values'],
-                v_model = config['input']['encoder'][dtype.v_model]['default'],
+                items = self.config['input']['encoder'][dtype.v_model]['values'],
+                v_model = self.config['input']['encoder'][dtype.v_model]['default'],
                 dense = True,
                 style_ = "max-width:150px; margin-right:24px;",
-                readonly = True if len(config['input']['encoder'][dtype.v_model]['values']) == 1 else False
-            ) for i, dtype in enumerate(data_types)
+                readonly = True if len(self.config['input']['encoder'][dtype.v_model]['values']) == 1 else False
+            ) for i, dtype in enumerate(self.data_types)
         ]
 
         def _on_select_encoder_or_model_type(item, event=None, data=None):
             index = int(item.index)
             _change_additional_options(index)
 
-        for item in encoder_or_model_types:
+        for item in self.encoder_or_model_types:
            item.on_event('change', _on_select_encoder_or_model_type)
 
         # (6) additional options--------------------------------
         def _get_additional_option(in_out_ignore, data_type, encoder_or_model_type):
-            return config[in_out_ignore]['additional_config'][data_type][encoder_or_model_type]
+            return self.config[in_out_ignore]['additional_config'][data_type][encoder_or_model_type]
 
         def _make_additional_option_widget_row(index, additional_option_dict):
-            additional_option_widgets = []
+            self.additional_option_widgets = []
             for additional_option in additional_option_dict.items():
                 if additional_option[0] == 'activation':
                     widget = LabeledSelect(
@@ -596,7 +636,7 @@ class TabularModelingOptions(BaseCard):
                             border-radius: 8px; background-color: #f1f1f1;",
                         readonly = True if len(additional_option[1]['values']) == 1 else False,
                     )
-                    additional_option_widgets.append(widget)
+                    self.additional_option_widgets.append(widget)
 
                 if additional_option[0] == 'representation':
                     widget = LabeledSelect(
@@ -610,7 +650,7 @@ class TabularModelingOptions(BaseCard):
                             border-radius: 8px; background-color: #f1f1f1;",
                         readonly = True if len(additional_option[1]['values']) == 1 else False,
                     )
-                    additional_option_widgets.append(widget)
+                    self.additional_option_widgets.append(widget)
                 
                 if additional_option[0] == 'num_fc_layers':
                     widget = DataSlider(
@@ -622,7 +662,7 @@ class TabularModelingOptions(BaseCard):
                         style_ = "max-width:220px; padding: 0; margin: 3px !important; \
                             border-radius: 8px; background-color: #f1f1f1;",
                     )
-                    additional_option_widgets.append(widget)
+                    self.additional_option_widgets.append(widget)
                 
                 if additional_option[0] == 'fc_size':
                     widget = DataSlider(
@@ -634,7 +674,7 @@ class TabularModelingOptions(BaseCard):
                         style_ = "max-width:220px; padding: 0; margin: 3px !important; \
                             border-radius: 8px; background-color: #f1f1f1;",
                     )
-                    additional_option_widgets.append(widget)
+                    self.additional_option_widgets.append(widget)
 
                 if additional_option[0] == 'embedding_size':
                     widget = DataSlider(
@@ -646,7 +686,7 @@ class TabularModelingOptions(BaseCard):
                         style_ = "max-width:220px; padding: 0; margin: 3px !important; \
                             border-radius: 8px; background-color: #f1f1f1;",
                     )
-                    additional_option_widgets.append(widget)
+                    self.additional_option_widgets.append(widget)
 
                 if additional_option[0] == 'dropout':
                     widget = DataSlider(
@@ -658,26 +698,26 @@ class TabularModelingOptions(BaseCard):
                         style_ = "max-width:220px; padding: 0; margin: 3px !important; \
                             border-radius: 8px; background-color: #f1f1f1;",
                     )
-                    additional_option_widgets.append(widget)
-            return additional_option_widgets
+                    self.additional_option_widgets.append(widget)
+            return self.additional_option_widgets
         
         self.additional_option_rows =  [_get_additional_option(            
             in_out_ignore_button.v_slots[0]['children'][0].state, 
             data_type_option.v_model, 
             encoder_or_model_type.v_model
-            ) for in_out_ignore_button, data_type_option, encoder_or_model_type in zip(in_out_ignore_buttons, data_types, encoder_or_model_types)
+            ) for in_out_ignore_button, data_type_option, encoder_or_model_type in zip(self.in_out_ignore_buttons, self.data_types, self.encoder_or_model_types)
         ]
 
         self.additional_option_widget_rows = []
         for i, additional_option_dict in enumerate(self.additional_option_rows):
             self.additional_option_widget_rows.append(_make_additional_option_widget_row(i, additional_option_dict))
-   
+  
 #-------------------------------------------------------------------------------
         self.column_options_rows = [
             IndexRow(
                 index = str(i),
                 children = [
-                    in_out_ignore_buttons[i], column_names[i], pandas_data_types[i], data_types[i], encoder_or_model_types[i],
+                    self.in_out_ignore_buttons[i], column_names[i], pandas_data_types[i], self.data_types[i], self.encoder_or_model_types[i],
                     v.Row(
                         children =  self.additional_option_widget_rows[i],
                         style_ = "margin:0;",
@@ -769,7 +809,7 @@ class TabularModelingOptions(BaseCard):
 
         super().__init__(
             class_ = context_key,
-            header_title = title,
+            header_title_main = title,
             header_bottom  = column_options_header,
             body_items = [
                 self.column_options_body, 
@@ -782,10 +822,12 @@ class TabularModelingOptions(BaseCard):
                     },
             body_border_bottom = [True, True],
             body_background_color = ["rgb(255, 255, 255)", "rgb(248, 250, 252)"],
-            align = 'center'
+            align = 'center',
+            app_context = self.app_context,
         )
 
-    def retrieve_config(self):
+
+    def retrieve_config(self) -> dict: 
         self.train_config = {
             "input_features": [],
             "combiner": {"type":"concat"},
@@ -803,33 +845,27 @@ class TabularModelingOptions(BaseCard):
         def _get_additional_option_config(row):
             additional_option_config = {}
             for widget in row.children[-1].children:
-                if widget.__class__.__name__ == 'LabeledSelect':
-                    additional_option_config.update(
-                        {widget.class_: widget.children[0].children[1].v_model}
-                        )
-                elif widget.__class__.__name__ == 'DataSlider':
-                    additional_option_config.update(
-                        {widget.class_: widget.children[0].children[1].v_model}
-                        )
+                additional_option_config.update(
+                    {widget.class_: widget.children[0].children[1].v_model}
+                    )
+
             return additional_option_config
 
         for row in self.column_options_rows:
             additional_option_config = _get_additional_option_config(row)
+
+            config_type = []
             if row.children[0].children[0] == "입력":
-                self.train_config["input_features"].append(
-                    {
-                        "name": row.children[1].children[0],
-                        "type": row.children[3].v_model,
-                        "encoder": row.children[4].v_model,
-                        **additional_option_config
-                    }
-                )
+                config_type = ["input_features", "encoder"]
             elif row.children[0].children[0] == "출력":
-                self.train_config["output_features"].append(
+                config_type = ["output_features", "decoder"]
+
+            if not config_type == []:
+                self.train_config[config_type[0]].append(
                     {
                         "name": row.children[1].children[0],
                         "type": row.children[3].v_model,
-                        "decoder": row.children[4].v_model,
+                        config_type[1]: row.children[4].v_model,
                         **additional_option_config
                     }
                 )
@@ -841,3 +877,11 @@ class TabularModelingOptions(BaseCard):
         self.train_config["training"]["learning_rate"] = self.train_parameter.children[4].children[1].children[0].v_model
 
         return self.train_config
+
+    def save_config(self, path: str):
+        config_path_to_save = os.path.join(path, "modeling_options.json")
+
+        with open(config_path_to_save, 'w') as f:
+            json.dump(self.retrieve_config(), f, indent=4)
+        
+

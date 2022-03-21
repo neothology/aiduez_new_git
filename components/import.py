@@ -123,7 +123,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             
             body_items=[
                 
@@ -207,7 +207,7 @@ class TabularLocalImport(BaseCard, AppCell):
         
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[
                 # self.data_upload,
                 # self.uploaded_data
@@ -295,7 +295,7 @@ class TabularEDAPImport(BaseCard):
         # self.edap_upload.on_event('click',_on_edap_upload)
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[
                 self.edap_upload,
                 self.uploaded_data,
@@ -316,7 +316,7 @@ class TabularPodImport(BaseCard):
         title = "POD"
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[],
             body_size={
                 "width":"1570px",
