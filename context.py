@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from utils import read_config
+
 @dataclass
 class AppContext:
 
@@ -42,6 +43,8 @@ class AppContext:
     tabular_data_import_local: object = None
     tabular_data_import_edap: object = None
     tabular_data_import_pod: object = None
+
+    
 
     # tabular data analyze objects
     tabular_data_analyze: object = None
@@ -115,3 +118,7 @@ class AppContext:
         self.processing_params: dict = app_config['processing_params']
         self.modeling_params: dict = app_config['modeling_params']
 
+    
+    
+    # def createJob(self, currPjtName, data_name):
+    #     self.info = [True, "작업 생성 완료"]
