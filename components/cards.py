@@ -222,6 +222,15 @@ class BaseCard(v.Card):
             children = self.children,
         )
 
+    def update_body_items(self, body_items):
+        self.card_body = [v.CardText(
+                style_ = self.style['card_body'][n],
+                children = [body_item]
+            )for n, body_item in enumerate(body_items)]
+        self.children = [self.card_header, *self.card_body, self.card_footer]
+
+
+
 class SmallHeaderCard(v.Card):
     def __init__(
         self, 
