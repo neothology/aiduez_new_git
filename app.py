@@ -1,6 +1,7 @@
 from context import AppContext
-from utils import get_or_create_class
-
+from utils import get_or_create_class, delete_files_in_dir
+import os
+import ipyvuetify as v
 class Aian:
     def __init__(self, **kwargs):
 
@@ -8,8 +9,15 @@ class Aian:
         self.app_context = AppContext(
             theme = kwargs.get('theme') if kwargs.get('theme') else 'ez_default',
         ) 
+        # delete tmp directory contents if exists, else make tmp directory
+        tmp_dir = self.app_context.env_values['tmp_dir']
+        if os.path.exists(tmp_dir):
+            delete_files_in_dir(tmp_dir)
+        else:
+            os.makedirs(tmp_dir)
 
         # initialize layout
+        self.overlay = get_or_create_class('base_overlay', self.app_context)
         self.background = get_or_create_class('background', self.app_context)
         self.top_area = get_or_create_class('top_area', self.app_context)
         self.work_area = get_or_create_class('work_area', self.app_context)
@@ -21,7 +29,7 @@ class Aian:
 
         # merge components into layouts
         self.side_nav.children = [self.side_nav_menu]
-        self.background.children = [self.top_area, self.side_nav, self.work_area]
+        self.background.children = [self.overlay, self.top_area, self.side_nav, self.work_area]
 
         # when re-loaded, establish from thst last saved state
         # ...

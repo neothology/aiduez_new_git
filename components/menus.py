@@ -120,7 +120,7 @@ class ListMenu(v.List):
          # code_add: run progress circular: with...
         def _proceed_to_target(item, event=None, data=None): 
 
-            task_type = item.value.split('_')[0] # code_add: to use different pipeline by task_type
+            task_type = item.value.split('_')[0] # code_add: to use different workbook by task_type
 
             # set 'active' to last activated item wihich is now deactivated
             if self.last_activated_item:
@@ -245,7 +245,7 @@ class TabMenu(v.Col):
             # add - run progress circular: with...
 
             # get target and set
-            setattr(self.app_context, f'{self.app_context.current_workflow}_workflow_stage', tab.value)
+            self.app_context.current_workflow_stage = tab.value
             target_instance = get_or_create_class(tab.value, self.app_context) # for example, tab.value = "tabular_ai_training"
             self.target_area.children = [target_instance]
 
@@ -253,7 +253,7 @@ class TabMenu(v.Col):
         default_tab_name: str = self.tab_props['default']
         default_tab = list(filter(lambda x: x.value == default_tab_name, self.tab_menu.children))[0]
         _proceed_to_target(default_tab)
-
+        
         for tab in self.tab_menu.children:
             tab.on_event('click', _proceed_to_target)
 

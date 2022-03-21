@@ -98,7 +98,7 @@ class TabularSingleProcessingMenu(BaseCard):
         
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[self.processing_ui],
             body_size={
                 "width":"lg",
@@ -345,7 +345,7 @@ class TabularMultipleProcessing(BaseCard):
         title = "복합칼럼변환"
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[],
             body_size={
                 "width":"1570px",

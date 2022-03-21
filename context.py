@@ -1,27 +1,18 @@
 from dataclasses import dataclass
 from utils import read_config
-
 @dataclass
 class AppContext:
 
 ## set env as dev or prod
     env: str = None
 
-## config variables necessary when initialization ##
+## config variables necessary when initialization
     theme: str = None
 
-## pipeline variables #
-    current_work_file: object = None
-    mf_experiment_id: str = None
-    mf_experiment_name: str = None
-
-## common variabls for general use ##
-    current_user: dict = None
+## current variables
+    current_user: str = None
     current_workflow: str = None
-    current_workfile: object = None
-    current_model: object = None
-
-    pipeline: object = None
+    current_workflow_stage: str = None
 
 ## base layout object ##
     background: object = None
@@ -29,16 +20,20 @@ class AppContext:
     side_nav_menu: object = None
     top_area: object = None
     work_area: object = None
+    base_overlay: object = None
 
 ## workflow stages object ##
     # --------------------------------------------------
     tabular_base: object = None
+    tabular_workbook: object = None
+    tabular_dataset: object = None
+    tabular_model: object = None
+
     tabular_tab_menu: object = None
     tabular_contents: object = None
-    tabular_workflow_stage: str = None
+    tabular_data_context: object = None
     tabular_model: object = None
     tabular_dataset: object = None
-    tabular_data_context: object = None
 
     # tabular data import objects
     tabular_data_import: object = None
@@ -63,14 +58,12 @@ class AppContext:
     tabular_ai_training__modeling_options: object = None
     tabular_ai_training__column_summary: object = None
     tabular_ai_training__train_result: object = None
-    tabular_ai_training__train_plots: object = None
 
     tabular_ai_evaluation: object = None
     # --------------------------------------------------
     text_base: object = None
     text_tab_menu: object = None
     text_contents: object = None
-    text_workflow_stage: str = None
 
     text_data_import: object = None
     text_data_analyze: object = None
@@ -81,7 +74,6 @@ class AppContext:
     image_base: object = None
     image_tab_menu: object = None
     image_contents: object = None
-    image_workflow_stage: str = None
 
     image_data_import: object = None
     image_data_analyze: object = None
@@ -92,7 +84,6 @@ class AppContext:
     audio_base: object = None
     audio_tab_menu: object = None
     audio_contents: object = None
-    audio_workflow_stage: str = None
 
     audio_data_import: object = None
     audio_data_analyze: object = None
@@ -103,7 +94,6 @@ class AppContext:
     video_base: object = None
     video_tab_menu: object = None
     video_contents: object = None
-    video_workflow_stage: str = None
 
     video_data_import: object = None
     video_data_analyze: object = None

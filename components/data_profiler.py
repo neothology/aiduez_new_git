@@ -220,7 +220,7 @@ class ColumnSummary(BaseCard):
 
         super().__init__(
             class_ = context_key,
-            header_title = title,
+            header_title_main = title,
             body_items = [v.Row(
                 class_ = "",
                 style_ = "margin:0",
@@ -228,6 +228,7 @@ class ColumnSummary(BaseCard):
             )],
             body_size = {"width":"1570px", "height":"auto"},
             align = 'center',
+            app_context = self.app_context
         )
 
     def update_data(self, col:pd.Series):

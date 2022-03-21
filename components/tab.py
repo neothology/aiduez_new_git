@@ -1,8 +1,5 @@
-from click import style
 import ipyvuetify as v
 from utils import get_or_create_class
-from pipeline import Pipeline
-
 class BaseTab(v.Tabs):
     def __init__(
         self,
