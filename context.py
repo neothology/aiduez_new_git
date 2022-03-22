@@ -21,8 +21,13 @@ class AppContext:
     def addData(self, dataname, df):
         self.df = df
         numCol = len(self.df.columns)
-        colDtypes = ','.join([str(dtype) for dtype in df.dtypes.values])   
+        colDtypes = ','.join([str(dtype) for dtype in df.dtypes.values])
+
+        ## test용으로 local data 폴더에 업로드   
         df.to_csv(f"/opt/code/aiduez/data/{dataname}.csv", index = False)
+
+        ## aihub/data에 업로드
+        # df.to_csv(f"../../../aihub/data/{dataname}.csv", index = False)
 
 
 ## set env as dev or prod

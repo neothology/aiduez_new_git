@@ -11,6 +11,7 @@ from ipywidgets.widgets import widget_float
 from ipywidgets.widgets.widget_layout import Layout
 import pandas as pd
 
+
 from components.globals import html_UI_seperator
 import ipywidgets as widgets
 from components.cell import AppCell
@@ -59,12 +60,15 @@ class TabularAIDUImport(BaseCard, AppCell):
         
 
         self.button = v.Btn(color = 'primary', class_= 'ma-2 white--text', children = ['데이터 가져오기', v.Icon(right = True, children = ['mdi-cloud-upload'])])
-        # data_options = make_path_select_options(Path(os.sep, "aihub","data"),recursive=True, extensions=None)
+        data_options = make_path_select_options(Path(os.sep, "aihub","data"),recursive=True, extensions=None)
         # data_options = make_path_select_options(Path(os.sep, "opt","code","aiduez","data"),recursive=True, extensions=None)
-        data_options = os.listdir('data')
+        # data_options = os.listdir('data')
         workspace_data_options = make_path_select_options(os.getcwd(), recursive=False, extensions=['.csv','.tsv'])
         # self.data_select = widgets.Select(options = data_options, value = None,rows =7)
-        self.data_select = v.Select(label = 'Data',items = data_options, value = None,rows =7)
+        data_list = []
+        for i in range (0, len(data_options)):
+            data_list.append(data_options[i][0])
+        self.data_select = v.Select(label = 'Data',items = data_list, value = None,rows =7)
         # self.workspace_data_select = widgets.Select(options = workspace_data_options,value=None,rows= 7)
         self.workspace_data_select = v.Select(items = [workspace_data_options],value=None,rows= 7)
         self.data_select.observe(self.on_data_select,names="value")
@@ -78,7 +82,8 @@ class TabularAIDUImport(BaseCard, AppCell):
             v.Html(
                 tag = 'h5', 
                 children = ["AIDU 플랫폼에 업로드한 데이터"]
-            ), 
+            ),
+            
             self.data_select
         ])
         # workspace_box = widgets.VBox([widgets.HTML("<h5> 현재 경로에 생성한 데이터 (csv, tsv) </h5>"), self.workspace_data_select])
@@ -108,12 +113,7 @@ class TabularAIDUImport(BaseCard, AppCell):
 
             v.Row(style_ = 'padding-top:150px', children = [self.upload_widgets()]),
             v.Row(style_='padding-top:50px', children = [self.button])
-            # v.Row(children = [aidu_box]),
-            # v.Row(children = [workspace_box]),
-            # v.Row(children = [self.encoding_widgets()]),
-            # v.Row(children = [self.seperator_widgets()],),
-            # v.Row(children = [self.upload_widgets()]),
-            # v.Row(children = [self.button])
+            
 
         ])
 
@@ -141,18 +141,7 @@ class TabularAIDUImport(BaseCard, AppCell):
     def on_data_select(self, change):
             self.button.disabled = False
             self.selected_datapath = change["new"]
-    # def on_clicked(self,btn):
-    #     data_name = os.path.splitext(self.selected_datapath.name)[0]
-    #     info = self.context.validatePipe(data_name, 'add_data')
-    #     uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding,sep = self.seperator_widgets.seperator, filepath = self.selected_datapath)
-    #     if uploaded_data is not None:
-    #         self.context.createJob(self.context.currPjtName, data_name)
-    #         self.context.addData(self.context.currJobID, data_name, uploaded_data)    
-    #         self.context.getCellOf('form-ctx-summary').redraw() 
-    #         self.upload_widgets.complete(data_name)        
-    #     self.data_select.value = None
-    #     self.workspace_data_select.value = None
-    #     self.button.disabled = True
+    
 
     def on_clicked(self,widget, event, data):
         data_name = os.path.splitext(self.selected_datapath.name)[0]
@@ -267,6 +256,24 @@ class TabularEDAPImport(BaseCard):
         self.app_context = app_context
         self.context_key = context_key
         title = "EDAP에서 데이터 가져오기"
+        # def on_clicked(self,btn):
+        #     uploaded_data = self.edap_widgets.execute_query()
+        #     data_name = self.edap_widgets.curr_table
+        #     if uploaded_data is not None:
+        #         self.context.createJob(self.context.currPjtName, data_name)
+        #         self.context.addData(self.context.currJobID, data_name, uploaded_data)    
+        #         self.context.getCellOf('form-ctx-summary').redraw() 
+        #         self.edap_widgets.append_bottom_right_box(widgets.HTML(f"<h5> {data_name} 데이터가 업로드되었습니다. </h5>"))
+        
+        # query_button = widgets.Button(description = "데이터 가져오기")
+        # self.edap_widgets = EDAPWidgets(query_button)
+        # query_button.on_click(self.on_clicked)
+        # # with self.output:
+        # #     display(self.edap_widgets())
+
+        # self.edap_upload = v.Container(
+        #     children = [self.edap_widgets()]
+        # )
 
         self.edap_upload = v.Container(
             children = [
@@ -283,13 +290,13 @@ class TabularEDAPImport(BaseCard):
             ]
         )
 
-        self.uploaded_data = v.Container(
-            children=[
-                v.Card(children = [
-                    "Upload Data"
-                ])
-            ]
-        )
+        # self.uploaded_data = v.Container(
+        #     children=[
+        #         v.Card(children = [
+        #             "Upload Data"
+        #         ])
+        #     ]
+        # )
         # def _on_edap_upload(item, event = None, data = None):
         
         # self.edap_upload.on_event('click',_on_edap_upload)
@@ -298,7 +305,7 @@ class TabularEDAPImport(BaseCard):
             header_title=title,
             body_items=[
                 self.edap_upload,
-                self.uploaded_data,
+                
             ],
             body_size={
                 "width":"1570px",
