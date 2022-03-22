@@ -1,8 +1,7 @@
 envs: 
   workspace_dir: /aihub/workspace
-  data_dir: /aihub/data
   tmp_dir: /aihub/workspace/tmp
-
+  tmp_workbook_dir: /aihub/workspace/tmp/workbook
 
 class_paths:
   # components - layout & menu
@@ -13,15 +12,21 @@ class_paths:
   list_menu: components.menus.ListMenu
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
-
-  # other components
+  
+  # other common components
   column_summary: components.data_profiler.ColumnSummary
+  base_overlay: components.overlays.BaseOverlay
 
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
   task_all: workflows.task.TaskAll
 
+  # workflow-tabular
   tabular_base: workflows.tabular.TabularBase
+  tabular_workbook: workbooks.TabularWorkbook
+  tabular_dataset: components.dataset.TabularDataset
+  tabular_data_context: components.dataset.TabularDataContext
+  tabular_model: components.modeling.TabularModel
 
   tabular_data_import: workflows.tabular.TabularDataImport
   tabular_data_import_tab: components.import.TabularImportTab
@@ -31,15 +36,18 @@ class_paths:
   tabular_data_import_pod: components.import.TabularPodImport
 
   tabular_data_analyze: workflows.tabular.TabularDataAnalyze
+
   tabular_data_processing: workflows.tabular.TabularDataProcessing
+  tabular_data_processing_tab: components.processing.TabularProcessingTab
+  tabular_data_single_processing: components.processing.TabularSingleProcessing
+  tabular_data_single_processing_dialog: components.processing.TabularSingleProcessingDialog
+  tabular_data_multiple_processing: components.processing.TabularMultipleProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
   tabular_modeling_options: components.modeling.TabularModelingOptions
-  tabular_model: components.modeling.TabularModel
   tabular_train_activator: components.modeling.TabularTrainActivator
   tabular_train_result: components.modeling.TabularTrainResult
-  tabular_train_plots: components.modeling.TabularTrainPlots
-
+  
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
   text_base: workflows.text.TextBase
@@ -366,8 +374,8 @@ processing_params:
             values: [re_extract]
             default: re_extract
           nlp:
-            values: [morpheme_analysis, noun_extract]
-            default: morpheme_analysis
+            values: [형태소 분석, 명사 추출]
+            default: 형태소 분석
       additional_config:
         quantile_transformer:
           option:
@@ -382,6 +390,11 @@ processing_params:
               values: [10, 1000, 1, 10] # min, max, step, default
         kbins_discretizer:
           option:
+            -
+              name: strategy
+              type: select
+              values: ['quantile', 'uniform', 'kmeans']
+              default: 'quantile'
             - 
               name: n_bins
               type: slider
@@ -393,6 +406,10 @@ processing_params:
               type: select
               values: ['most_frequent', 'median', 'mean',  'constant']
               default: most_frequent
+            - 
+              name: value
+              type: text
+              value: ""
         missing_cat_imputer:
           option:
             -
@@ -400,8 +417,31 @@ processing_params:
               type: select
               values: ['most_frequent', 'constant']
               default: most_frequent
-
-# 학습 parameter 정의
+            - 
+              name: value
+              type: text
+              value: ""
+        re_extract:
+          option:
+            -
+              name: regex
+              type: text
+              value: '(.*)'
+        형태소 분석:
+          option:
+            -
+              name: package
+              type: select
+              values: ['komoran', 'hannanum']
+              default: komoran
+        명사 추출:
+          option:
+            -
+              name: package
+              type: select
+              values: ['komoran', 'hannanum']
+              default: komoran
+ # 학습 parameter 정의
 modeling_params:
   ludwig:
     config:

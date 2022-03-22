@@ -1,52 +1,19 @@
 from dataclasses import dataclass
 from utils import read_config
-from pipeline import Pipeline
-from IPython.display import display
-import ipywidgets as widgets
-from pathlib import Path
-import warnings
-import os
 
 @dataclass
 class AppContext:
 
-    
-    # Pipline 적용시 수정예정
-    def validatePipe(self, name, type):
-        NoErr = [True, ""]
-
-        if type == 'add_data':
-            return NoErr    
-
-    def addData(self, dataname, df):
-        self.df = df
-        numCol = len(self.df.columns)
-        colDtypes = ','.join([str(dtype) for dtype in df.dtypes.values])
-
-        ## test용으로 local data 폴더에 업로드   
-        df.to_csv(f"/opt/code/aiduez/data/{dataname}.csv", index = False)
-
-        ## aihub/data에 업로드
-        # df.to_csv(f"../../../aihub/data/{dataname}.csv", index = False)
-
-
 ## set env as dev or prod
     env: str = None
 
-## config variables necessary when initialization ##
+## config variables necessary when initialization
     theme: str = None
 
-## pipeline variables #
-    current_work_file: object = None
-    mf_experiment_id: str = None
-    mf_experiment_name: str = None
-
-## common variabls for general use ##
-    current_user: dict = None
-    current_data_name: str = ''
-    current_data: object = None
+## current variables
+    current_user: str = None
     current_workflow: str = None
-    current_workfile: object = None
+    current_workflow_stage: str = None
 
 ## base layout object ##
     background: object = None
@@ -54,14 +21,20 @@ class AppContext:
     side_nav_menu: object = None
     top_area: object = None
     work_area: object = None
+    base_overlay: object = None
 
 ## workflow stages object ##
     # --------------------------------------------------
     tabular_base: object = None
+    tabular_workbook: object = None
+    tabular_dataset: object = None
+    tabular_model: object = None
+
     tabular_tab_menu: object = None
     tabular_contents: object = None
-    tabular_workflow_stage: str = None
+    tabular_data_context: object = None
     tabular_model: object = None
+    tabular_dataset: object = None
 
     # tabular data import objects
     tabular_data_import: object = None
@@ -80,6 +53,7 @@ class AppContext:
     tabular_data_processing: object = None
     tabular_data_processing_tab: object = None
     tabular_data_single_processing: object = None
+    tabular_data_single_processing_dialog: object = None
     tabular_data_processing_column_summary: object = None
 
     # tabilar ai training objects
@@ -88,14 +62,12 @@ class AppContext:
     tabular_ai_training__modeling_options: object = None
     tabular_ai_training__column_summary: object = None
     tabular_ai_training__train_result: object = None
-    tabular_ai_training__train_plots: object = None
 
     tabular_ai_evaluation: object = None
     # --------------------------------------------------
     text_base: object = None
     text_tab_menu: object = None
     text_contents: object = None
-    text_workflow_stage: str = None
 
     text_data_import: object = None
     text_data_analyze: object = None
@@ -106,7 +78,6 @@ class AppContext:
     image_base: object = None
     image_tab_menu: object = None
     image_contents: object = None
-    image_workflow_stage: str = None
 
     image_data_import: object = None
     image_data_analyze: object = None
@@ -117,7 +88,6 @@ class AppContext:
     audio_base: object = None
     audio_tab_menu: object = None
     audio_contents: object = None
-    audio_workflow_stage: str = None
 
     audio_data_import: object = None
     audio_data_analyze: object = None
@@ -128,7 +98,6 @@ class AppContext:
     video_base: object = None
     video_tab_menu: object = None
     video_contents: object = None
-    video_workflow_stage: str = None
 
     video_data_import: object = None
     video_data_analyze: object = None

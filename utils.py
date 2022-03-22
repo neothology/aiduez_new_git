@@ -3,6 +3,8 @@ from os.path import expanduser
 import importlib
 import shutil
 import os
+import json
+import numpy as np
 
 
 def read_config():
@@ -43,13 +45,25 @@ def get_or_create_class(class_path_key:str, app_context:object, context_key:str 
 def set_theme_style(app_context: dict, context_key: str,  elem: str = 'base', style_type: str = 'default') -> dict:
     return app_context.theme_values[context_key]['style'][elem][style_type] 
 
-def delete_files_in_dir(dir_path):
+def delete_files_in_dir(dir_path, except_files: list = []):
     for filename in os.listdir(dir_path):
-        file_path = os.path.join(dir_path, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+        if filename not in except_files:
+            file_path = os.path.join(dir_path, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+class JsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(JsonEncoder, self).default(obj)

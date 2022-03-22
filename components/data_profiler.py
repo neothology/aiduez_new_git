@@ -213,14 +213,14 @@ class ColumnSummary(BaseCard):
 
     def __init__(self, app_context, context_key, title:str, col:pd.Series, **kwargs):
         self.app_context = app_context
-        self.data_name = app_context.current_data_name
+        self.data_name = app_context.tabular_dataset.current_data_name
         self._make_summary_data(self.data_name, col)
         self._make_chart_data(self.data_name, col) 
         table_headers, table_data_list, chart = self._make_output_data(col)
 
         super().__init__(
             class_ = context_key,
-            header_title = title,
+            header_title_main = title,
             body_items = [v.Row(
                 class_ = "",
                 style_ = "margin:0",
@@ -228,6 +228,7 @@ class ColumnSummary(BaseCard):
             )],
             body_size = {"width":"1570px", "height":"auto"},
             align = 'center',
+            app_context = self.app_context
         )
 
     def update_data(self, col:pd.Series):

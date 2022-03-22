@@ -122,8 +122,9 @@ class TabularAIDUImport(BaseCard, AppCell):
    
         
         super().__init__(
+            app_context = self.app_context,
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             
             body_items=[
                 
@@ -151,7 +152,7 @@ class TabularAIDUImport(BaseCard, AppCell):
             # self.context.createJob(self.context.currPjtName, data_name)
             # self.context.addData(self.context.currJobID, data_name, uploaded_data)    
             # self.context.getCellOf('form-ctx-summary').redraw()
-            self.app_context.addData(data_name,uploaded_data) 
+            self.app_context.tabular_workbook.create_new_work(data_name,uploaded_data) 
             self.upload_widgets.complete(data_name)        
         self.data_select.value = None
         self.workspace_data_select.value = None
@@ -195,8 +196,9 @@ class TabularLocalImport(BaseCard, AppCell):
         )
         
         super().__init__(
-            class_=context_key,
-            header_title=title,
+            app_context = self.app_context,
+            class_=context_key,            
+            header_title_main=title,
             body_items=[
                 # self.data_upload,
                 # self.uploaded_data
@@ -211,11 +213,12 @@ class TabularLocalImport(BaseCard, AppCell):
             align='center'
         )
     def _handle_uploaded(self, change):
-            
+         
             uploaded_dict = change["new"]
             file_name = list(uploaded_dict.keys())[0]
             data_name = os.path.splitext(file_name)[0]
-            info = self.app_context.validatePipe(data_name, 'add_data')
+            # info = self.app_context.validatePipe(data_name, 'add_data')
+            info = [True, ""]
             content = uploaded_dict[file_name]['content']
             uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding, sep = self.seperator_widgets.seperator, content=content)
             if uploaded_data is not None:
@@ -223,13 +226,13 @@ class TabularLocalImport(BaseCard, AppCell):
                 # self.app_context.createJob(self.app_context.currPjtName, data_name)
                 # self.app_context.addData(self.context.currJobID, data_name, uploaded_data)
                 # self.app_context.getCellOf('form-ctx-summary').redraw()
-                self.app_context.addData(data_name, uploaded_data)
+                self.app_context.tabular_workbook.create_new_work(data_name, uploaded_data)
                 self.upload_widgets.complete(data_name)
               
 
             self.reset_uploader()
 
-
+    
     def reset_uploader(self):
         
         uploader = widgets.FileUpload(
@@ -302,7 +305,7 @@ class TabularEDAPImport(BaseCard):
         # self.edap_upload.on_event('click',_on_edap_upload)
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[
                 self.edap_upload,
                 
@@ -323,7 +326,7 @@ class TabularPodImport(BaseCard):
         title = "POD"
         super().__init__(
             class_=context_key,
-            header_title=title,
+            header_title_main=title,
             body_items=[],
             body_size={
                 "width":"1570px",
