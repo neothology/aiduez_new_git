@@ -1,11 +1,11 @@
-# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/23/22)</span>
+# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/24/22)</span>
 
 ## Development
 
 - Docker Image 만들기
 
 ```console
-# 소스 코드 Clone후에 도커 이미지(dev) 빌드
+# 소스 코드 Clone후에 도커 이미지 빌드
 -$ docker build -t (image name) .  
 ```
 
