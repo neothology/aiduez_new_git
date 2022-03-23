@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, OrdinalEncoder, 
 import plotly.express as px
 import os
 import ipywidgets
-from konlpy.tag import Komoran, Hannanum
+# from konlpy.tag import Komoran, Hannanum
 
 class TabularProcessingTab(BaseTab):
     def __init__(self, app_context, context_key, **kwags) -> None:
@@ -116,6 +116,7 @@ class TabularSingleProcessingMenu(BaseCard):
         self.processing_ui = self._make_single_processing_ui()
         
         super().__init__(
+            app_context=self.app_context,
             class_=context_key,
             header_title_main=title,
             body_items=[self.processing_ui],
@@ -347,6 +348,7 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         super().__init__(
             class_="d-flex",
+            scrollable=True,
             children=[self.dialog_contents],
             min_width=700,
             max_width=1200,
@@ -535,14 +537,12 @@ class TabularSingleProcessingDialog(v.Dialog):
         before_result = v.CardText(
             class_='text-center',
             children=["Before Contents"],
-            overflow=True,
-            style_=f"width:100%; height:100%; padding:0; display:flex; flex-direction:column; "
         )
 
         if self.process in ['scale', 'transform'] and self.method != 'ordinal_encoder':
             sample_data = self.get_sample_data(column_name, n=-1)
         else :
-            sample_data = self.get_sample_data(column_name, n=20)
+            sample_data = self.get_sample_data(column_name, n=15)
 
         if self.process == "fill" and len(sample_data) == 0:
             children = ["Null 값이 없습니다!"]
@@ -556,8 +556,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         before_result.children = children
         
         contents = v.Card(
-            # class_="d-flex",
-            style_="width:100%; height:100%",
+            class_="overlow-auto",
             children=[
                 v.CardTitle(
                     class_="headline justify-center",
@@ -627,13 +626,12 @@ class TabularSingleProcessingDialog(v.Dialog):
         processed_result = v.CardText(
             class_='text-center',
             children=["After Contents"],
-            style_=f"width:100%; height:100%; padding:0; display:flex; flex-direction:column; "
         )
 
         if self.process in ['scale', 'transform']:
             sample_data = self.get_sample_data(column_name, n=-1)
         else:
-            sample_data = self.get_sample_data(column_name, n=20)
+            sample_data = self.get_sample_data(column_name, n=15)
 
         sample_processed_data = self.processing_data(sample_data)
         children = []
@@ -650,7 +648,7 @@ class TabularSingleProcessingDialog(v.Dialog):
             children = [chart]
         elif self.process == "transform":
             if self.method == "ordinal_encoder":
-                sample_processed_data = sample_processed_data[:20] if len(sample_processed_data) > 20 else sample_processed_data
+                sample_processed_data = sample_processed_data[:15] if len(sample_processed_data) > 15 else sample_processed_data
                 children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
             else:
                 chart = self._make_histogram(sample_processed_data, suffix="processed")
@@ -660,14 +658,17 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         processed_result.children = children
         
-        contents = v.Card(children=[
-            v.CardTitle(
-                class_="headline justify-center",
-                primary_title=True,
-                children=["After"]
-            ),
-            processed_result
-        ])
+        contents = v.Card(
+            class_="overlow-auto",            
+            children=[
+                v.CardTitle(
+                    class_="headline justify-center",
+                    primary_title=True,
+                    children=["After"]
+                ),
+                processed_result
+            ]
+        )
         return contents
 
     def _make_histogram(self, sample_data, suffix):

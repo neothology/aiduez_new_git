@@ -5,7 +5,7 @@ class BaseDialog(v.Dialog):
         v_slots:object = None,
         header_title_main:str = "",
         header_title_sub:str = "",
-        header_bottom = None,
+        header_bottom:object = None,
         body_items:list = [],
         body_size:dict = {},
         body_border_bottom:list = None,
@@ -34,7 +34,7 @@ class BaseDialog(v.Dialog):
         )
 
         super().__init__(
-            persistent = False,
+            persistent = True,
             children = [children],
             width = body_size.get('width'),
         )

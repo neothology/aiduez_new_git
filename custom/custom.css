@@ -80,7 +80,7 @@ div.output_subarea {
     opacity: 0.3 !important;
 }
 
-.vuetify-styles .tabular_ai_training__modeling_options .v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
+.vuetify-styles .tabular_ai_training__training_options .v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
     box-shadow: none !important;
     border-bottom: 1px solid black;
 }
@@ -89,11 +89,11 @@ div.output_subarea {
     box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 10%) 0px 1px 3px 0px, rgb(0 0 0 / 10%) 0px 1px 2px -1px !important;
 }
 
-.vuetify-styles .tabular_ai_training__modeling_options .v-card__title{
+.vuetify-styles .tabular_ai_training__training_options .v-card__title{
     align-items: stretch !important;
 }
 
-.vuetify-styles .tabular_ai_training__modeling_options .v-input {
+.vuetify-styles .tabular_ai_training__training_options .v-input {
     align-items: flex-end !important;
 }
 

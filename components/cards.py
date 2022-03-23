@@ -29,7 +29,7 @@ class BaseCard(v.Card):
             'card': f"width:{body_size.get('width')}; border-radius:8px 8px 8px 8px; border:1px solid #e0e0e0; align-self:{align};",
             'card_header': "padding:0; flex-direction:column; background-color:rgb(248, 250, 252); border-bottom:1px solid #e0e0e0;" + \
                 ("height:94px;" if header_bottom else "height:60px;"),
-            'card_header_top': "margin:0px; width:100%;",
+            'card_header_top': "margin:0px; width:100%;" + "max-height:59px;" if header_bottom else "",
             'title_main': "padding:16px 32px 0px 24px; \
                     max-height: 48px; font-size:1rem; \
                     font-weight:bold; color: rgb(30, 41, 59); ",
@@ -117,6 +117,9 @@ class BaseCard(v.Card):
             def _close_window(item, event=None, data=None):
                 train_result = self.app_context.tabular_ai_training__train_result
                 train_result.close()
+                self.more_button.disabled = True
+                self.save_button.disabled = True
+                self.close_button.disabled = True
 
             self.close_button.on_event('click', _close_window)
 
@@ -126,6 +129,7 @@ class BaseCard(v.Card):
              # model save as (dialog)
             self.model_save_body = v.TextField(
                 v_model = "",
+                prefix = "",
             )
 
             self.save_confrim_btn = v.Btn(
@@ -133,7 +137,7 @@ class BaseCard(v.Card):
             )
 
             def save_model_as(item, event=None, data=None):
-                self.app_context.tabular_model.save_as(self.model_save_body.v_model)
+                self.app_context.tabular_model.save_as(self.model_save_body.prefix, self.model_save_body.v_model)
                 self.model_save_dialog.value = 0
 
             self.save_confrim_btn.on_event('click', save_model_as)

@@ -26,7 +26,7 @@ class_paths:
   tabular_workbook: workbooks.TabularWorkbook
   tabular_dataset: components.dataset.TabularDataset
   tabular_data_context: components.dataset.TabularDataContext
-  tabular_model: components.modeling.TabularModel
+  tabular_model: components.training.TabularModel
 
   tabular_data_import: workflows.tabular.TabularDataImport
   tabular_data_import_tab: components.import.TabularImportTab
@@ -44,9 +44,9 @@ class_paths:
   tabular_data_multiple_processing: components.processing.TabularMultipleProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
-  tabular_modeling_options: components.modeling.TabularModelingOptions
-  tabular_train_activator: components.modeling.TabularTrainActivator
-  tabular_train_result: components.modeling.TabularTrainResult
+  tabular_training_options: components.training.TabularTrainingOptions
+  tabular_train_activator: components.training.TabularTrainActivator
+  tabular_train_result: components.training.TabularTrainResult
   
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
@@ -442,7 +442,7 @@ processing_params:
               values: ['komoran', 'hannanum']
               default: komoran
  # 학습 parameter 정의
-modeling_params:
+training_params:
   ludwig:
     config:
       input:
