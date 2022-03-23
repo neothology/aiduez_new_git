@@ -98,7 +98,7 @@ class IndexRow(v.Row):
         self,
         app_context:object = None,
         context_key:str = "",
-        class_: str = "modeling-options-row",
+        class_: str = "training-options-row",
         index:int = 0,
         **kwargs
         ):

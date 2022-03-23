@@ -29,7 +29,7 @@ class TabularModel:
         self.current_exp_and_model_name = ''
 
     def train(self, output_logs, output_plots, **kwargs):
-        config = self.app_context.tabular_ai_training__modeling_options.retrieve_config()
+        config = self.app_context.tabular_ai_training__training_options.retrieve_config()
         self.output_logs = output_logs
         self.output_plots = output_plots
         self.current_model = LudwigModel(config, logging_level = logging.INFO)
@@ -39,6 +39,7 @@ class TabularModel:
         self.dataset = self.app_context.tabular_dataset.current_data
         self.output_directory =  self.app_context.tabular_workbook.current_models_dir # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models
 
+        # 모델 결과 Dialog 에 모델명 추가
         self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
         
         # clear output directory if model_name is 'latest'
@@ -65,40 +66,77 @@ class TabularModel:
         )]
 
         # save output_logs
-        # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models/_latest
-        self.train_result_dir = f'{self.output_directory}/{self.data_name}_{self.current_model_name}'
-        ludwig_log_file = os.path.join('/aihub/workspace/tmp/ludwig.log')
-        result_logs_file =  os.path.join(self.train_result_dir, 'result_logs.txt')
+        # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models/titanic_train_latest
+        self.current_train_result_dir = f'{self.output_directory}/{self.data_name}_{self.current_model_name}'
+        ludwig_log_file = '/aihub/workspace/tmp/ludwig.log'
+        result_logs_file =  os.path.join(self.current_train_result_dir, 'result_logs.txt')
         shutil.move(ludwig_log_file, result_logs_file) 
 
-        # save modeling options
+        # save training config
+        self.app_context.tabular_ai_training__training_options.save_config(self.current_train_result_dir)
+
+        # save training options
         self.work_state_dir = self.app_context.tabular_workbook.current_work_state_dir
-        self.app_context.tabular_ai_training__modeling_options.save_config(self.work_state_dir)
-        self.app_context.tabular_ai_training__modeling_options.save_config(self.train_result_dir)
 
         # set model in model_save_dialog text_field
-        self.app_context.tabular_ai_training__train_result.children[0].model_save_body.v_model = self.current_exp_and_model_name
+        self.app_context.tabular_ai_training__train_result.children[0].model_save_body.v_model = self.current_model_name
+        self.app_context.tabular_ai_training__train_result.children[0].model_save_body.prefix = f'{self.data_name}_'
 
+        # acivate buttons in train_result_dialog
         self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
         self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
         self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
 
-    def save_as(self, model_name: str):
-        from_dir = self.train_result_dir
-        to_dir = f'{self.output_directory}/{model_name}'
+    def save_as(self, exp_name, model_name: str):
+        # update: current_model_name, current_exp_and_model_name, current_train_result_dir
+        self.current_model_name = model_name
+        self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
+        from_dir = self.current_train_result_dir
+        to_dir = f'{self.output_directory}/{self.current_exp_and_model_name}'
         if from_dir == to_dir:
             raise Exception('from_dir and to_dir are same')
         shutil.copytree(from_dir, to_dir)
+        self.current_train_result_dir = to_dir
 
     def load_model(self, model_name: str):
-        self.current_model_name = model_name
-        self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
-        self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
-        self.train_result_dir = f'{self.output_directory}/{self.data_name}_{self.current_model_name}'
-        self.app_context.tabular_ai_training__train_result.children[0].model_save_body.v_model = self.current_exp_and_model_name
-        self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
-        self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
-        self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
+        pass
+class TabularModelContext(v.Row):
+    def __init__(self, app_context:object = None, context_key:str = '', **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+
+        self.workbook = self.app_context.tabular_workbook
+        self.dataset = self.app_context.tabular_dataset
+
+        self.data_name_list = self.dataset.data_name_list
+        self.current_data_name = self.dataset.current_data_name
+
+        self.style = {
+            'row': 'width:1570px; align-self:center;',
+            'data_selector': 'max-width:400px;',
+        }
+
+        self.data_selector = v.Select(
+            v_model = self.current_data_name,
+            items = self.data_name_list,
+            attach = True,
+            dense = True,
+            filled = True,
+            label = '데이터',
+            class_ = "tabula-data-selector",
+            style_ = self.style['data_selector'],
+        )
+
+        def _on_data_selector_change(item, event=None, data=None):
+            self.workbook.change_work(item.v_model)
+
+        self.data_selector.on_event('change', _on_data_selector_change)        
+
+        super().__init__(
+            style_ = self.style['row'],
+            children = [self.data_selector],
+        )
+
 class TabularTrainActivator(v.Row):
     def __init__(
         self,
@@ -426,7 +464,7 @@ class TabularTrainResult(BaseDialog):
         return widgets.VBox(plot_list)
 
 
-class TabularModelingOptions(BaseCard):
+class TabularTrainingOptions(BaseCard):
     def __init__(
         self, 
         app_context:object = None,
@@ -445,7 +483,7 @@ class TabularModelingOptions(BaseCard):
 
         # re-structure data for column-wise configuration
         num_rows = len(self.data.columns)
-        self.config= self.app_context.modeling_params['ludwig']['config']
+        self.config= self.app_context.training_params['ludwig']['config']
 
         # column options header ----------------------------------------------------------
         column_options_header_texts = [
@@ -549,6 +587,7 @@ class TabularModelingOptions(BaseCard):
 
         self.in_out_ignore_buttons = [
             v.Tooltip(
+                class_ = "in_out_ignore",
                 right=True, 
                 v_slots=[{
                     'name': 'activator',
@@ -560,9 +599,9 @@ class TabularModelingOptions(BaseCard):
         ]
 
         # (2) column_names ------------------------------------------------------
-        column_names = [
+        self.column_names = [
             v.Col(
-                class_ = '',
+                class_ = 'col_name',
                 children = [column_name],
                 style_ = "font-size:1rem; padding-top:22px; padding-bottom:5px; padding-right:15px; max-width:200px; min-width:200px; \
                     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;",
@@ -572,17 +611,18 @@ class TabularModelingOptions(BaseCard):
         # (3) pandas_data_types -------------------------------------------------
         pandas_data_types = [
             v.TextField(
-                class_ = str(i),
+                class_ = "pandas_dtype",
                 v_model = dtype,
                 style_ = "display:none;",
             ) for i, dtype in enumerate(self.data.dtypes.apply(lambda x: x.name).to_list())
             
         ]
 
-        # (4) data_type for modeling -------------------------------------------------
+        # (4) data_type for training -------------------------------------------------
         self.data_types = [
             DataSelect(
                 index = str(i),
+                class_ = "data_type",
                 items = self.config['input']['dtype'][dtype.v_model]['values'],
                 v_model = self.config['input']['dtype'][dtype.v_model]['default'],
                 dense = True,
@@ -602,6 +642,7 @@ class TabularModelingOptions(BaseCard):
         self.encoder_or_model_types = [
             DataSelect(
                 index = str(i),
+                class_ = "encoder_or_model_type",
                 items = self.config['input']['encoder'][dtype.v_model]['values'],
                 v_model = self.config['input']['encoder'][dtype.v_model]['default'],
                 dense = True,
@@ -717,8 +758,13 @@ class TabularModelingOptions(BaseCard):
             IndexRow(
                 index = str(i),
                 children = [
-                    self.in_out_ignore_buttons[i], column_names[i], pandas_data_types[i], self.data_types[i], self.encoder_or_model_types[i],
+                    self.in_out_ignore_buttons[i], 
+                    self.column_names[i], 
+                    pandas_data_types[i], 
+                    self.data_types[i], 
+                    self.encoder_or_model_types[i],
                     v.Row(
+                        class_ = 'additional_options',
                         children =  self.additional_option_widget_rows[i],
                         style_ = "margin:0;",
                         ),
@@ -733,7 +779,7 @@ class TabularModelingOptions(BaseCard):
             index = int(item.index)
             if self.last_clicked_column_options_rows != index:
                 self.last_clicked_column_options_rows = index
-                self.app_context.tabular_ai_training__column_summary.update_data(self.data[column_names[index].children[0]])
+                self.app_context.tabular_ai_training__column_summary.update_data(self.data[self.column_names[index].children[0]])
 
         for row in self.column_options_rows:
             row.on_event('click', _on_click_column_options_rows)      
@@ -744,7 +790,7 @@ class TabularModelingOptions(BaseCard):
             style_ = self.style['column_options_body'],
             children = [
                 v.ListItem(
-                    class_ = "modeling-option-table-row",
+                    class_ = "training-option-table-row",
                     children = [row],
                     dense = True,
                     style_ = self.style['column_options_body_item'],
@@ -879,9 +925,41 @@ class TabularModelingOptions(BaseCard):
         return self.train_config
 
     def save_config(self, path: str):
-        config_path_to_save = os.path.join(path, "modeling_options.json")
+        config_path_to_save = os.path.join(path, "training_config_for_model_input.json")
 
         with open(config_path_to_save, 'w') as f:
             json.dump(self.retrieve_config(), f, indent=4)
-        
 
+    def retrieve_training_options(self):
+        training_options = []
+        training_options_row = {
+            'column_options':[],
+            'hyperparameter_options':[]
+        }
+        for row in self.column_options_rows:
+            for widget in row.children:
+                if widget.class_ == 'in_out_ignore':
+                    option = {
+                        'tooltip': widget.children[0], # list  입력, 출력, 제외
+                        'state': widget.v_slots[0]['children'][0].state, # str 'input', 'output', 'ignore'
+                        'icon': widget.v_slots[0]['children'][0].children[0].children[0] # list 
+                        }
+                elif row.class_ in ['data_type', 'encoder_or_model_type']:
+                    option = {
+                        'items': widget.items,
+                        'v_model': widget.v_model,
+                    }
+                elif row.class_ == 'additional_options':
+                    for sub_widget in widget.children:
+                        if sub_widget.__class__name__ == 'LabeledSelect':
+                            option = {
+                                'items': sub_widget.children[0],
+                                'v_model': sub_widget.children[1].children[1].v_model,
+                            }
+                        elif sub_widget.__class__name__ == 'DataSlider':
+                            option = {
+                                'v_model': sub_widget.children[1].v_model,
+                            }
+                        training_options_row['column_options'].append(option)
+                training_options_row['column_options'].append(option)
+            training_options.append(training_options_row)

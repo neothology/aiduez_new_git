@@ -59,7 +59,7 @@ class AppContext:
     # tabilar ai training objects
     tabular_ai_training: object = None
     tabular_ai_training__train_activator: object = None
-    tabular_ai_training__modeling_options: object = None
+    tabular_ai_training__training_options: object = None
     tabular_ai_training__column_summary: object = None
     tabular_ai_training__train_result: object = None
 
@@ -116,7 +116,7 @@ class AppContext:
         self.theme_values: dict = app_config['theme'][self.theme]
         self.env_values: dict = app_config['envs']
         self.processing_params: dict = app_config['processing_params']
-        self.modeling_params: dict = app_config['modeling_params']
+        self.training_params: dict = app_config['training_params']
 
     
     

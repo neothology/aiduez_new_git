@@ -1,5 +1,6 @@
 import ipyvuetify as v
 import os
+import json
 from utils import get_or_create_class
 class TabularBase(v.Container):
 
@@ -81,6 +82,7 @@ class TabularDataProcessing(v.Container):
             'tabular_data_processing_tab',
             app_context=self.app_context,
             context_key='tabular_data_processing_tab',
+            update = True,
         )
 
         super().__init__(
@@ -103,12 +105,14 @@ class TabularAITraining(v.Container):
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
+            update = True,
         )
 
         # model
         self.model = get_or_create_class(
             'tabular_model',
             self.app_context,
+            update = True,
         )
 
         # train result
@@ -116,6 +120,7 @@ class TabularAITraining(v.Container):
             'tabular_train_result',
             self.app_context,
             context_key = 'tabular_ai_training__train_result',
+            update = True,
             title = '학습 로그',
             size = {'width':'90vw', 'height':'80vh'}, 
         )
@@ -125,14 +130,16 @@ class TabularAITraining(v.Container):
             'tabular_train_activator',
             self.app_context,
             context_key = 'tabular_ai_training__train_activator',
+            update = True,
             title = '학습하기'
         )
 
-        # modeling_options
-        self.modeling_options = get_or_create_class(
-            'tabular_modeling_options', 
+        # training_options
+        self.training_options = get_or_create_class(
+            'tabular_training_options', 
             self.app_context, 
-            context_key = 'tabular_ai_training__modeling_options',
+            context_key = 'tabular_ai_training__training_options',
+            update = True,
             title = '학습 Parameter 설정',
         )
 
@@ -142,6 +149,7 @@ class TabularAITraining(v.Container):
             'column_summary',
             self.app_context,
             context_key = 'tabular_ai_training__column_summary',
+            update = True,
             title = '데이터 요약',
             col = self.data[initial_column_name],
         )       
@@ -155,45 +163,14 @@ class TabularAITraining(v.Container):
                 self.train_button ,
                 self.train_result,
                 v.Spacer(style_ = "height:20px"),
-                self.modeling_options,
+                self.training_options,
                 v.Spacer(style_ = "height:30px"),
                 self.column_summary,
                 v.Spacer(style_ = "height:30px"),
                 ],
         )  
 
-    def change_data(self) :
-        self.data = self.app_context.tabular_dataset.current_data
-
-        self.app_context.tabular_ai_training__modeling_options = None
-        self.modeling_options = get_or_create_class(
-            'tabular_modeling_options', 
-            self.app_context, 
-            context_key = 'tabular_ai_training__modeling_options',
-            title = '학습 Parameter 설정',
-        )
-
-        self.app_context.tabular_ai_training__column_summary = None
-        initial_column_name = self.data.columns[0]
-        self.column_summary = get_or_create_class(
-            'column_summary',
-            self.app_context,
-            context_key = 'tabular_ai_training__column_summary',
-            title = '데이터 요약',
-            col = self.data[initial_column_name],
-        )
-
-        self.app_context.tabular_ai_training.children = [
-            self.data_context,
-            v.Spacer(style_ = "height:20px"),
-            self.train_button ,
-            self.train_result,
-            v.Spacer(style_ = "height:20px"),
-            self.modeling_options,
-            v.Spacer(style_ = "height:30px"),
-            self.column_summary,
-            v.Spacer(style_ = "height:30px"),
-            ]
+        self.app_context.tabular_ai_training__training_options.retrieve_training_options()
 class TabularAIEvaluation(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(

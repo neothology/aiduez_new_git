@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, OrdinalEncoder, 
 import plotly.express as px
 import os
 import ipywidgets
-from konlpy.tag import Komoran, Hannanum
+# from konlpy.tag import Komoran, Hannanum
 
 class TabularProcessingTab(BaseTab):
     def __init__(self, app_context, context_key, **kwags) -> None:

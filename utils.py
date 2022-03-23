@@ -17,13 +17,13 @@ def read_config():
             pass
 
 # return component class if exist, else init a new component class, keep it in the context if needed, and return it
-def get_or_create_class(class_path_key:str, app_context:object, context_key:str = None, **kwargs):
+def get_or_create_class(class_path_key:str, app_context:object, context_key:str = None, update:bool = False, **kwargs):
     class_path = app_context.class_paths.get(class_path_key)
     module_path = '.'.join(class_path.split('.')[:-1])
     class_name = class_path.split('.')[-1]
     if not context_key:
             context_key = class_path_key
-    if not kwargs.get('update'):
+    if not update:
         try:
             if not getattr(app_context, context_key): # if None in app_context with the context_key
                 imported_class = getattr(importlib.import_module(module_path), class_name)

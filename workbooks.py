@@ -94,12 +94,13 @@ class TabularWorkbook:
         # save current work -(1) 데이터 입수
         # save current work -(2) 데이터 분석
         # save current work -(3) 데이터 가공
-        # save current work -(4) AI모델 학습(모델관련 내용은 '학습'할 때 저장되므로 여기서는 modeling options 만 저장)
-        self.app_context.tabular_ai_training__modeling_options.save_config(self.current_work_state_dir)
+        # save current work -(4) AI모델 학습(모델관련 내용은 '학습'할 때 저장되므로 여기서는 training options 만 저장)
+        self.app_context.tabular_ai_training__training_options.save_config(self.current_work_state_dir)
         # save current work -(5) AI모델 평가
 
 
     def load_existing_work(self, work_name):
+
         # work 변경
         self.current_work_name = work_name
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'
@@ -108,15 +109,13 @@ class TabularWorkbook:
         # data 변경
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
-        # load new work -(1) 데이터 분석
-        if self.app_context.current_workflow_stage == 'tabular_data_analyze':
-            pass
-        # load new work -(2) 데이터 가공
-        elif self.app_context.current_workflow_stage == 'tabular_data_processing':
-            pass
-        # load new work -(3) AI모델 학습
-        elif self.app_context.current_workflow_stage == 'tabular_ai_training':
-            self.app_context.tabular_ai_training.change_data()
+        # tabular_contents 변경
+        work_stages_to_be_updated = ['tabular_data_analyze', 'tabular_data_processing', 'tabular_ai_training']
+        for stage in work_stages_to_be_updated:
+            setattr(self.app_context, stage, None)
+ 
+        new_instance = get_or_create_class('tabular_ai_training', self.app_context, update = True)
+        self.app_context.tabular_contents.children = [new_instance]
 
     def change_work(self, work_name):
         self.app_context.base_overlay.value = True
