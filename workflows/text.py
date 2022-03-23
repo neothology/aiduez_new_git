@@ -31,7 +31,7 @@ class TextDataImport(v.Container):
             children = []
         )
 
-class TextDataAnalyze(v.Container):
+class TextDataanalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
             style_ = "min-width:100%; min-height:100%;",

@@ -19,6 +19,7 @@ class AppContext:
     background: object = None
     side_nav: object = None
     side_nav_menu: object = None
+    list_menu_sub: object = None
     top_area: object = None
     work_area: object = None
     base_overlay: object = None
@@ -46,8 +47,8 @@ class AppContext:
 
     
 
-    # tabular data analyze objects
-    tabular_data_analyze: object = None
+    # tabular data analytics objects
+    tabular_data_analytics: object = None
 
     #tabular data processing objects
     tabular_data_processing: object = None
@@ -70,7 +71,7 @@ class AppContext:
     text_contents: object = None
 
     text_data_import: object = None
-    text_data_analyze: object = None
+    text_data_analytics: object = None
     text_ai_training: object = None
     text_ai_evaluation: object = None
     # --------------------------------------------------
@@ -80,7 +81,7 @@ class AppContext:
     image_contents: object = None
 
     image_data_import: object = None
-    image_data_analyze: object = None
+    image_data_analytics: object = None
     image_ai_training: object = None
     image_ai_evaluation: object = None
     # --------------------------------------------------
@@ -90,7 +91,7 @@ class AppContext:
     audio_contents: object = None
 
     audio_data_import: object = None
-    audio_data_analyze: object = None
+    audio_data_analytics: object = None
     audio_ai_training: object = None
     audio_ai_evaluation: object = None
     # --------------------------------------------------
@@ -100,7 +101,7 @@ class AppContext:
     video_contents: object = None
 
     video_data_import: object = None
-    video_data_analyze: object = None
+    video_data_analytics: object = None
     video_ai_training: object = None
     video_ai_evaluation: object = None
 

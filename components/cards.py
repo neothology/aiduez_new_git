@@ -29,14 +29,14 @@ class BaseCard(v.Card):
             'card': f"width:{body_size.get('width')}; border-radius:8px 8px 8px 8px; border:1px solid #e0e0e0; align-self:{align};",
             'card_header': "padding:0; flex-direction:column; background-color:rgb(248, 250, 252); border-bottom:1px solid #e0e0e0;" + \
                 ("height:94px;" if header_bottom else "height:60px;"),
-            'card_header_top': "margin:0px; width:100%;" + "max-height:59px;" if header_bottom else "",
+            'card_header_top': "margin:0px; width:100%;" + f"{'max-height:59px;' if header_bottom else ''}",
             'title_main': "padding:16px 32px 0px 24px; \
                     max-height: 48px; font-size:1rem; \
                     font-weight:bold; color: rgb(30, 41, 59); ",
             'title_sub': "padding:16px 32px 0px 24px; \
                     max-height: 48px; font-size:1rem; \
                     font-weight:bold; color: rgb(30, 41, 59); ",
-            'more_menu': "max-width:40px;",
+            'more_menu': f'{"max-width:40px;" if close else "max-width:60px;"}',
             'save_button': "max-width:40px;",
             'close_button': "max-width:60px;",
             'card_body': [
@@ -63,10 +63,12 @@ class BaseCard(v.Card):
         )
 
         # card title_sub
-        self.title_sub = v.Col(
-            children = [header_title_sub],
-            style_ = self.style['title_sub'],
-        )
+        self.title_sub = ""
+        if header_title_sub != "":
+            self.title_sub = v.Col(
+                children = [header_title_sub],
+                style_ = self.style['title_sub'],
+            )
 
         # more menu
         self.more_menu_col = ""

@@ -31,7 +31,7 @@ class AudioDataImport(v.Container):
             children = []
         )
 
-class AudioDataAnalyze(v.Container):
+class AudioDataanalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
             style_ = "min-width:100%; min-height:100%;",

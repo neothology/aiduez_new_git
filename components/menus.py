@@ -11,9 +11,10 @@ class ListMenu(v.List):
         def _make_sub_menu(sub_items: list) -> list:
 
             sub_menu = [v.ListItemGroup(
-                class_ = "",
+                class_ = "main-menu-group",
                 style_ = "",
                 children = [v.ListItem(
+                    class_ = "",
                     value = item["target"],
                     style_ = "padding-left:32px;",
                     active = False,
@@ -45,6 +46,7 @@ class ListMenu(v.List):
             if item.get("sub_menu"):
                 list_menu.append(
                     v.ListGroup(
+                        class_ = "main-menu-group",
                         ripple = False,
                         prepend_icon = item["icon"],
                         v_slots = [{
@@ -257,3 +259,219 @@ class TabMenu(v.Col):
         for tab in self.tab_menu.children:
             tab.on_event('click', _proceed_to_target)
 
+class ListMenuSub(v.List):
+
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.menu_to_target = [] # to collect menus to be clicked
+
+        self.menu_tree = [
+            {   
+                'icon': 'mdi-file-document-edit-outline',
+                'title': '기초정보분석',
+                'target': 'tabular_data_analytics__basic',
+            },
+            {   
+                'icon': 'mdi-file-chart-outline',
+                'title': '시각화 분석',
+                'target': 'tabular_data_analytics__visualization',
+                'sub_menu': [
+                    {
+                        'icon': 'mdi-scatter-plot-outline',
+                        'title': '산점도',
+                        'sub_title': 'Scatter',
+                        'target': 'tabular_data_analytics__visualization__scatter',
+                    },
+                    {   
+                        'icon': 'mdi-checkerboard',
+                        'title': '히트맵',
+                        'sub_title': 'Heatmap',
+                        'target': 'tabular_data_analytics__visualization__heatmap',
+                    },
+                    {
+                        'icon': 'mdi-checkbox-intermediate',
+                        'title': '박스차트',
+                        'sub_title': 'Boxplot',
+                        'target': 'tabular_data_analytics__visualization__boxplot',
+                    },
+                    {
+                        'icon': 'mdi-chart-bell-curve',
+                        'title': '분포차트',
+                        'sub_title': 'Densityplot',
+                        'target': 'tabular_data_analytics__visualization__densityplot',
+                    },
+                    {
+                        'icon': 'mdi-earth',
+                        'title': '한글워드클라우드',
+                        'sub_title': 'Korean Words Cloud',
+                        'target': 'tabular_data_analytics__visualization__wordcloud',
+                    },
+                ]
+            },
+            {
+                'icon': 'mdi-gesture',
+                'title': '비지도학습분석',
+                'target': 'tabular_data_analytics__unsupervised',
+                'sub_menu': [
+                    {
+                        'icon': 'mdi-arrow-collapse-all',
+                        'title': '차원축소',
+                        'sub_title': 'Dimensionality Reduction',
+                        'target': 'tabular_data_analytics__unsupervised__reduction',
+                    },
+                    {
+                        'icon': 'mdi-gamepad-circle-right',
+                        'title': '군집분석',
+                        'sub_title': 'Clustering',
+                        'target': 'tabular_data_analytics__unsupervised__clustering',
+                    },
+                ],
+            },
+            {
+                'icon': 'mdi-text',
+                'title': '데이터샘플보기',
+                'target': 'tabular_data_analytics__sample',
+            },
+
+        ]
+
+        self.style = {
+            'background': 'background-color: #ffffff00; width:270px',
+            'list_title': 'color: #5a5a5a; font-size: 14px;',
+            'icon': 'color: #5a5a5a; font-size: 20px; margin-right:0px;',
+
+
+        }
+
+        def _make_sub_menu(sub_items: list) -> list:
+
+            sub_menu = [v.ListItemGroup(
+                class_ = "",
+                style_ = "",
+                children = [v.ListItem(
+                    value = item["target"],
+                    style_ = "padding-left:32px;",
+                    active = False,
+                    ripple = False,
+                    children = [
+                        v.ListItemIcon(
+                            style_ = self.style['icon'],
+                            children = [v.Icon(
+                                style_ = self.style['icon'],
+                                children = [item['icon']])]
+                        ),
+                        v.ListItemContent(
+                            style_ = "padding-left:12px;",
+                            children = [
+                                v.ListItemTitle(
+                                        style_ = self.style['list_title'],
+                                        children = [item['title']]
+                                    ),
+                                v.ListItemSubtitle(
+                                    style_ = "font-size:10px;",
+                                    children = [item['sub_title']]
+                                ),
+                            ],
+                        ),
+                    ],
+                ) for item in sub_items]
+            )]
+            self.menu_to_target += sub_menu[0].children
+            return sub_menu
+
+        list_menu = []
+        for item in self.menu_tree:
+            if item.get("sub_menu"):
+                list_menu.append(
+                    v.ListGroup(
+                        class_ = "sub-menu-group",
+                        ripple = False,
+                        prepend_icon = item["icon"],
+                        v_slots = [{
+                            "name": "activator",
+                            "children": v.ListItemContent(
+                                style_ = "",
+                                children = [
+                                    v.ListItemTitle(
+                                        style_ = self.style['list_title'],
+                                        children = [item['title']]
+                                    ),
+                                ],
+                            ),
+                        }],
+                        children = _make_sub_menu(item['sub_menu']),
+                        style_ = 'margin-bottom:8px;',
+                    )
+                ) 
+            else:
+                list_item = v.ListItem(
+                                class_ = 'sub-menu-item',
+                                value = item['target'],
+                                style_ = "",  
+                                active = False,
+                                ripple = False,
+                                children = [
+                                    v.ListItemIcon(
+                                        style_ = self.style['icon'],
+                                        children = [v.Icon(
+                                            style_ = self.style['icon'],
+                                            children = [item['icon']]
+                                            )]
+                                    ),
+                                    v.ListItemContent(
+                                        style_ = "padding-left:7px; color:#ffffff;",
+                                        children = [
+                                            v.ListItemTitle(
+                                                style_ = self.style['list_title'],
+                                                children = [item['title']],
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            )
+                list_menu.append(
+                    v.ListItemGroup(
+                        style_ = "margin-bottom:8px;",
+                        children = [list_item],
+                    )
+                )
+
+                self.menu_to_target.append(list_item)
+
+        super().__init__(
+            class_ = self.context_key,
+            style_ = self.style['background'],
+            nav = True,
+            color = "#0f172a",
+            children =list_menu,
+        )     
+
+        self.last_activated_item = None
+         # code_add: run progress circular: with...
+        def _proceed_to_target(item, event=None, data=None): 
+
+            task_type = item.value.split('_')[0] # code_add: to use different workbook by task_type
+
+            # set 'active' to last activated item wihich is now deactivated
+            if self.last_activated_item:
+                self.last_activated_item.disabled = False  
+
+            # disable clicked item and keep it as last activated item
+            item.disabled = True
+            self.last_activated_item = item
+
+            # get target and set
+            self.app_context.current_workflow = task_type  
+            target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area           
+            target_instance = get_or_create_class(item.value, self.app_context) # tabluar, text, image, video, audio, etc ~base
+            target_area.children = [target_instance]
+
+        # set default
+        # default_target_name: str = self.app_context.side_nav_menu_list['default']
+        # default_menu_item = list(filter(lambda x: x.value == default_target_name, self.menu_to_target))[0]
+        # _proceed_to_target(default_menu_item)
+
+        # set event listener
+        # for item in self.menu_to_target:
+        #     item.on_event('click', _proceed_to_target)
