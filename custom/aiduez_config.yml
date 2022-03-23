@@ -154,7 +154,7 @@ workflows_list:
             title: EDAP에서 가져오기
             target: tabular_data_import_edap
           -
-            title: Pod에서 가져오기
+            title: 가공데이터 가져오기
             target: tabular_data_import_pod 
       - 
         title: 데이터 분석

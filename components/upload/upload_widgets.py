@@ -25,12 +25,12 @@ class EncodingWidgets:
             ]
 
         )
-        # radio_buttons =  widgets.RadioButtons(
-        #     options= encoding_options,
-        #     disabled=False,
-        #     value = self.encoding
-        # )
-        radio_buttons.observe(self._on_encoding_option, names="value")
+        def _change_radio(widget, event = None, data = None):
+            widget.value = widget.v_model
+
+        
+        radio_buttons.on_event("change", _change_radio)
+        # radio_buttons.observe(self._on_encoding_option, names="value")
         
         
         
@@ -43,8 +43,8 @@ class EncodingWidgets:
                 
             ]
         )
-    def _on_encoding_option(self, change):
-        self.encoding = change["new"]
+    # def _on_encoding_option(self, change):
+    #     self.encoding = self.radio_buttons.value
 class SeperatorWidgets:
     def __init__(self):
         self.seperator = ","
@@ -66,8 +66,12 @@ class SeperatorWidgets:
                 v.Radio(label = seperator_options[2][0], value = seperator_options[2][1])
             ]
         )
-     
-        radio_buttons.observe(self._on_seperator_option, names="value")
+        def _change_radio(widget, event = None, data = None):
+            widget.value = widget.v_model
+
+
+        radio_buttons.on_event("change", _change_radio)
+        # radio_buttons.observe(self._on_seperator_option, names="value")
         
         return v.Col(
             style_ = 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
@@ -76,8 +80,8 @@ class SeperatorWidgets:
                 radio_buttons
             ]
         ) 
-    def _on_seperator_option(self, change):
-        self.seperator = change["new"]
+    # def _on_seperator_option(self, change):
+    #     self.seperator = change["new"]
 class UploadWidgets:
     def __init__(self):
         self.box = v.Container(style_ = 'font-size: 1rem; font-weight: bold; color: rgb(0,0,0);', children = ["데이터의 필드명에 공백이 포함될 경우 오류가 발생하니 필히 확인 부탁드립니다"])
@@ -119,6 +123,7 @@ class UploadWidgets:
                     encoding = encodings.pop(0)
                     uploaded_data = self.load_data(data_name, encoding=encoding, sep=sep, filepath=filepath, content=content)
             if uploaded_data is None:
+                
                 self.box.children = [v.Html(
                     tag = 'h5',
                     children = [f" {data_name} : 적합한 인코딩이 없습니다."])]                
@@ -169,6 +174,9 @@ class EDAPWidgets:
                 auth_mechanism="LDAP",
                 user=os.environ.get("AIAN_EDAP_USER_ID"),
                 password=os.environ.get("AIAN_EDAP_USER_PW"),
+                timeout = 100
+                # user = "aidu",
+                # password = "new1234!"
             )
         except Exception as e:
             self.conn = None
