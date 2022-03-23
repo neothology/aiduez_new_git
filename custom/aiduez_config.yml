@@ -10,6 +10,7 @@ class_paths:
   work_area: components.layouts.WorkArea
   side_nav: components.layouts.SideNav
   list_menu: components.menus.ListMenu
+  list_menu_sub: components.menus.ListMenuSub
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
   
@@ -35,7 +36,7 @@ class_paths:
   tabular_data_import_edap: components.import.TabularEDAPImport
   tabular_data_import_pod: components.import.TabularPodImport
 
-  tabular_data_analyze: workflows.tabular.TabularDataAnalyze
+  tabular_data_analytics: workflows.tabular.TabularDataAnalytics
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_tab: components.processing.TabularProcessingTab
@@ -52,28 +53,28 @@ class_paths:
   
   text_base: workflows.text.TextBase
   text_data_import: workflows.text.TextDataImport
-  text_data_analyze: workflows.text.TextDataAnalyze
+  text_data_analytics: workflows.text.TextDataanalytics
   text_data_processing: workflows.text.TextDataProcessing
   text_ai_training: workflows.text.TextAITraining
   text_ai_evaluation: workflows.text.TextAIEvaluation
 
   image_base: workflows.image.ImageBase
   image_data_import: workflows.image.ImageDataImport
-  image_data_analyze: workflows.image.ImageDataAnalyze
+  image_data_analytics: workflows.image.ImageDataanalytics
   image_data_processing: workflows.image.ImageDataProcessing
   image_ai_training: workflows.image.ImageAITraining
   image_ai_evaluation: workflows.image.ImageAIEvaluation
 
   audio_base: workflows.audio.AudioBase
   audio_data_import: workflows.audio.AudioDataImport
-  audio_data_analyze: workflows.audio.AudioDataAnalyze
+  audio_data_analytics: workflows.audio.AudioDataanalytics
   audio_data_processing: workflows.audio.AudioDataProcessing
   audio_ai_training: workflows.audio.AudioAITraining
   audio_ai_evaluation: workflows.audio.AudioAIEvaluation
 
   video_base: workflows.video.VideoBase
   video_data_import: workflows.video.VideoDataImport
-  video_data_analyze: workflows.video.VideoDataAnalyze
+  video_data_analytics: workflows.video.VideoDataanalytics
   video_data_processing: workflows.video.VideoDataProcessing
   video_ai_training: workflows.video.VideoAITraining
   video_ai_evaluation: workflows.video.VideoAIEvaluation
@@ -136,7 +137,7 @@ workflows_list:
     stages:
       - task_all
   tabular:
-    default: tabular_ai_training
+    default: tabular_data_import
     target_area: tabular_contents
     stages:
       - 
@@ -157,7 +158,7 @@ workflows_list:
             target: tabular_data_import_pod 
       - 
         title: 데이터 분석
-        target: tabular_data_analyze
+        target: tabular_data_analytics
       - 
         title: 데이터 가공
         target: tabular_data_processing
@@ -183,7 +184,7 @@ workflows_list:
         target: text_data_import
       - 
         title: 데이터 분석
-        target: text_data_analyze
+        target: text_data_analytics
       - 
         title: 데이터 가공
         target: text_data_processing
@@ -202,7 +203,7 @@ workflows_list:
         target: image_data_import
       - 
         title: 데이터 분석
-        target: image_data_analyze
+        target: image_data_analytics
       - 
         title: 데이터 가공
         target: image_data_processing
@@ -221,7 +222,7 @@ workflows_list:
         target: audio_data_import
       - 
         title: 데이터 분석
-        target: audio_data_analyze
+        target: audio_data_analytics
       - 
         title: 데이터 가공
         target: audio_data_processing
@@ -240,7 +241,7 @@ workflows_list:
         target: video_data_import
       - 
         title: 데이터 분석
-        target: video_data_analyze
+        target: video_data_analytics
       - 
         title: 데이터 가공
         target: video_data_processing

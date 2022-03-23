@@ -110,7 +110,7 @@ class TabularWorkbook:
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
         # tabular_contents 변경
-        work_stages_to_be_updated = ['tabular_data_analyze', 'tabular_data_processing', 'tabular_ai_training']
+        work_stages_to_be_updated = ['tabular_data_analytics', 'tabular_data_processing', 'tabular_ai_training']
         for stage in work_stages_to_be_updated:
             setattr(self.app_context, stage, None)
  

@@ -40,7 +40,7 @@ div.output_subarea {
     opacity: 0.08 !important;
 }
 
-.vuetify-styles .theme--light.v-list-item--active:before {
+.vuetify-styles .main-menu-group .theme--light.v-list-item--active:before {
     background-color: #0f172a !important;
 }
 
@@ -49,19 +49,44 @@ div.output_subarea {
     opacity: 0.08 !important;
 }
 
-.v-list-group__header__prepend-icon {
+.main-menu-group .v-list-group__header__prepend-icon {
     margin-right: 6px !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     align-self: auto !important;
 }
 
-.v-list-group__header__prepend-icon .v-icon {
+.main-menu-group .v-list-group__header__prepend-icon .v-icon {
     color: #e2e2e2de !important;
 }
 
-.v-list-group__header__append-icon .v-icon.mdi-chevron-down {
+.main-menu-group .v-list-group__header__append-icon .v-icon.mdi-chevron-down {
     color: #e2e2e2de !important;
+}
+
+.sub-menu-group .v-list-group__header__prepend-icon {
+    margin-right: 6px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    align-self: auto !important;
+}
+
+.sub-menu-group .theme--light.v-icon {
+    color: rgba(90, 90, 90, 1) !important;
+    font-size: 20px !important;
+}
+
+.v-list-item.sub-menu-item::before {
+    transition: none !important;
+}
+
+.sub-menu-group .v-list-item--link:before {
+    transition: none !important;
+    background-color: #ffffff00 !important;
+}
+
+.theme--light.v-list-item--active.sub-menu-item:before {
+    background-color: #ff000000 !important;
 }
 
 .vuetify-styles .col {

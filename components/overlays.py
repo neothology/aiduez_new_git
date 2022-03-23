@@ -7,7 +7,7 @@ class BaseOverlay(v.Overlay):
             children = [
                 v.ProgressCircular(
                     indeterminate = True,
-                    size = 64,
+                    size = 32,
                 ),
             ],
             class_ = kwargs.get('class_'),

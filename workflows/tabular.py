@@ -65,11 +65,33 @@ class TabularDataImport(v.Container):
             ],
         )
 
-class TabularDataAnalyze(v.Container):
+class TabularDataAnalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.style = {}
+
+        self.data = self.app_context.tabular_dataset.current_data
+
+        # data_context
+        self.data_context = get_or_create_class(
+            'tabular_data_context',
+            self.app_context,
+            update = False,
+        )
+
+        self.sub_menu = get_or_create_class(
+            'list_menu_sub',
+            self.app_context,
+            update = False
+        )
+
         super().__init__(
             style_ = "min-width:100%; min-height:100%;",
-            children = ["안녕하세요"]
+            children = [
+                self.data_context,
+                self.sub_menu,
+                ]
         )
 
 class TabularDataProcessing(v.Container):
@@ -105,7 +127,7 @@ class TabularAITraining(v.Container):
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
-            update = True,
+            update = False,
         )
 
         # model
