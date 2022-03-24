@@ -90,6 +90,14 @@ div.output_subarea {
     background-color: #ff000000 !important;
 }
 
+.v-list-item.v-list-item--link.theme--light.sub-menu-item:hover {
+    background-color: rgba(197 197 197 / 38%);
+}
+
+.v-list-group.sub-menu-group .v-list-group__header:hover {
+    background-color: rgba(197 197 197 / 38%);
+}
+
 .vuetify-styles .col {
     margin: 0 !important;
 }

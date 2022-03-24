@@ -14,6 +14,7 @@ class AppContext:
     current_user: str = None
     current_workflow: str = None
     current_workflow_stage: str = None
+    current_workflow_stage_sub: str = None
 
 ## base layout object ##
     background: object = None
@@ -33,6 +34,7 @@ class AppContext:
 
     tabular_tab_menu: object = None
     tabular_contents: object = None
+    tabular_contents_sub: object = None
     tabular_data_context: object = None
     tabular_model: object = None
     tabular_dataset: object = None
@@ -45,10 +47,17 @@ class AppContext:
     tabular_data_import_edap: object = None
     tabular_data_import_pod: object = None
 
-    
-
     # tabular data analytics objects
     tabular_data_analytics: object = None
+    tabular_analytics_basicinfo: object = None
+    tabular_analytics_scatter: object = None
+    tabular_analytics_heatmap: object = None
+    tabular_analytics_boxplot: object = None
+    tabular_analytics_density: object = None
+    tabular_analytics_wcloud: object = None
+    tabular_analytics_reduction: object = None
+    tabular_analytics_clustering: object = None
+    tabular_analytics_datasample: object = None
 
     #tabular data processing objects
     tabular_data_processing: object = None

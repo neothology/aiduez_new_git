@@ -59,8 +59,8 @@ class TabularDataContext(v.Row):
         self.current_data_name = self.dataset.current_data_name
 
         self.style = {
-            'row': 'width:1570px; align-self:center;',
-            'data_selector': 'max-width:400px;',
+            'row': 'width:1570px; align-self:center; border-bottom:1px solid rgb(203 203 203);',
+            'data_selector': 'max-width:400px; padding-bottom:20px',
         }
 
         self.data_selector = v.Select(
@@ -68,8 +68,8 @@ class TabularDataContext(v.Row):
             items = self.data_name_list,
             attach = True,
             dense = True,
-            filled = True,
-            label = '데이터',
+            outlined = True,
+            hide_details = True,
             class_ = "tabula-data-selector",
             style_ = self.style['data_selector'],
         )
