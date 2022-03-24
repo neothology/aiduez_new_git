@@ -261,83 +261,22 @@ class TabMenu(v.Col):
 
 class ListMenuSub(v.List):
 
-    def __init__(self, app_context, context_key, **kwargs):
+    def __init__(
+        self, 
+        app_context, 
+        context_key, 
+        menu_tree,
+        **kwargs):
+
         self.app_context = app_context
         self.context_key = context_key
+        self.menu_tree = menu_tree
         self.menu_to_target = [] # to collect menus to be clicked
 
-        self.menu_tree = [
-            {   
-                'icon': 'mdi-file-document-edit-outline',
-                'title': '기초정보분석',
-                'target': 'tabular_data_analytics__basic',
-            },
-            {   
-                'icon': 'mdi-file-chart-outline',
-                'title': '시각화 분석',
-                'target': 'tabular_data_analytics__visualization',
-                'sub_menu': [
-                    {
-                        'icon': 'mdi-scatter-plot-outline',
-                        'title': '산점도',
-                        'sub_title': 'Scatter',
-                        'target': 'tabular_data_analytics__visualization__scatter',
-                    },
-                    {   
-                        'icon': 'mdi-checkerboard',
-                        'title': '히트맵',
-                        'sub_title': 'Heatmap',
-                        'target': 'tabular_data_analytics__visualization__heatmap',
-                    },
-                    {
-                        'icon': 'mdi-checkbox-intermediate',
-                        'title': '박스차트',
-                        'sub_title': 'Boxplot',
-                        'target': 'tabular_data_analytics__visualization__boxplot',
-                    },
-                    {
-                        'icon': 'mdi-chart-bell-curve',
-                        'title': '분포차트',
-                        'sub_title': 'Densityplot',
-                        'target': 'tabular_data_analytics__visualization__densityplot',
-                    },
-                    {
-                        'icon': 'mdi-earth',
-                        'title': '한글워드클라우드',
-                        'sub_title': 'Korean Words Cloud',
-                        'target': 'tabular_data_analytics__visualization__wordcloud',
-                    },
-                ]
-            },
-            {
-                'icon': 'mdi-gesture',
-                'title': '비지도학습분석',
-                'target': 'tabular_data_analytics__unsupervised',
-                'sub_menu': [
-                    {
-                        'icon': 'mdi-arrow-collapse-all',
-                        'title': '차원축소',
-                        'sub_title': 'Dimensionality Reduction',
-                        'target': 'tabular_data_analytics__unsupervised__reduction',
-                    },
-                    {
-                        'icon': 'mdi-gamepad-circle-right',
-                        'title': '군집분석',
-                        'sub_title': 'Clustering',
-                        'target': 'tabular_data_analytics__unsupervised__clustering',
-                    },
-                ],
-            },
-            {
-                'icon': 'mdi-text',
-                'title': '데이터샘플보기',
-                'target': 'tabular_data_analytics__sample',
-            },
-
-        ]
+        
 
         self.style = {
-            'background': 'background-color: #ffffff00; width:270px',
+            'background': 'background-color: #ffffff00; width:270px; margin-left: -18px;',
             'list_title': 'color: #5a5a5a; font-size: 14px;',
             'icon': 'color: #5a5a5a; font-size: 20px; margin-right:0px;',
 
@@ -350,6 +289,7 @@ class ListMenuSub(v.List):
                 class_ = "",
                 style_ = "",
                 children = [v.ListItem(
+                    class_ = "sub-menu-item",
                     value = item["target"],
                     style_ = "padding-left:32px;",
                     active = False,
@@ -451,8 +391,6 @@ class ListMenuSub(v.List):
          # code_add: run progress circular: with...
         def _proceed_to_target(item, event=None, data=None): 
 
-            task_type = item.value.split('_')[0] # code_add: to use different workbook by task_type
-
             # set 'active' to last activated item wihich is now deactivated
             if self.last_activated_item:
                 self.last_activated_item.disabled = False  
@@ -462,8 +400,8 @@ class ListMenuSub(v.List):
             self.last_activated_item = item
 
             # get target and set
-            self.app_context.current_workflow = task_type  
-            target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area           
+            self.app_context.current_workflow_stage_sub = item.value 
+            target_area = self.app_context.tabular_contents_sub        
             target_instance = get_or_create_class(item.value, self.app_context) # tabluar, text, image, video, audio, etc ~base
             target_area.children = [target_instance]
 
@@ -473,5 +411,5 @@ class ListMenuSub(v.List):
         # _proceed_to_target(default_menu_item)
 
         # set event listener
-        # for item in self.menu_to_target:
-        #     item.on_event('click', _proceed_to_target)
+        for item in self.menu_to_target:
+            item.on_event('click', _proceed_to_target)

@@ -37,6 +37,15 @@ class_paths:
   tabular_data_import_pod: components.import.TabularPodImport
 
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
+  tabular_analytics_basicinfo: components.analytics.TabularaAnalyticsBasicinfo
+  tabular_analytics_scatter: components.analytics.TabularAnalyticsScatter
+  tabular_analytics_heatmap: components.analytics.TabularAnalyticsHeatmap
+  tabular_analytics_boxplot: components.analytics.TabularAnalyticsBoxplot
+  tabular_analytics_density: components.analytics.TabularAnalyticsDensity
+  tabular_analytics_wcloud: components.analytics.TabularAnalyticsWordCloud
+  tabular_analytics_reduction: components.analytics.TabularAnalyticsDimensionReduction
+  tabular_analytics_clustering: components.analytics.TabularAnalyticsClustering
+  tabular_analytics_datasample: components.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_tab: components.processing.TabularProcessingTab

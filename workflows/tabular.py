@@ -37,6 +37,7 @@ class TabularBase(v.Container):
 
         # put components into layout
         super().__init__(
+            class_ = self.context_key,
             style_ = "min-width:100%; min-height:100%;",
             children = [
                 self.tab_menu, 
@@ -58,6 +59,7 @@ class TabularDataImport(v.Container):
             context_key = 'tabular_data_import_tab'
         )
         super().__init__(
+            class_ = self.context_key,
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column",
             children = [
                 self.import_tab,
@@ -72,6 +74,73 @@ class TabularDataAnalytics(v.Container):
         self.style = {}
 
         self.data = self.app_context.tabular_dataset.current_data
+        self.menu_tree = [
+            {   
+                'icon': 'mdi-file-document-edit-outline',
+                'title': '기초정보분석',
+                'target': 'tabular_analytics_basicinfo',
+            },
+            {   
+                'icon': 'mdi-file-chart-outline',
+                'title': '시각화 분석',
+                'sub_menu': [
+                    {
+                        'icon': 'mdi-scatter-plot-outline',
+                        'title': '산점도',
+                        'sub_title': 'Scatter',
+                        'target': 'tabular_analytics_scatter',
+                    },
+                    {   
+                        'icon': 'mdi-checkerboard',
+                        'title': '히트맵',
+                        'sub_title': 'Heatmap',
+                        'target': 'tabular_analytics_heatmap',
+                    },
+                    {
+                        'icon': 'mdi-checkbox-intermediate',
+                        'title': '박스차트',
+                        'sub_title': 'Boxplot',
+                        'target': 'tabular_analytics_boxplot',
+                    },
+                    {
+                        'icon': 'mdi-chart-bell-curve',
+                        'title': '분포차트',
+                        'sub_title': 'Densityplot',
+                        'target': 'tabular_analytics_density',
+                    },
+                    {
+                        'icon': 'mdi-earth',
+                        'title': '한글워드클라우드',
+                        'sub_title': 'Korean Words Cloud',
+                        'target': 'tabular_analytics_wcloud',
+                    },
+                ]
+            },
+            {
+                'icon': 'mdi-gesture',
+                'title': '비지도학습분석',
+                'sub_menu': [
+                    {
+                        'icon': 'mdi-arrow-collapse-all',
+                        'title': '차원축소',
+                        'sub_title': 'Dimensionality Reduction',
+                        'target': 'tabular_analytics_reduction',
+                    },
+                    {
+                        'icon': 'mdi-gamepad-circle-right',
+                        'title': '군집분석',
+                        'sub_title': 'Clustering',
+                        'target': 'tabular_analytics_clustering',
+                    },
+                ],
+            },
+            {
+                'icon': 'mdi-text',
+                'title': '데이터샘플보기',
+                'target': 'tabular_analytics_datasample',
+            },
+
+        ]
 
         # data_context
         self.data_context = get_or_create_class(
@@ -80,18 +149,34 @@ class TabularDataAnalytics(v.Container):
             update = False,
         )
 
-        self.sub_menu = get_or_create_class(
+        self.work_area_contents_sub_menu = get_or_create_class(
             'list_menu_sub',
             self.app_context,
-            update = False
+            update = False,
+            menu_tree = self.menu_tree,
+        )
+
+        self.work_area_contents_sub_area = get_or_create_class(
+            'sub_area',
+            self.app_context,
+            context_key = 'tabular_contents_sub',
+            update = False,
+            style = "width:1200px; background-color:#64b5f6; width:1318px; align-self:flex-start; margin:0; padding-left:0; background-color:#64b5f6;",
         )
 
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            class_ = self.context_key,
+            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
             children = [
                 self.data_context,
-                self.sub_menu,
-                ]
+                v.Row(
+                    style_ = "flex-direction:row; width:1570px; align-self:center;",
+                    children = [
+                        self.work_area_contents_sub_menu,
+                        self.work_area_contents_sub_area,
+                    ],
+                )
+            ]
         )
 
 class TabularDataProcessing(v.Container):

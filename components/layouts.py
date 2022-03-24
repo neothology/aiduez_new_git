@@ -90,7 +90,7 @@ class SubArea(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = ""
+            style_ = "display:flex; flex-direction:column;" + f'{kwargs.get("style", "")}',
         )
 
 class IndexRow(v.Row):
