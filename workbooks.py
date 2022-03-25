@@ -1,7 +1,7 @@
 import os
 import re
 import zipfile
-import json
+import ipyvuetify as v
 from utils import get_or_create_class, delete_files_in_dir
 
 class TabularWorkbook:
@@ -110,13 +110,58 @@ class TabularWorkbook:
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
         # tabular_contents 변경
-        work_stages_to_be_updated = ['tabular_data_analytics', 'tabular_data_processing', 'tabular_ai_training']
-        for stage in work_stages_to_be_updated:
-            setattr(self.app_context, stage, None)
- 
-        new_instance = get_or_create_class('tabular_ai_training', self.app_context, update = True)
-        self.app_context.tabular_contents.children = [new_instance]
+            # data_processing
 
+
+            # ai_training
+        tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
+
+        train_result = get_or_create_class(
+            'tabular_train_result',
+            self.app_context,
+            context_key = 'tabular_ai_training__train_result',
+            update = True,
+            title = '학습 로그',
+            size = {'width':'90vw', 'height':'80vh'}, 
+        )
+
+        train_button = get_or_create_class(
+            'tabular_train_activator',
+            self.app_context,
+            context_key = 'tabular_ai_training__train_activator',
+            update = True,
+            title = '학습하기'
+        )
+
+        training_options = get_or_create_class(
+            'tabular_training_options', 
+            self.app_context, 
+            context_key = 'tabular_ai_training__training_options',
+            update = True,
+            title = '학습 Parameter 설정',
+        )
+
+        column_summary = get_or_create_class(
+            'column_summary',
+            self.app_context,
+            context_key = 'tabular_ai_training__column_summary',
+            update = True,
+            title = '데이터 요약',
+            col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
+        ) 
+
+        tabular_ai_training.children = [
+            self.app_context.tabular_data_context,
+            v.Spacer(style_ = "height:20px"),
+            train_button ,
+            train_result,
+            v.Spacer(style_ = "height:20px"),
+            training_options,
+            v.Spacer(style_ = "height:30px"),
+            column_summary,
+            v.Spacer(style_ = "height:30px"),
+        ]
+        
     def change_work(self, work_name):
         self.app_context.base_overlay.value = True
         self.save_current_work()

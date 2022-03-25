@@ -17,6 +17,7 @@ class_paths:
   # other common components
   column_summary: components.data_profiler.ColumnSummary
   base_overlay: components.overlays.BaseOverlay
+  select_table: components.tables.SelectTable
 
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
@@ -163,7 +164,7 @@ workflows_list:
             title: EDAP에서 가져오기
             target: tabular_data_import_edap
           -
-            title: 가공데이터 가져오기
+            title: Pod에서 가져오기
             target: tabular_data_import_pod 
       - 
         title: 데이터 분석

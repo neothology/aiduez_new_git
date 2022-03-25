@@ -35,6 +35,9 @@ class TabularBase(v.Container):
             target_area = work_area_contents
             )
 
+        # initialize each workflow 
+
+        
         # put components into layout
         super().__init__(
             class_ = self.context_key,
@@ -146,21 +149,20 @@ class TabularDataAnalytics(v.Container):
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
-            update = False,
         )
 
+        # sub menu
         self.work_area_contents_sub_menu = get_or_create_class(
             'list_menu_sub',
             self.app_context,
-            update = False,
             menu_tree = self.menu_tree,
         )
 
+        # sub area
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
             context_key = 'tabular_contents_sub',
-            update = False,
             style = "width:1200px; background-color:#64b5f6; width:1318px; align-self:flex-start; margin:0; padding-left:0; background-color:#64b5f6;",
         )
 
@@ -184,42 +186,45 @@ class TabularDataProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
+         # data_context
+        self.data_context = get_or_create_class(
+            'tabular_data_context',
+            self.app_context,
+        )
+
         # vertical tab
         self.processing_tab = get_or_create_class(
             'tabular_data_processing_tab',
             app_context=self.app_context,
             context_key='tabular_data_processing_tab',
-            update = True,
         )
 
         super().__init__(
             class_ = self.context_key,
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
             children = [
+                self.data_context,
                 self.processing_tab,
             ],
         )
 
 class TabularAITraining(v.Container):
+
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
         self.style = {}
 
-        self.data = self.app_context.tabular_dataset.current_data
-
         # data_context
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
-            update = False,
         )
 
         # model
         self.model = get_or_create_class(
             'tabular_model',
             self.app_context,
-            update = True,
         )
 
         # train result
@@ -227,7 +232,6 @@ class TabularAITraining(v.Container):
             'tabular_train_result',
             self.app_context,
             context_key = 'tabular_ai_training__train_result',
-            update = True,
             title = '학습 로그',
             size = {'width':'90vw', 'height':'80vh'}, 
         )
@@ -237,7 +241,6 @@ class TabularAITraining(v.Container):
             'tabular_train_activator',
             self.app_context,
             context_key = 'tabular_ai_training__train_activator',
-            update = True,
             title = '학습하기'
         )
 
@@ -246,19 +249,16 @@ class TabularAITraining(v.Container):
             'tabular_training_options', 
             self.app_context, 
             context_key = 'tabular_ai_training__training_options',
-            update = True,
             title = '학습 Parameter 설정',
         )
 
         # column summary
-        initial_column_name = self.data.columns[0]
         self.column_summary = get_or_create_class(
             'column_summary',
             self.app_context,
             context_key = 'tabular_ai_training__column_summary',
-            update = True,
             title = '데이터 요약',
-            col = self.data[initial_column_name],
+            col = self.app_context.tabular_dataset.current_data.iloc[:, 0]
         )       
 
         super().__init__(
@@ -278,6 +278,13 @@ class TabularAITraining(v.Container):
         )  
 
         self.app_context.tabular_ai_training__training_options.retrieve_training_options()
+
+    def update_contents(self):
+        self.data = self.app_context.tabular_dataset.current_data
+        self.column_summary.col = self.data[self.data.columns[0]]
+        self.column_summary.update_contents()
+
+
 class TabularAIEvaluation(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(

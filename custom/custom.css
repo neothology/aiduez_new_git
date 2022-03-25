@@ -98,6 +98,10 @@ div.output_subarea {
     background-color: rgba(197 197 197 / 38%);
 }
 
+.v-list-item.v-list-item--link.theme--light.sub-menu-item.v-list-item--disabled {
+    background-color: rgba(197 197 197 / 38%);
+}
+
 .vuetify-styles .col {
     margin: 0 !important;
 }

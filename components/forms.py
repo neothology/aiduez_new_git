@@ -128,3 +128,24 @@ class SimpleSlider(v.Row):
                 counter
             ],
         )
+class SelectBox(v.Container):
+    def __init__(
+        self, 
+        app_context:object = None, 
+        context_key:str = "", 
+        title:str = "",
+        size:dict = {},
+        **kwargs):
+
+        self.app_context = app_context
+        self.context_key = context_key
+
+        style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};'
+
+        
+
+
+        super().__init__(
+            style_ = "margin:0; display:flex; flex-direction:column;" + style,
+            children = []
+        )

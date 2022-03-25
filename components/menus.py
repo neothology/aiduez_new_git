@@ -250,14 +250,24 @@ class TabMenu(v.Col):
             self.app_context.current_workflow_stage = tab.value
             target_instance = get_or_create_class(tab.value, self.app_context) # for example, tab.value = "tabular_ai_training"
             self.target_area.children = [target_instance]
+        
+        for tab in self.tab_menu.children:
+            tab.on_event('click', _proceed_to_target)
+
+
+        # initialize each tab in advance
+        def _activate_tab_in_background(tab):
+            _ = get_or_create_class(tab.value, self.app_context)
+        # initialize each tab in advance
+        self.app_context.base_overlay.value = True
+        for tab in self.tab_menu.children:
+            _activate_tab_in_background(tab)
+        self.app_context.base_overlay.value = False
 
         # set default
         default_tab_name: str = self.tab_props['default']
         default_tab = list(filter(lambda x: x.value == default_tab_name, self.tab_menu.children))[0]
         _proceed_to_target(default_tab)
-        
-        for tab in self.tab_menu.children:
-            tab.on_event('click', _proceed_to_target)
 
 class ListMenuSub(v.List):
 
@@ -402,7 +412,7 @@ class ListMenuSub(v.List):
             # get target and set
             self.app_context.current_workflow_stage_sub = item.value 
             target_area = self.app_context.tabular_contents_sub        
-            target_instance = get_or_create_class(item.value, self.app_context) # tabluar, text, image, video, audio, etc ~base
+            target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
             target_area.children = [target_instance]
 
         # set default

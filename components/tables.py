@@ -1,5 +1,7 @@
 import ipyvuetify as v
 import traitlets
+import pandas as pd
+import json
       
 class PlainTable(v.VuetifyTemplate):
     header = traitlets.Dict({}).tag(sync=True, allow_null=True)
@@ -58,3 +60,51 @@ class PlainTable(v.VuetifyTemplate):
         self.header = _split_text_and_colspan(header)
         self.items = items
 
+class SelectTable(v.VuetifyTemplate):    
+    headers = traitlets.List([]).tag(sync=True, allow_null=True)
+    items = traitlets.List([]).tag(sync=True, allow_null=True)
+    selected = traitlets.List([]).tag(sync=True, allow_null=True)
+    index_col = traitlets.Unicode('').tag(sync=True)
+    template = traitlets.Unicode('''
+        <template>
+            <v-data-table
+                v-model="selected"
+                :headers="headers"
+                :items="items"
+                :item-key="index_col"
+                show-select
+                dense
+                hide-default-footer
+            >
+            </v-data-table>
+        </template>
+        ''').tag(sync=True)
+    
+    def __init__(
+        self, 
+        app_context:object = None, 
+        context_key:str = "", 
+        data=pd.DataFrame(),
+        size:dict = {'width':'150px', 'height':'200px'},
+        *args,
+        **kwargs
+        ):
+        
+        super().__init__(*args, **kwargs)
+        
+        self.app_context = app_context
+        self.context_key = context_key
+        data = data.reset_index()
+        self.index_col = data.columns[0]
+        self.style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};'
+        
+        headers = [{
+              "text": col,
+              "value": col
+            } for col in data.columns]
+        headers[0].update({'align': ' d-none'})
+        headers[1].update({'text': ''})
+        
+        self.headers = headers        
+        self.items = json.loads(
+            data.to_json(orient='records'))
