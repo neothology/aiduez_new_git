@@ -158,7 +158,7 @@ workflows_list:
             title: AIDU에서 가져오기
             target: tabular_data_import_aidu
           -
-            title: PC에서 가져오기
+            title: 개인PC에서 가져오기
             target: tabular_data_import_local
           -
             title: EDAP에서 가져오기
