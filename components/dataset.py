@@ -47,7 +47,7 @@ class TabularDataset:
         self.current_data_path = f'{self.current_data_dir}/{data_name}.json'
         self.current_data = self.read_data(data_name)      
 
-class TabularDataContext(v.Row):
+class TabularDataContext(v.Col):
     def __init__(self, app_context:object = None, context_key:str = '', **kwargs):
         self.app_context = app_context
         self.context_key = context_key
@@ -59,19 +59,24 @@ class TabularDataContext(v.Row):
         self.current_data_name = self.dataset.current_data_name
 
         self.style = {
-            'row': 'width:1570px; align-self:center; border-bottom:1px solid rgb(203 203 203);',
+            'col': 'max-height:60px; margin:0; padding:0; padding-top:10px;',
             'data_selector': 'max-width:400px; padding-bottom:20px',
         }
 
-        self.data_selector = v.Select(
-            v_model = self.current_data_name,
-            items = self.data_name_list,
-            attach = True,
-            dense = True,
-            outlined = True,
-            hide_details = True,
-            class_ = "tabula-data-selector",
-            style_ = self.style['data_selector'],
+        self.data_selector = v.Col(
+            style_ = "padding:0; margin:0;",
+            children = [
+                v.Select(
+                    v_model = self.current_data_name,
+                    items = self.data_name_list,
+                    attach = True,
+                    dense = True,
+                    outlined = True,
+                    hide_details = True,
+                    class_ = "tabula-data-selector",
+                    style_ = self.style['data_selector'],
+                )
+            ],
         )
 
         def _on_data_selector_change(item, event=None, data=None):
@@ -80,6 +85,6 @@ class TabularDataContext(v.Row):
         self.data_selector.on_event('change', _on_data_selector_change)        
 
         super().__init__(
-            style_ = self.style['row'],
+            style_ = self.style['col'],
             children = [self.data_selector],
         )

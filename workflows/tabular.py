@@ -41,7 +41,7 @@ class TabularBase(v.Container):
         # put components into layout
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0px; display:flex; flex-direction:column;",
             children = [
                 self.tab_menu, 
                 work_area_contents,
@@ -145,37 +145,62 @@ class TabularDataAnalytics(v.Container):
 
         ]
 
-        # data_context
+        # progress bar
+        self.progress_bar = v.ProgressLinear(
+            indeterminate = True,
+            color = 'primary',
+        )
+        self.progress_bar.active = False
+
+        # top area(data_context, button)
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
         )
 
-        # sub menu
+        self.top_area = v.Row(
+            children = [
+                self.data_context
+            ],
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
+        )
+
+        # sub menu area
         self.work_area_contents_sub_menu = get_or_create_class(
+            'sub_menu_area',
+            self.app_context,
+            context_key = 'tabular_analytics_sub_menu',
+            style = "width:250px; background-color:#e5e5e5; border: 1px solid #cbcbcb; border-top:0; border-bottom:0;",
+        )
+
+        self.sub_menu = get_or_create_class(
             'list_menu_sub',
             self.app_context,
             menu_tree = self.menu_tree,
         )
 
-        # sub area
+        self.work_area_contents_sub_menu.children = [self.sub_menu]
+
+        # sub work area
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
             context_key = 'tabular_contents_sub',
-            style = "width:1200px; background-color:#64b5f6; width:1318px; align-self:flex-start; margin:0; padding-left:0; background-color:#64b5f6;",
+            style = "width:100%; \
+                    padding:0; margin:0; background-color:#ffffff00; position:relative;",
         )
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
-                self.data_context,
-                v.Row(
-                    style_ = "flex-direction:row; width:1570px; align-self:center;",
+                self.top_area,
+                self.progress_bar,
+                v.Col(
+                    style_ = "display:flex; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
-                        self.work_area_contents_sub_area,
+                        self.work_area_contents_sub_area
                     ],
                 )
             ]
@@ -263,7 +288,7 @@ class TabularAITraining(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column; padding:0;",
             children = [
                 self.data_context,
                 v.Spacer(style_ = "height:20px"),

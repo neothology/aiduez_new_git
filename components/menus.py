@@ -221,7 +221,7 @@ class TabMenu(v.Col):
 
         super().__init__(
             class_ = kwargs.get("context_key"),
-            style_ = "margin-top:-48px !important; padding:0 70px; backgroung-color: none;",
+            style_ = "margin-top:-36px !important; padding:0 70px; backgroung-color: none; max-height:37px;",
             children = [self.tab_menu, self.tab_menu_border_bottom_block]
         )
         
@@ -255,14 +255,15 @@ class TabMenu(v.Col):
             tab.on_event('click', _proceed_to_target)
 
 
-        # initialize each tab in advance
-        def _activate_tab_in_background(tab):
-            _ = get_or_create_class(tab.value, self.app_context)
-        # initialize each tab in advance
-        self.app_context.base_overlay.value = True
-        for tab in self.tab_menu.children:
-            _activate_tab_in_background(tab)
-        self.app_context.base_overlay.value = False
+        # # initialize each tab in advance
+        # def _activate_tab_in_background(tab):
+        #     _ = get_or_create_class(tab.value, self.app_context)
+
+        # # initialize each tab in advance
+        # self.app_context.base_overlay.value = True
+        # for tab in self.tab_menu.children:
+        #     _activate_tab_in_background(tab)
+        # self.app_context.base_overlay.value = False
 
         # set default
         default_tab_name: str = self.tab_props['default']
@@ -286,7 +287,7 @@ class ListMenuSub(v.List):
         
 
         self.style = {
-            'background': 'background-color: #ffffff00; width:270px; margin-left: -18px;',
+            'background': 'background-color: #ffffff00;',
             'list_title': 'color: #5a5a5a; font-size: 14px;',
             'icon': 'color: #5a5a5a; font-size: 20px; margin-right:0px;',
 
@@ -393,7 +394,6 @@ class ListMenuSub(v.List):
             class_ = self.context_key,
             style_ = self.style['background'],
             nav = True,
-            color = "#0f172a",
             children =list_menu,
         )     
 
