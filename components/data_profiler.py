@@ -9,7 +9,6 @@ from scipy import stats
 import plotly.express as px
 import plotly.graph_objects as go
 
-
 class ColumnSummary(BaseCard):
 
     def _make_summary_data(self, data_name, col:pd.Series):
@@ -240,3 +239,5 @@ class ColumnSummary(BaseCard):
             PlainTable(header=header, items=items) for header, items in zip(table_headers, table_data_list)
             ] + [chart]
  
+class DataSummary(BaseCard):
+     pass

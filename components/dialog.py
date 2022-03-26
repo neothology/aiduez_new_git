@@ -52,7 +52,8 @@ class SimpleDialog(v.Dialog):
             title = title,
             body = body,
             buttons = buttons,
-            size = size
+            size = size,
+            **kwargs,
         )
 
         super().__init__(

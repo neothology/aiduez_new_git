@@ -51,6 +51,7 @@ class AppContext:
     tabular_data_analytics: object = None
     tabular_analytics_basicinfo: object = None
     tabular_analytics_basicinfo__column_selector: object = None
+    tabular_analytics_basicinfo__data_range_selector: object = None
     tabular_analytics_scatter: object = None
     tabular_analytics_heatmap: object = None
     tabular_analytics_boxplot: object = None

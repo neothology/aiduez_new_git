@@ -2,7 +2,8 @@ import ipyvuetify as v
 import traitlets
 import pandas as pd
 import json
-      
+from components.cards import SimpleCard
+
 class PlainTable(v.VuetifyTemplate):
     header = traitlets.Dict({}).tag(sync=True, allow_null=True)
     items = traitlets.List([]).tag(sync=True, allow_null=True)
@@ -60,11 +61,39 @@ class PlainTable(v.VuetifyTemplate):
         self.header = _split_text_and_colspan(header)
         self.items = items
 
+class SelectTableCard(SimpleCard): 
+    def __init__(
+        self, 
+        app_context:object, 
+        context_key:str, 
+        title:str,
+        data:pd.DataFrame(),
+        size:dict = {},
+        *args,
+        **kwargs
+    ):
+
+        self.select_table = SelectTable(
+            data = data,
+            size = size,
+            *args,
+            **kwargs,
+        )
+
+        super().__init__(
+            class_ = context_key,
+            title = title,
+            body = self.select_table,
+            size = {'width':size.get('width')},
+            **kwargs,
+        )
+
 class SelectTable(v.VuetifyTemplate):    
     headers = traitlets.List([]).tag(sync=True, allow_null=True)
     items = traitlets.List([]).tag(sync=True, allow_null=True)
     selected = traitlets.List([]).tag(sync=True, allow_null=True)
     index_col = traitlets.Unicode('').tag(sync=True)
+    style = traitlets.Unicode('').tag(sync=True)
     template = traitlets.Unicode('''
         <template>
             <v-data-table
@@ -72,6 +101,8 @@ class SelectTable(v.VuetifyTemplate):
                 :headers="headers"
                 :items="items"
                 :item-key="index_col"
+                :style="style"
+                :items-per-page=-1
                 show-select
                 dense
                 hide-default-footer
@@ -82,28 +113,24 @@ class SelectTable(v.VuetifyTemplate):
     
     def __init__(
         self, 
-        app_context:object = None, 
-        context_key:str = "", 
         data=pd.DataFrame(),
-        size:dict = {'width':'150px', 'height':'200px'},
+        size:dict = {},
         *args,
         **kwargs
         ):
         
         super().__init__(*args, **kwargs)
         
-        self.app_context = app_context
-        self.context_key = context_key
         data = data.reset_index()
         self.index_col = data.columns[0]
-        self.style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};'
-        
+        self.style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};' \
+                     + "overflow-y:auto; overflow-x:hidden; font-weight:400;"
         headers = [{
               "text": col,
               "value": col
             } for col in data.columns]
         headers[0].update({'align': ' d-none'})
-        headers[1].update({'text': ''})
+        headers[1].update({'text': '(전체 선택)', 'sortable': False})
         
         self.headers = headers        
         self.items = json.loads(
