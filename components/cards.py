@@ -290,18 +290,19 @@ class SimpleCard(v.Card):
         self.title = v.Col(children = [title], style_='padding:0;')
         self.controls = v.Col(children = controls,  style_='padding:0; display:flex; justify-content:flex-end; padding-right:15px;')
         self.buttons = buttons
-        size_style = f"width:{size.get('width', '')};" + f"height:{size.get('height', '')};" if size else ""
+        size_style = f"min-width:{size.get('width', '')};" + f"max-width:{size.get('width', '')};" + f"height:{size.get('height', '')};" if size else ""
         self.style = {
             "card": size_style + " \
                 padding:0; display:flex; flex-direction:column; \
                 box-shadow: none !important; border:1px solid #e0e0e0; \
-                background-color: rgb(255, 255, 255); ",
+                background-color: rgb(255, 255, 255); " + kwargs.get('style', ''),
             "header": "max-height:33px; min-height:33px; margin:0; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
                 padding:0; padding-left:16px; \
                 background-color:rgb(248, 250, 252); \
                 border-bottom:1px solid #e0e0e0;",
-            "body": "padding:0px; height:100%; margin:0px; background-color:rgb(255, 255, 255); display:flex;" + kwargs.get('style', ""),
+            "body": "padding:0px; height:100%; margin:0px; background-color:rgb(255, 255, 255); \
+                     display:flex;" ,
             "footer": "background-color:rgb(248, 250, 252); \
                 justify-content:flex-end; padding-right:20px;" 
         }

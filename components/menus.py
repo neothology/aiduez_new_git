@@ -255,15 +255,15 @@ class TabMenu(v.Col):
             tab.on_event('click', _proceed_to_target)
 
 
-        # # initialize each tab in advance
-        # def _activate_tab_in_background(tab):
-        #     _ = get_or_create_class(tab.value, self.app_context)
+        # initialize each tab in advance
+        def _activate_tab_in_background(tab):
+            _ = get_or_create_class(tab.value, self.app_context)
 
-        # # initialize each tab in advance
-        # self.app_context.base_overlay.value = True
-        # for tab in self.tab_menu.children:
-        #     _activate_tab_in_background(tab)
-        # self.app_context.base_overlay.value = False
+        # initialize each tab in advance
+        self.app_context.base_overlay.value = True
+        for tab in self.tab_menu.children:
+            _activate_tab_in_background(tab)
+        self.app_context.base_overlay.value = False
 
         # set default
         default_tab_name: str = self.tab_props['default']
@@ -398,27 +398,37 @@ class ListMenuSub(v.List):
         )     
 
         self.last_activated_item = None
-         # code_add: run progress circular: with...
         def _proceed_to_target(item, event=None, data=None): 
+            if self.last_activated_item == None:
+                self.last_activated_item = item
+                self.last_activated_item.class_list.add("now_active")
 
-            # set 'active' to last activated item wihich is now deactivated
-            if self.last_activated_item:
-                self.last_activated_item.disabled = False  
+                # get target and set
+                self.app_context.current_workflow_stage_sub = item.value 
+                target_area = self.app_context.tabular_contents_sub        
+                target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
+                target_area.children = [target_instance]
 
-            # disable clicked item and keep it as last activated item
-            item.disabled = True
-            self.last_activated_item = item
+                self.app_context.tabular_data_analytics__options.v_model = True
 
-            # get target and set
-            self.app_context.current_workflow_stage_sub = item.value 
-            target_area = self.app_context.tabular_contents_sub        
-            target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
-            target_area.children = [target_instance]
+            else:
+                if self.last_activated_item == item:
+                    if self.app_context.tabular_data_analytics__options.v_model == False:
+                        self.app_context.tabular_data_analytics__options.v_model = True
+                    else:
+                        pass
+                else:
+                    self.last_activated_item.class_list.remove("now_active")
+                    item.class_list.add("now_active")
+                    self.last_activated_item = item
 
-        # set default
-        # default_target_name: str = self.app_context.side_nav_menu_list['default']
-        # default_menu_item = list(filter(lambda x: x.value == default_target_name, self.menu_to_target))[0]
-        # _proceed_to_target(default_menu_item)
+                    # get target and set
+                    self.app_context.current_workflow_stage_sub = item.value 
+                    target_area = self.app_context.tabular_contents_sub        
+                    target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
+                    target_area.children = [target_instance]
+
+                    self.app_context.tabular_data_analytics__options.v_model = True
 
         # set event listener
         for item in self.menu_to_target:

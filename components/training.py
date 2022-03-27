@@ -137,7 +137,7 @@ class TabularModelContext(v.Row):
             children = [self.data_selector],
         )
 
-class TabularTrainActivator(v.Row):
+class TabularTrainActivator(v.Col):
     def __init__(
         self,
         app_context:object = None,
@@ -147,21 +147,22 @@ class TabularTrainActivator(v.Row):
     ):
         self.app_context = app_context
         self.style = {
-            'row':'width: 1570px; align-self: center;',
-            'button':'background-color:#1876d2; color:#ffffff;'
+            'row':'display:flex; flex-direction:row; padding:0; padding-top:12px; width:50%; justify-content:flex-end;',
+            'button':'width:100px; height:35px; background-color:#636efa; color:white;',
             } 
 
         self.train_activator = v.Btn(
-            children = ['학습하기'],
-            disabled = True,
             style_ = self.style['button'],
+            children = ['학습하기'],
+            rounded = True,
+            disabled = True,
         )
 
         self.target_yn = v.Html(
             tag = 'h4',
             children = ['출력 데이터가 없습니다'],
             attributes = {
-                'style': 'padding-left:15px; padding-top:10px;',
+                'style': 'padding-right:15px; padding-top:10px;',
             },
         )
 
@@ -187,7 +188,7 @@ class TabularTrainActivator(v.Row):
         self.train_activator.on_event('click', _activate_model_train)
 
         super().__init__(
-            children = [self.train_activator, self.target_yn],
+            children = [ self.target_yn, self.train_activator],
             style_ = self.style['row'],
         )
 

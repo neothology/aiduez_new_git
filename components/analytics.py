@@ -1,7 +1,35 @@
 from email.policy import default
+from numpy import absolute
 import pandas as pd
 import ipyvuetify as v
-from utils import get_or_create_class, get_dataset_stat, get_variable_types
+from utils import get_or_create_class
+
+class TabualrAnalyticsOptionArea(v.NavigationDrawer):
+    def __init__(
+        self,
+        app_context,
+        context_key,
+        children,
+    ):
+        self.children = children
+
+        super().__init__(
+            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:8px; background-color:#eeeeee;",
+            children = [
+                v.Col(
+                    children = self.children,
+                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                )
+            ],
+            v_model = False,
+            class_ = context_key,
+            absolute = True,
+            temporary = True,
+        )
+    
+    def toggle(self):
+        self.v_model = not self.v_model
+
 
 class TabularaAnalyticsBasicinfo(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
@@ -20,7 +48,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
             context_key = f'{self.context_key}__column_selector', # tabular_analytics_basicinfo__column_selector
             title = '변수 선택',
             data = df_col_names,
-            size = {'width':'250px', 'height':'200px'},
+            size = {'width':'210px', 'height':'200px'},
             style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
 
@@ -36,7 +64,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
             context_key = f'{self.context_key}__data_range_selector', 
             title = '행 범위',
             range = [0, len(self.data), 1, default],
-            size = {'width':'250px', 'height':'90px'},
+            size = {'width':'210px', 'height':'90px'},
             style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
 
@@ -51,43 +79,34 @@ class TabularaAnalyticsBasicinfo(v.Container):
                     dark = True,
                 ),
             ],
-            style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:flex-end; align-items:center; width:250px;",
+            style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:flex-end; align-items:center; width:210px;",
         )
 
-        self.setting_part = v.NavigationDrawer(
-            style_ = "height:1527px; width:266px; padding-top:8px; background-color:#eeeeee;",
+        self.setting_part = get_or_create_class(
+            'tabular_data_analytics_options',
+            self.app_context,
+            context_key = 'tabular_data_analytics__options',
             children = [
-                v.Col(
-                    children = [
-                        self.column_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.data_range_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.run_button,
-                        ],
-                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
-                )
+                self.column_selector,
+                v.Spacer(style_ = "min-height:10px"),
+                self.data_range_selector,
+                v.Spacer(style_ = "min-height:10px"),
+                self.run_button,
             ],
-            v_model = True,
         )
 
-
-        output_part_style_off = "max-height:100%; margin:0; background-color:#ffffff; border-top:1px solid #e0e0e0; display:none;"
-        output_part_style_on = "max-height:100%; margin:0; background-color:#ffffff; border-top:1px solid #e0e0e0;"
         self.output_part = v.Row(
-            style_ = output_part_style_off,
-            children = [""],
+            class_ = 'tabular_analytics_basicinfo__output_part',
+            style_ = "max-height:100%; margin:0; padding:0; background-color:#ffffff; \
+                      display:flex, flex-direction:column;",
+            children = [self.setting_part],
         )
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row;",
             children = [
-                self.setting_part,
-                # v.Spacer(style_ = "max-height:20px"),
-                # self.setting_part_2,
-                # v.Spacer(style_ = "max-height:8px"),
-                # self.output_part
+                self.output_part
                 ],
         )
 
@@ -96,14 +115,46 @@ class TabularaAnalyticsBasicinfo(v.Container):
 
             # selected col_names
             selected_cols = self.app_context.tabular_analytics_basicinfo__column_selector.children[1].children[0].selected
+            if len(selected_cols) == 0:
+                raise Exception('변수를 1개 이상 선택해주세요.')
             selected_cols_to_idx = [col['index'] for col in selected_cols]
 
             # data range
             selected_num_rows = int(self.app_context.tabular_analytics_basicinfo__data_range_selector.children[1].children[0].children[0].v_model)
 
             # data
-            self.df = self.app_context.tabular_dataset.current_data.iloc[:selected_num_rows + 1, selected_cols_to_idx]
-            
+            self.df = self.app_context.tabular_dataset.current_data.iloc[:selected_num_rows, selected_cols_to_idx]
+
+            # make output & show
+            self.data_info = get_or_create_class(
+                'data_info',
+                self.app_context,
+                context_key = f'{self.context_key}__data_info', # tabular_analytics_basicinfo__data_info
+                data_name = self.app_context.tabular_dataset.current_data_name,
+                data = self.df,
+                update = True,
+            )
+
+            self.columns_info = [
+                get_or_create_class(
+                    'column_summary_simple',
+                    self.app_context,
+                    context_key = f'{self.context_key}__column_summary_simple', # tabular_analytics_basicinfo__column_summary_simple
+                    title = f'변수명: {col_name}',
+                    col = self.df[col_name],
+                    update = True,
+                ) for col_name in self.df.columns
+            ]
+
+            self.setting_part.v_model = False
+            self.output_part.children = [
+                self.setting_part, 
+                v.Col(
+                    children = [self.data_info] + self.columns_info,
+                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
+                              padding-top:15px; padding-left:15px",
+                ),
+            ]
             self.app_context.tabular_data_analytics.progress_bar.active = False
 
         self.run_button.on_event('click', _show_base_info)

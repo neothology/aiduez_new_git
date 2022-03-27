@@ -67,25 +67,3 @@ class JsonEncoder(json.JSONEncoder):
             return obj.tolist()
         else:
             return super(JsonEncoder, self).default(obj)
-
-def get_dataset_stat(df):
-    num_of_obs, num_of_var = df.shape
-    num_of_missing_cells = df.isna().sum().sum()
-
-    f2 = lambda x: float(int(x * 1000))/1000
-
-    ratio_of_missing_cells = f2(num_of_missing_cells / (num_of_obs * num_of_var) * 100)
-    num_of_duplicated = df.duplicated().sum()
-    ratio_of_duplicated = f2(num_of_duplicated / num_of_obs * 100)
-
-    return {
-        'Number of variables': num_of_var, 'Number of observations': num_of_obs,
-        'Missing cells': num_of_missing_cells, 'Missing cells(%)': ratio_of_missing_cells,
-        'Duplicated rows': num_of_duplicated, 'Duplicated rows(%)': ratio_of_duplicated
-    }
-
-def get_variable_types(df):
-    variable_types = {'Numeric': np.number,
-                     'Object': 'object', 'Category': 'category',
-                     'Datetime': 'datetime', 'Timedeltas': 'timedelta'}
-    return {k: len(df.select_dtypes(include=v).columns) for k, v in variable_types.items()}

@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../root/.aiduez"
+		},
+		{
+			"path": "../../../root/.jupyter/custom"
+		},
+		{
+			"path": "../../../usr/local/lib/python3.8/dist-packages/voila"
+		},
+		{
+			"path": "../../../usr/local/share/jupyter/nbconvert/templates/lab"
+		}
+	],
+	"settings": {}
+}

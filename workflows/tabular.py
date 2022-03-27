@@ -169,8 +169,9 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_menu = get_or_create_class(
             'sub_menu_area',
             self.app_context,
-            context_key = 'tabular_analytics_sub_menu',
-            style = "width:250px; background-color:#e5e5e5; border: 1px solid #cbcbcb; border-top:0; border-bottom:0;",
+            context_key = 'tabular_data_analytics_sub_menu',
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; border: 1px solid #cbcbcb; \
+                    border-top:0; border-bottom:0; z-index:100;",
         )
 
         self.sub_menu = get_or_create_class(
@@ -187,7 +188,7 @@ class TabularDataAnalytics(v.Container):
             self.app_context,
             context_key = 'tabular_contents_sub',
             style = "width:100%; \
-                    padding:0; margin:0; background-color:#ffffff00; position:relative;",
+                    padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
 
         super().__init__(
@@ -197,7 +198,7 @@ class TabularDataAnalytics(v.Container):
                 self.top_area,
                 self.progress_bar,
                 v.Col(
-                    style_ = "display:flex; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
                         self.work_area_contents_sub_area
@@ -246,6 +247,22 @@ class TabularAITraining(v.Container):
             self.app_context,
         )
 
+        # train button
+        self.train_button = get_or_create_class(
+            'tabular_train_activator',
+            self.app_context,
+            context_key = 'tabular_ai_training__train_activator',
+            title = '학습하기'
+        )
+
+        self.top_area = v.Row(
+            children = [
+                self.data_context,
+                self.train_button,
+            ],
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;"
+        )
+
         # model
         self.model = get_or_create_class(
             'tabular_model',
@@ -259,14 +276,6 @@ class TabularAITraining(v.Container):
             context_key = 'tabular_ai_training__train_result',
             title = '학습 로그',
             size = {'width':'90vw', 'height':'80vh'}, 
-        )
-
-        # train button
-        self.train_button = get_or_create_class(
-            'tabular_train_activator',
-            self.app_context,
-            context_key = 'tabular_ai_training__train_activator',
-            title = '학습하기'
         )
 
         # training_options
@@ -283,22 +292,20 @@ class TabularAITraining(v.Container):
             self.app_context,
             context_key = 'tabular_ai_training__column_summary',
             title = '데이터 요약',
-            col = self.app_context.tabular_dataset.current_data.iloc[:, 0]
+            col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
         )       
 
         super().__init__(
             class_ = self.context_key,
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column; padding:0;",
             children = [
-                self.data_context,
-                v.Spacer(style_ = "height:20px"),
-                self.train_button ,
+                self.top_area,
+                v.Spacer(style_ = "max-height:20px"),
                 self.train_result,
-                v.Spacer(style_ = "height:20px"),
+                v.Spacer(style_ = "max-height:20px"),
                 self.training_options,
-                v.Spacer(style_ = "height:30px"),
+                v.Spacer(style_ = "max-height:30px"),
                 self.column_summary,
-                v.Spacer(style_ = "height:30px"),
                 ],
         )  
 

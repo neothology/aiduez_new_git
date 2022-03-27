@@ -49,9 +49,12 @@ class AppContext:
 
     # tabular data analytics objects
     tabular_data_analytics: object = None
+    tabular_data_analytics__options: object = None
     tabular_analytics_basicinfo: object = None
     tabular_analytics_basicinfo__column_selector: object = None
     tabular_analytics_basicinfo__data_range_selector: object = None
+    tabular_analytics_basicinfo__data_info: object = None
+    tabular_analytics_basicinfo__column_summary_simple: object = None
     tabular_analytics_scatter: object = None
     tabular_analytics_heatmap: object = None
     tabular_analytics_boxplot: object = None

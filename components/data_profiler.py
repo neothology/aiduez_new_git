@@ -1,5 +1,5 @@
 import ipyvuetify as v
-from components.cards import BaseCard
+from components.cards import BaseCard, SimpleCard
 from components.tables import PlainTable
 from components.iframe import ChartFrame
 import pandas as pd
@@ -9,7 +9,7 @@ from scipy import stats
 import plotly.express as px
 import plotly.graph_objects as go
 
-class ColumnSummary(BaseCard):
+class ColumnSummaryTables(v.Row):
 
     def _make_summary_data(self, data_name, col:pd.Series):
         special_char = '_'
@@ -210,7 +210,7 @@ class ColumnSummary(BaseCard):
 
         return table_headers, table_data_list, chart
 
-    def __init__(self, app_context, context_key, title:str, col:pd.Series, **kwargs):
+    def __init__(self, app_context, col:pd.Series, **kwargs):
         self.app_context = app_context
         self.data_name = app_context.tabular_dataset.current_data_name
         self._make_summary_data(self.data_name, col)
@@ -218,26 +218,92 @@ class ColumnSummary(BaseCard):
         table_headers, table_data_list, chart = self._make_output_data(col)
 
         super().__init__(
+            class_ = "",
+            style_ = "margin:0",
+            children = [PlainTable(header=header, items=items) for header, items in zip(table_headers, table_data_list)] + [chart]
+        )
+
+class ColumnSummary(BaseCard):
+    def __init__(self, app_context, context_key, title:str, col:pd.Series, **kwargs):
+        self.app_context = app_context
+
+        self.column_summary_tables =  ColumnSummaryTables(app_context, col, **kwargs)
+        
+        super().__init__(
             class_ = context_key,
             header_title_main = title,
-            body_items = [v.Row(
-                class_ = "",
-                style_ = "margin:0",
-                children = [PlainTable(header=header, items=items) for header, items in zip(table_headers, table_data_list)] + [chart]
-            )],
+            body_items = [
+                self.column_summary_tables
+            ],
             body_size = {"width":"1570px", "height":"auto"},
             align = 'center',
-            app_context = self.app_context
+            app_context = app_context
         )
 
     def update_data(self, col:pd.Series):
-        self._make_summary_data(self.data_name, col)
-        self._make_chart_data(self.data_name, col) 
-        table_headers, table_data_list, chart = self._make_output_data(col)
-
-        self.card_body[0].children[0].children = [
-            PlainTable(header=header, items=items) for header, items in zip(table_headers, table_data_list)
-            ] + [chart]
+        self.app_context.tabular_ai_training__column_summary.children[1].children = [ColumnSummaryTables(self.app_context, col)]
  
-class DataSummary(BaseCard):
-     pass
+class DataInfo(SimpleCard):
+    def __init__(
+        self,
+        app_context,
+        context_key,
+        data_name:str,
+        data:pd.DataFrame,
+    ):  
+
+        num_of_obs, num_of_var = data.shape
+        num_of_missing_cells = data.isna().sum().sum()
+        f2 = lambda x: float(int(x * 1000))/1000
+        ratio_of_missing_cells = f2(num_of_missing_cells / (num_of_obs * num_of_var) * 100)
+        num_of_duplicated = data.duplicated().sum()
+        ratio_of_duplicated = f2(num_of_duplicated / num_of_obs * 100)
+
+        self.table_headers = ['데이터 정보/2', '유형/2']
+        self.table_data_list = [
+            [
+                ({'value':'Number of variables', 'style':''}, {'value':num_of_var, 'style':'text-align:right'}),
+                ({'value':'Number of observations', 'style':''}, {'value':num_of_obs, 'style':'text-align:right'}),
+                ({'value':'Missing cells', 'style':''}, {'value':num_of_missing_cells, 'style':'text-align:right'}),
+                ({'value':'Missing cells(%)', 'style':''}, {'value':ratio_of_missing_cells, 'style':'text-align:right'}),
+                ({'value':'Duplicated rows', 'style':''}, {'value':num_of_duplicated, 'style':'text-align:right'}),
+                ({'value':'Duplicated rows(%)', 'style':''}, {'value':ratio_of_duplicated, 'style':'text-align:right'}),
+            ],
+            [
+                ({'value':'Numeric', 'style':''}, {'value':len(data.select_dtypes(include = np.number).columns),'style':'text-align:right'}),
+                ({'value':'Object', 'style':''}, {'value':len(data.select_dtypes(include = 'object').columns),'style':'text-align:right'}),
+                ({'value':'Category', 'style':''}, {'value':len(data.select_dtypes(include = 'category').columns),'style':'text-align:right'}),
+                ({'value':'Datetime', 'style':''}, {'value':len(data.select_dtypes(include = 'datetime').columns),'style':'text-align:right'}),
+                ({'value':'Timedeltas', 'style':''}, {'value':len(data.select_dtypes(include = 'timedelta').columns),'style':'text-align:right'}),
+            ],
+        ]
+
+        super().__init__(
+            class_ = context_key,
+            title = '데이터 요약',
+            body = v.Row(
+                class_ = "",
+                style_ = "margin:0",
+                children = [PlainTable(header=header, items=items) for header, items in zip(self.table_headers, self.table_data_list)] 
+            ),
+            no_footer=True,
+            size = {"width":"410px", "height":"360px"},
+            style = "margin-bottom:15px;",
+        )
+class ColumnSummarySimple(SimpleCard):
+    def __init__(self, app_context, context_key, title:str, col:pd.Series, **kwargs):
+        self.app_context = app_context
+
+        self.column_summary_tables =  ColumnSummaryTables(app_context, col, **kwargs) # v.Row
+        
+        super().__init__(
+            class_ = context_key,
+            title = title,
+            body = self.column_summary_tables,
+            no_footer = True,
+            size = {"width":"1300px", "height":"auto"},
+            style = "margin-bottom:15px;",
+        )
+
+    def update_data(self, col:pd.Series):
+        self.app_context.tabular_ai_training__column_summary.children[1].children = [ColumnSummaryTables(self.app_context, col)]

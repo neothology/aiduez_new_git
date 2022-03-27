@@ -59,12 +59,12 @@ class TabularDataContext(v.Col):
         self.current_data_name = self.dataset.current_data_name
 
         self.style = {
-            'col': 'max-height:60px; margin:0; padding:0; padding-top:10px;',
+            'col': 'max-height:60px; margin:0; padding:0; padding-top:10px; z-index:500;',
             'data_selector': 'max-width:400px; padding-bottom:20px',
         }
 
         self.data_selector = v.Col(
-            style_ = "padding:0; margin:0;",
+            style_ = "padding:0; margin:0; max-width:50%;",
             children = [
                 v.Select(
                     v_model = self.current_data_name,
