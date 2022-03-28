@@ -2,6 +2,7 @@ envs:
   workspace_dir: /aihub/workspace
   tmp_dir: /aihub/workspace/tmp
   tmp_workbook_dir: /aihub/workspace/tmp/workbook
+  data_dir: /aihub/data
 
 class_paths:
   # components - layout & menu

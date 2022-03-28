@@ -68,7 +68,6 @@ class SeperatorWidgets:
 
 
         radio_buttons.on_event("change", _change_radio)
-        # radio_buttons.observe(self._on_seperator_option, names="value")
         
         return v.Col(
             style_ = 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
@@ -157,6 +156,13 @@ class UploadWidgets:
                 v.Html(
                     children = [f"에러 메시지 : {e} "])]                
         return uploaded_data
+
+
+
+
+
+
+
 class EDAPWidgets:
     def __init__(self, button):
         import os

@@ -47,6 +47,8 @@ class TabularImportTab(BaseTab):
             vertical=True,
             centered=True,
         )
+
+        ## Logging 기능
 class TabularAIDUImport(BaseCard, AppCell):
     
 
@@ -62,7 +64,9 @@ class TabularAIDUImport(BaseCard, AppCell):
         self.button = v.Btn(color = 'primary', class_= 'ma-2 white--text', children = ['데이터 가져오기', v.Icon(right = True, children = ['mdi-cloud-upload'])])
         
         # (2) 데이터 경로 체크----------------------------------------------------------------
-        data_options = make_path_select_options(Path(os.sep,"..","..","..", "aihub","data"),recursive=True, extensions=None)
+        # data_options = make_path_select_options(Path(os.sep,"..","..","..", "aihub","data"),recursive=True, extensions=None)
+        data_dir = self.app_context.env_values["data_dir"]
+        data_options = make_path_select_options(data_dir,recursive=True, extensions=None)
         workspace_data_options = make_path_select_options(os.getcwd(), recursive=False, extensions=['.csv','.tsv'])
        
         # (3) AIDU 업로드 데이터 선택----------------------------------------------------------
@@ -105,6 +109,7 @@ class TabularAIDUImport(BaseCard, AppCell):
             self.workspace_data_select
         ])
         
+        # 화면 그리기
         self.aidu_upload = v.Container(children = [
             v.Row(children = [
                 v.Col(children = [aidu_box]),
@@ -128,7 +133,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         # (6) 데이터 업로드 경고 문구 추가
         self.upload_warning = v.Container(
             style_ = "font-size:15x; font-weigth: bold; color = rgb(255,255,255)",
-            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생합니다."]
+            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생할 수 있습니다. 해당 사항 발생 시 확인 부탁드립니다."]
         )
 
         super().__init__(
@@ -154,18 +159,17 @@ class TabularAIDUImport(BaseCard, AppCell):
     # 버튼 핸들러-------------------------------------------------------------------------
     def on_clicked(self, widget, event = None, data = None):
         data_name = self.data_select.value.split('.')[0]
-        file_path = f"../../../aihub/data/{self.data_select.value}"
+        # file_path = f"../../../aihub/data/{self.data_select.value}"
+        data_dir = self.app_context.env_values["data_dir"]
+        file_path = data_dir + self.data_select.value
         info = [True, ""]
         uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding,sep = self.seperator_widgets.seperator, filepath = file_path)
         if uploaded_data is not None:
-            # self.context.createJob(self.context.currPjtName, data_name)
-            # self.context.addData(self.context.currJobID, data_name, uploaded_data)    
-            # self.context.getCellOf('form-ctx-summary').redraw()
             self.app_context.tabular_workbook.create_new_work(data_name,uploaded_data) 
             self.upload_widgets.complete(data_name)         
         self.data_select.value = None
         self.workspace_data_select.value = None
-        self.button.disabled = True
+        self.button.disabled = False
 
    
 
@@ -210,7 +214,7 @@ class TabularLocalImport(BaseCard, AppCell):
         # (2) 데이터 업로드 경고 문구 추가
         self.upload_warning = v.Container(
             style_ = "font-size:15x; font-weigth: bold; color = rgb(255,255,255)",
-            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생합니다."]
+            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생할 수 있습니다. 해당 사항 발생 시 확인 부탁드립니다."]
         )
         
         super().__init__(
@@ -240,10 +244,6 @@ class TabularLocalImport(BaseCard, AppCell):
             content = uploaded_dict[file_name]['content']
             uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding, sep = self.seperator_widgets.seperator, content=content)
             if uploaded_data is not None:
-                # Pipline 작업 할 것
-                # self.app_context.createJob(self.app_context.currPjtName, data_name)
-                # self.app_context.addData(self.context.currJobID, data_name, uploaded_data)
-                # self.app_context.getCellOf('form-ctx-summary').redraw()
                 self.app_context.tabular_workbook.create_new_work(data_name, uploaded_data)
                 self.upload_widgets.complete(data_name)
               
