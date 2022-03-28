@@ -40,10 +40,6 @@ div.output_subarea {
     opacity: 0.08 !important;
 }
 
-/* .vuetify-styles .main-menu-group .theme--light.v-list-item--active:before {
-    background-color: #0f172a !important;
-} */
-
 .vuetify-styles .theme--light.v-list-item--disabled:before {
     background-color: #ffffff !important;
     opacity: 0.08 !important;
@@ -90,12 +86,41 @@ div.output_subarea {
     background-color: #ff000000 !important;
 }
 
+.vuetify-styles .sub-menu-item.now_active:before {
+    background-color: #585858 !important;
+    opacity: 0.08 !important;
+}
+
 .v-list-item.v-list-item--link.theme--light.sub-menu-item:hover {
     background-color: rgba(197 197 197 / 38%);
 }
 
 .v-list-group.sub-menu-group .v-list-group__header:hover {
     background-color: rgba(197 197 197 / 38%);
+}
+
+.v-list-item.v-list-item--link.theme--light.sub-menu-item.v-list-item--disabled {
+    background-color: rgba(197 197 197 / 38%);
+}
+
+.vuetify-styles .v-text-field.extra-dense .v-input__slot {
+    min-height: 30px !important;
+}
+
+.vuetify-styles .theme--light.v-text-field.extra-dense>.v-input__control>.v-input__slot:before {
+    border: 0;
+}
+
+.vuetify-styles .theme--light.v-text-field.extra-dense>.v-input__control>.v-input__slot:after {
+    border: 0;
+}
+
+.extra-dense input {
+    text-align: right;
+}
+
+.vuetify-styles .v-text-field--outlined.tabula-data-selector fieldset {
+    border: 1px solid #cbcbcb !important;
 }
 
 .vuetify-styles .col {

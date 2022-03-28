@@ -2,6 +2,8 @@ from importlib.abc import FileLoader
 from click import style
 import ipyvuetify as v
 import ipywidgets
+from components.cards import SimpleCard
+
 
 class DataSelect(v.Select):
     def __init__(self, index:int, items, v_model, **kwargs):
@@ -127,4 +129,51 @@ class SimpleSlider(v.Row):
                 slider,
                 counter
             ],
+        )
+class SimpleSliderCard(SimpleCard):
+    def __init__(
+        self,
+        app_context:object = None, 
+        context_key:str = "",  
+        title:str = "",
+        range:list = [], 
+        size:dict = {},
+        **kwargs
+        ):
+
+        slider = v.Slider(
+            min = range[0],
+            max = range[1],
+            step = range[2],
+            v_model = range[3],
+            dense = True,
+            hide_details = True,
+            style_ = "padding:0; height:25px;"
+        )
+
+        counter = v.TextField(
+            class_ = "extra-dense",
+            v_model = range[3],
+            dense = True,
+            hide_details = True,
+            style_ = "max-width:100px; margin:0;",
+        )
+
+        ipywidgets.jslink((slider, 'v_model'), (counter, 'v_model'))
+
+        body = v.Row(
+            children = [
+                slider,
+            ],
+            style_ = "margin:0; padding-bottom:10px; align-items:center;" + kwargs.get('style', ""), 
+        )
+
+        super().__init__(
+            class_ = kwargs.get('class_'),
+            title= title,
+            style_ = "margin:0;", 
+            body = body,
+            controls = [counter],
+            no_footer=True,
+            size = size,
         )

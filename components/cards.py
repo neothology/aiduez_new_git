@@ -158,6 +158,7 @@ class BaseCard(v.Card):
                 body = self.model_save_body,
                 buttons = [ self.save_confrim_btn, self.save_cancel_btn ],
                 size = {'width':'500px', 'height':'200px'},
+                style = "align-items:center; padding-left:20px; padding-right:20px; height:150px;",
             )
             self.save_button = v.Btn(
                 v_on = 'tooltip.on',
@@ -249,7 +250,7 @@ class SmallHeaderCard(v.Card):
         self.style = {
             "card": f"width:{size.get('width')}; height:{size.get('height')}; \
                 padding:0; display:flex; flex-direction:column; \
-                box-shadow: none !important; \
+                box-shadow: none !important;  \
                 background-color: #ffffff00; ",
             "header": "max-height:33px; min-height:33px; margin:0; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
@@ -278,33 +279,38 @@ class SimpleCard(v.Card):
     def __init__(
         self,
         title:str = "",
-        body:object = None,
-        buttons:list = None,
+        body:object = "",
+        controls:list = [],
+        buttons:list = [],
+        no_footer:bool = False,
         size:dict = {},
         **kwargs
         ):
+
+        self.title = v.Col(children = [title], style_='padding:0;')
+        self.controls = v.Col(children = controls,  style_='padding:0; display:flex; justify-content:flex-end; padding-right:15px;')
         self.buttons = buttons
+        size_style = f"min-width:{size.get('width', '')};" + f"max-width:{size.get('width', '')};" + f"height:{size.get('height', '')};" if size else ""
         self.style = {
-            "card": f"width:{size.get('width')}; height:{size.get('height')}; \
+            "card": size_style + " \
                 padding:0; display:flex; flex-direction:column; \
-                box-shadow: none !important; \
-                background-color: rgb(255, 255, 255); ",
+                box-shadow: none !important; border:1px solid #e0e0e0; \
+                background-color: rgb(255, 255, 255); " + kwargs.get('style', ''),
             "header": "max-height:33px; min-height:33px; margin:0; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
                 padding:0; padding-left:16px; \
                 background-color:rgb(248, 250, 252); \
                 border-bottom:1px solid #e0e0e0;",
-            "body": "padding:0px; margin:0px; background-color:rgb(255, 255, 255); \
-                padding-left: 20px; padding-right: 20px; \
-                display:flex; align-items:center; height:150px;",
-            "footer": "background-color:rgb(255, 255, 255); \
+            "body": "padding:0px; height:100%; margin:0px; background-color:rgb(255, 255, 255); \
+                     display:flex;" ,
+            "footer": "background-color:rgb(248, 250, 252); \
                 justify-content:flex-end; padding-right:20px;" 
         }
 
         self.header = v.CardTitle(
             class_ = "",
             style_ = self.style['header'],
-            children = [title],
+            children = [self.title, self.controls],
         )
 
         self.body = v.CardText(
@@ -313,18 +319,17 @@ class SimpleCard(v.Card):
             children = [body]
         )
 
-        self.footer = v.CardActions(
-            class_ = "",
-            style_ = self.style['footer'],
-            children = [
-                self.buttons[0],
-                self.buttons[1],
-            ],
-        )
-
+        if no_footer:
+            self.footer = ""
+        else:
+            self.footer = v.CardActions(
+                class_ = "",
+                style_ = self.style['footer'],
+                children = [button for button in self.buttons]
+            )
 
         super().__init__(
-            class_ = "",
+            class_ = kwargs.get('class_', ""),
             style_ = self.style['card'],
             children = [self.header, self.body, self.footer],
         )

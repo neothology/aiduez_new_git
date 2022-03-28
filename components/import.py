@@ -3,7 +3,7 @@ import ipyvuetify as v
 from utils import get_or_create_class
 from components.tab import BaseTab
 from components.cards import BaseCard
-from components.dialog import BaseDialog
+from components.forms import DataSelect, DataSlider
 from pathlib import Path
 from IPython.core.display import HTML
 from IPython.display import display, clear_output
@@ -69,7 +69,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         data_list = []
         for i in range (0, len(data_options)):
             data_list.append(data_options[i][0])
-        self.data_select = v.Select(v_model = None, label = 'Data',items = data_list, value = None,rows =7)
+        self.data_select = v.Select(v_model = None, label = '데이터',items = data_list, value = None,rows =7)
         def _data_change_select(widget, event = None, data = None):
             widget.value = widget.v_model
         self.data_select.on_event("change", _data_change_select)
@@ -78,7 +78,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         work_data_list = []
         for i in range(0, len(workspace_data_options)):
             work_data_list.append(workspace_data_options[i][0])
-        self.workspace_data_select = v.Select(v_model = None, label = 'Workspcae Data',items = work_data_list,value=None,rows= 7)
+        self.workspace_data_select = v.Select(v_model = None, label = '작업공간 데이터',items = work_data_list,value=None,rows= 7)
         def _work_data_change_select(widget, event = None, data = None):
             widget.value = widget.v_model
         self.workspace_data_select.on_event("change",_work_data_change_select)
@@ -89,7 +89,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         self.upload_widgets = UploadWidgets()
         self.seperator_widgets = SeperatorWidgets()
         self.selected_datapath = None
-        aidu_box = v.Card(children = [
+        aidu_box = v.Container(children = [
             v.Html(
                 tag = 'h5', 
                 children = ["AIDU 플랫폼에 업로드한 데이터"]
@@ -114,7 +114,7 @@ class TabularAIDUImport(BaseCard, AppCell):
             ),
             v.Row(children = [
                 v.Col(children =[self.encoding_widgets()]),
-                v.Col(children =[self.seperator_widgets()])
+                v.Col(children =[self.seperator_widgets()]),
                 ]
                 
             ),
@@ -125,6 +125,12 @@ class TabularAIDUImport(BaseCard, AppCell):
 
         ])
 
+        # (6) 데이터 업로드 경고 문구 추가
+        self.upload_warning = v.Container(
+            style_ = "font-size:15x; font-weigth: bold; color = rgb(255,255,255)",
+            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생합니다."]
+        )
+
         super().__init__(
             app_context = self.app_context,
             class_=context_key,
@@ -132,7 +138,8 @@ class TabularAIDUImport(BaseCard, AppCell):
             
             body_items=[
                 
-                self.aidu_upload
+                self.aidu_upload,
+                self.upload_warning
 
             ],
             body_size={
@@ -155,10 +162,11 @@ class TabularAIDUImport(BaseCard, AppCell):
             # self.context.addData(self.context.currJobID, data_name, uploaded_data)    
             # self.context.getCellOf('form-ctx-summary').redraw()
             self.app_context.tabular_workbook.create_new_work(data_name,uploaded_data) 
-            self.upload_widgets.complete(data_name)        
+            self.upload_widgets.complete(data_name)         
         self.data_select.value = None
         self.workspace_data_select.value = None
         self.button.disabled = True
+
    
 
 class TabularLocalImport(BaseCard, AppCell):
@@ -198,15 +206,20 @@ class TabularLocalImport(BaseCard, AppCell):
                 
             ]
         )
+
+        # (2) 데이터 업로드 경고 문구 추가
+        self.upload_warning = v.Container(
+            style_ = "font-size:15x; font-weigth: bold; color = rgb(255,255,255)",
+            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생합니다."]
+        )
         
         super().__init__(
             app_context = self.app_context,
             class_=context_key,            
             header_title_main=title,
             body_items=[
-                # self.data_upload,
-                # self.uploaded_data
-                self.local_upload
+                self.local_upload,
+                self.upload_warning
             ],
             body_size={
                 "width":"lg",
@@ -223,7 +236,6 @@ class TabularLocalImport(BaseCard, AppCell):
             uploaded_dict = change["new"]
             file_name = list(uploaded_dict.keys())[0]
             data_name = os.path.splitext(file_name)[0]
-            # info = self.app_context.validatePipe(data_name, 'add_data')
             info = [True, ""]
             content = uploaded_dict[file_name]['content']
             uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding, sep = self.seperator_widgets.seperator, content=content)
@@ -242,8 +254,8 @@ class TabularLocalImport(BaseCard, AppCell):
         
         uploader = widgets.FileUpload(
             description = '데이터 업로드',
-            accept='.csv,.csv_,.tsv',  # Accepted file extension e.g. '.txt', '.pdf', 'image/*', 'image/*,.pdf'
-            multiple=False,  # True to accept multiple files upload else False
+            accept='.csv,.csv_,.tsv',  # 확장자 제한 '.txt', '.pdf', 'image/*', 'image/*,.pdf'
+            multiple=False,  # 복수 파일 업로드 불가
         )
                 
         uploaderBtn = v.Tooltip(right=True, v_slots =[{
@@ -264,6 +276,11 @@ class TabularEDAPImport(BaseCard):
         self.app_context = app_context
         self.context_key = context_key
         title = "EDAP에서 데이터 가져오기"
+        
+        ##------------------##
+        ## 테스트는 사내 망에서  ##
+        ##------------------##
+
         # def on_clicked(self,btn):
         #     uploaded_data = self.edap_widgets.execute_query()
         #     data_name = self.edap_widgets.curr_table
@@ -283,6 +300,8 @@ class TabularEDAPImport(BaseCard):
         #     children = [self.edap_widgets()]
         # )
 
+
+        # UI 배치용 더미 
         self.edap_upload = v.Container(
             children = [
                 v.Row(children = [
@@ -328,7 +347,7 @@ class TabularPodImport(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        title = "POD"
+        title = "가공데이터"
         super().__init__(
             class_=context_key,
             header_title_main=title,

@@ -13,10 +13,15 @@ class_paths:
   list_menu_sub: components.menus.ListMenuSub
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
+  sub_menu_area: components.layouts.SubMenuArea
   
   # other common components
   column_summary: components.data_profiler.ColumnSummary
+  column_summary_simple: components.data_profiler.ColumnSummarySimple
   base_overlay: components.overlays.BaseOverlay
+  select_table_card: components.tables.SelectTableCard
+  simple_slider_card: components.forms.SimpleSliderCard
+  data_info: components.data_profiler.DataInfo
 
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
@@ -37,6 +42,7 @@ class_paths:
   tabular_data_import_pod: components.import.TabularPodImport
 
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
+  tabular_data_analytics_options: components.analytics.TabualrAnalyticsOptionArea
   tabular_analytics_basicinfo: components.analytics.TabularaAnalyticsBasicinfo
   tabular_analytics_scatter: components.analytics.TabularAnalyticsScatter
   tabular_analytics_heatmap: components.analytics.TabularAnalyticsHeatmap
@@ -163,7 +169,7 @@ workflows_list:
             title: EDAP에서 가져오기
             target: tabular_data_import_edap
           -
-            title: 가공데이터 가져오기
+            title: Pod에서 가져오기
             target: tabular_data_import_pod 
       - 
         title: 데이터 분석
@@ -340,7 +346,7 @@ theme:
       style: 
         base:
           default: >
-            min-width:1700px; max-width:1700px !important;
+            min-width:1570px; max-width:1570px !important;
             border-left:1px dashed #cccccc;
             border-right:1px dashed #cccccc;
             height: 1599px; top:200px;

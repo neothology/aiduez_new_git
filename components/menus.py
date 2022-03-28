@@ -221,7 +221,7 @@ class TabMenu(v.Col):
 
         super().__init__(
             class_ = kwargs.get("context_key"),
-            style_ = "margin-top:-48px !important; padding:0 70px; backgroung-color: none;",
+            style_ = "margin-top:-36px !important; padding:0 70px; backgroung-color: none; max-height:37px;",
             children = [self.tab_menu, self.tab_menu_border_bottom_block]
         )
         
@@ -250,14 +250,25 @@ class TabMenu(v.Col):
             self.app_context.current_workflow_stage = tab.value
             target_instance = get_or_create_class(tab.value, self.app_context) # for example, tab.value = "tabular_ai_training"
             self.target_area.children = [target_instance]
+        
+        for tab in self.tab_menu.children:
+            tab.on_event('click', _proceed_to_target)
+
+
+        # initialize each tab in advance
+        def _activate_tab_in_background(tab):
+            _ = get_or_create_class(tab.value, self.app_context)
+
+        # initialize each tab in advance
+        self.app_context.base_overlay.value = True
+        for tab in self.tab_menu.children:
+            _activate_tab_in_background(tab)
+        self.app_context.base_overlay.value = False
 
         # set default
         default_tab_name: str = self.tab_props['default']
         default_tab = list(filter(lambda x: x.value == default_tab_name, self.tab_menu.children))[0]
         _proceed_to_target(default_tab)
-        
-        for tab in self.tab_menu.children:
-            tab.on_event('click', _proceed_to_target)
 
 class ListMenuSub(v.List):
 
@@ -276,7 +287,7 @@ class ListMenuSub(v.List):
         
 
         self.style = {
-            'background': 'background-color: #ffffff00; width:270px; margin-left: -18px;',
+            'background': 'background-color: #ffffff00;',
             'list_title': 'color: #5a5a5a; font-size: 14px;',
             'icon': 'color: #5a5a5a; font-size: 20px; margin-right:0px;',
 
@@ -383,32 +394,41 @@ class ListMenuSub(v.List):
             class_ = self.context_key,
             style_ = self.style['background'],
             nav = True,
-            color = "#0f172a",
             children =list_menu,
         )     
 
         self.last_activated_item = None
-         # code_add: run progress circular: with...
         def _proceed_to_target(item, event=None, data=None): 
+            if self.last_activated_item == None:
+                self.last_activated_item = item
+                self.last_activated_item.class_list.add("now_active")
 
-            # set 'active' to last activated item wihich is now deactivated
-            if self.last_activated_item:
-                self.last_activated_item.disabled = False  
+                # get target and set
+                self.app_context.current_workflow_stage_sub = item.value 
+                target_area = self.app_context.tabular_contents_sub        
+                target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
+                target_area.children = [target_instance]
 
-            # disable clicked item and keep it as last activated item
-            item.disabled = True
-            self.last_activated_item = item
+                self.app_context.tabular_data_analytics__options.v_model = True
 
-            # get target and set
-            self.app_context.current_workflow_stage_sub = item.value 
-            target_area = self.app_context.tabular_contents_sub        
-            target_instance = get_or_create_class(item.value, self.app_context) # tabluar, text, image, video, audio, etc ~base
-            target_area.children = [target_instance]
+            else:
+                if self.last_activated_item == item:
+                    if self.app_context.tabular_data_analytics__options.v_model == False:
+                        self.app_context.tabular_data_analytics__options.v_model = True
+                    else:
+                        pass
+                else:
+                    self.last_activated_item.class_list.remove("now_active")
+                    item.class_list.add("now_active")
+                    self.last_activated_item = item
 
-        # set default
-        # default_target_name: str = self.app_context.side_nav_menu_list['default']
-        # default_menu_item = list(filter(lambda x: x.value == default_target_name, self.menu_to_target))[0]
-        # _proceed_to_target(default_menu_item)
+                    # get target and set
+                    self.app_context.current_workflow_stage_sub = item.value 
+                    target_area = self.app_context.tabular_contents_sub        
+                    target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
+                    target_area.children = [target_instance]
+
+                    self.app_context.tabular_data_analytics__options.v_model = True
 
         # set event listener
         for item in self.menu_to_target:

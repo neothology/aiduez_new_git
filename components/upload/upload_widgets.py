@@ -27,14 +27,11 @@ class EncodingWidgets:
         )
         def _change_radio(widget, event = None, data = None):
             widget.value = widget.v_model
-
+            self.encoding = widget.value
+           
         
         radio_buttons.on_event("change", _change_radio)
-        # radio_buttons.observe(self._on_encoding_option, names="value")
-        
-        
-        
-        # return widgets.VBox([widgets.HTML("<h5> 인코딩 선택 </h5>"),radio_buttons])
+ 
         return v.Col(
             style_ = 'max-height: 15px; font-size: 1rem; font-weight: bold; color: rgb(30, 41, 59);',
             children = [
@@ -43,8 +40,7 @@ class EncodingWidgets:
                 
             ]
         )
-    # def _on_encoding_option(self, change):
-    #     self.encoding = self.radio_buttons.value
+   
 class SeperatorWidgets:
     def __init__(self):
         self.seperator = ","
@@ -68,6 +64,7 @@ class SeperatorWidgets:
         )
         def _change_radio(widget, event = None, data = None):
             widget.value = widget.v_model
+            self.seperator = widget.value
 
 
         radio_buttons.on_event("change", _change_radio)
@@ -80,11 +77,10 @@ class SeperatorWidgets:
                 radio_buttons
             ]
         ) 
-    # def _on_seperator_option(self, change):
-    #     self.seperator = change["new"]
+  
 class UploadWidgets:
     def __init__(self):
-        self.box = v.Container(style_ = 'font-size: 1rem; font-weight: bold; color: rgb(0,0,0);', children = ["데이터의 필드명에 공백이 포함될 경우 오류가 발생하니 필히 확인 부탁드립니다"])
+        self.box = v.Container(style_ = 'font-size: 1rem; font-weight: bold; color: rgb(0,0,0);', children = [""])
     def __call__(self):
         return self.box
 
