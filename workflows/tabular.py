@@ -1,6 +1,8 @@
 import ipyvuetify as v
 import os
 import json
+
+from matplotlib.style import context
 from utils import get_or_create_class
 class TabularBase(v.Container):
 
@@ -8,6 +10,8 @@ class TabularBase(v.Container):
         self.app_context = app_context
         self.context_key = context_key
         self.tmp_workbook_dir = self.app_context.env_values['tmp_workbook_dir']
+
+        self.app_context.base_overlay.value = True
 
         # init workbook
         self.workbook = get_or_create_class('tabular_workbook', self.app_context)
@@ -36,8 +40,10 @@ class TabularBase(v.Container):
             )
 
         # initialize each workflow 
+        tabular_workflow_names = [tab.value for tab in self.tab_menu.tab_menu.children]
+        for workflow_name in tabular_workflow_names:
+            _ = get_or_create_class(workflow_name, self.app_context)
 
-        
         # put components into layout
         super().__init__(
             class_ = self.context_key,
@@ -47,6 +53,8 @@ class TabularBase(v.Container):
                 work_area_contents,
                 ],
         )
+
+        self.app_context.base_overlay.value = False
 
     def update_workflow_stages(self):
         pass
@@ -177,6 +185,7 @@ class TabularDataAnalytics(v.Container):
         self.sub_menu = get_or_create_class(
             'list_menu_sub',
             self.app_context,
+            context_key = 'tabular_data_analytics__sub_menu',
             menu_tree = self.menu_tree,
         )
 
@@ -300,9 +309,8 @@ class TabularAITraining(v.Container):
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column; padding:0;",
             children = [
                 self.top_area,
-                v.Spacer(style_ = "max-height:20px"),
+                v.Spacer(style_ = "max-height:10px"),
                 self.train_result,
-                v.Spacer(style_ = "max-height:20px"),
                 self.training_options,
                 v.Spacer(style_ = "max-height:30px"),
                 self.column_summary,
@@ -315,7 +323,6 @@ class TabularAITraining(v.Container):
         self.data = self.app_context.tabular_dataset.current_data
         self.column_summary.col = self.data[self.data.columns[0]]
         self.column_summary.update_contents()
-
 
 class TabularAIEvaluation(v.Container):
     def __init__(self, app_context, context_key, **kwargs):

@@ -110,7 +110,21 @@ class TabularWorkbook:
         # data 변경
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
+        # analytics 변경
+        if self.app_context.tabular_data_analytics__options:
+            self.app_context.tabular_contents_sub.children = []
+            self.app_context.tabular_data_analytics__options = None
+            self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
+            self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
+        if self.app_context.tabular_analytics_basicinfo:
+            self.app_context.tabular_analytics_basicinfo__column_selector = None
+            self.app_context.tabular_analytics_basicinfo__data_range_selector = None
+            self.app_context.tabular_analytics_basicinfo = None
+
+        # training 변경
         tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
+        
+        tabular_ai_training.train_button.disabled = True
 
         train_result = get_or_create_class(
             'tabular_train_result',
@@ -119,14 +133,6 @@ class TabularWorkbook:
             update = True,
             title = '학습 로그',
             size = {'width':'90vw', 'height':'80vh'}, 
-        )
-
-        train_button = get_or_create_class(
-            'tabular_train_activator',
-            self.app_context,
-            context_key = 'tabular_ai_training__train_activator',
-            update = True,
-            title = '학습하기'
         )
 
         training_options = get_or_create_class(
@@ -147,23 +153,19 @@ class TabularWorkbook:
         ) 
 
         tabular_ai_training.children = [
-            self.app_context.tabular_data_context,
-            v.Spacer(style_ = "height:20px"),
-            train_button ,
+            tabular_ai_training.top_area,
+            v.Spacer(style_ = "max-height:20px"),
             train_result,
-            v.Spacer(style_ = "height:20px"),
             training_options,
-            v.Spacer(style_ = "height:30px"),
+            v.Spacer(style_ = "max-height:30px"),
             column_summary,
-            v.Spacer(style_ = "height:30px"),
         ]
         
     def change_work(self, work_name):
-        # self.app_context.base_overlay.value = True
-        # self.save_current_work()
-        # self.load_existing_work(work_name)
-        # self.app_context.base_overlay.value = False
-        pass
+        self.app_context.base_overlay.value = True
+        self.save_current_work()
+        self.load_existing_work(work_name)
+        self.app_context.base_overlay.value = False
 
     def save_current_work_as(self, work_name):
         pass
