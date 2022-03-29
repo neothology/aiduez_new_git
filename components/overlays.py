@@ -12,4 +12,5 @@ class BaseOverlay(v.Overlay):
             ],
             class_ = kwargs.get('class_'),
             app_context = kwargs.get('app_context'),
+            style_ = "z-index:9999;"
         )

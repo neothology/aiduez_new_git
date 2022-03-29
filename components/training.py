@@ -29,6 +29,7 @@ class TabularModel:
         self.current_exp_and_model_name = ''
 
     def train(self, output_logs, output_plots, **kwargs):
+        self.app_context.tabular_ai_training__train_result.children[0].progress_bar.active = True
         config = self.app_context.tabular_ai_training__training_options.retrieve_config()
         self.output_logs = output_logs
         self.output_plots = output_plots
@@ -86,6 +87,8 @@ class TabularModel:
         self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
         self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
         self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
+
+        self.app_context.tabular_ai_training__train_result.children[0].progress_bar.active = False
 
     def save_as(self, exp_name, model_name: str):
         # update: current_model_name, current_exp_and_model_name, current_train_result_dir
@@ -236,13 +239,13 @@ class TabularTrainResult(BaseDialog):
         self.button_chart_view.hide()
 
         def _on_click_button_chart_view(item, event=None, data=None):
-            self.children[0].children[1].children = [self.output_plots]
+            self.children[0].children[2].children = [self.output_plots]
             self.button_chart_view.disabled = True
             self.button_text_view.disabled = False
             
 
         def _on_click_button_text_view(item, event=None, data=None):
-            self.children[0].children[1].children = [self.output_logs]
+            self.children[0].children[2].children = [self.output_logs]
             self.button_text_view.disabled = True
             self.button_chart_view.disabled = False
 
