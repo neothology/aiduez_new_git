@@ -132,10 +132,12 @@ class BaseCard(v.Card):
             self.model_save_body = v.TextField(
                 v_model = "",
                 prefix = "",
+                style_ ="padding:15px 20px 0 20px;",
             )
 
             self.save_confrim_btn = v.Btn(
                 children = ["저장"],
+                small = True,
             )
 
             def save_model_as(item, event=None, data=None):
@@ -146,6 +148,7 @@ class BaseCard(v.Card):
 
             self.save_cancel_btn = v.Btn(
                 children = ["취소"],
+                small = True,
             )
 
             def cancel_save_model_as(item, event=None, data=None):
@@ -158,7 +161,7 @@ class BaseCard(v.Card):
                 body = self.model_save_body,
                 buttons = [ self.save_confrim_btn, self.save_cancel_btn ],
                 size = {'width':'500px', 'height':'200px'},
-                style = "align-items:center; padding-left:20px; padding-right:20px; height:150px;",
+                style = "height:150px;",
             )
             self.save_button = v.Btn(
                 v_on = 'tooltip.on',
@@ -304,7 +307,7 @@ class SimpleCard(v.Card):
                 padding:0; display:flex; flex-direction:column; \
                 box-shadow: none !important; border:1px solid #e0e0e0; \
                 background-color: rgb(255, 255, 255); " + kwargs.get('style', ''),
-            "header": "max-height:33px; min-height:33px; margin:0; \
+            "header": "max-height:33px; min-height:33px; margin:0; width:100%; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
                 padding:0; padding-left:16px; \
                 background-color:rgb(248, 250, 252); \
@@ -312,7 +315,7 @@ class SimpleCard(v.Card):
             "body": "padding:0px; height:100%; margin:0px; background-color:rgb(255, 255, 255); \
                      display:flex;" ,
             "footer": "background-color:rgb(248, 250, 252); \
-                justify-content:flex-end; padding-right:20px;" 
+                justify-content:flex-end; padding-right:20px; border-top:1px solid #e0e0e0;"
         }
 
         self.header = v.CardTitle(

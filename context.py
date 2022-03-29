@@ -24,6 +24,7 @@ class AppContext:
     top_area: object = None
     work_area: object = None
     base_overlay: object = None
+    progress_overlay: object = None
 
 ## workflow stages object ##
     # --------------------------------------------------
