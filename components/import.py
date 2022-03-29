@@ -10,7 +10,7 @@ from IPython.display import display, clear_output
 from ipywidgets.widgets import widget_float
 from ipywidgets.widgets.widget_layout import Layout
 import pandas as pd
-
+import io
 
 from components.globals import html_UI_seperator
 import ipywidgets as widgets
@@ -93,6 +93,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         self.upload_widgets = UploadWidgets()
         self.seperator_widgets = SeperatorWidgets()
         self.selected_datapath = None
+        
         aidu_box = v.Container(children = [
             v.Html(
                 tag = 'h5', 
@@ -129,12 +130,15 @@ class TabularAIDUImport(BaseCard, AppCell):
             
 
         ])
-
-        # (6) 데이터 업로드 경고 문구 추가
-        self.upload_warning = v.Container(
+        
+        # (6) 데이터 개요 보여주기
+        self.data_information = v.Container(
             style_ = "font-size:15x; font-weigth: bold; color = rgb(255,255,255)",
-            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생할 수 있습니다. 해당 사항 발생 시 확인 부탁드립니다."]
+            children = [
+                
+            ]
         )
+
 
         super().__init__(
             app_context = self.app_context,
@@ -144,7 +148,7 @@ class TabularAIDUImport(BaseCard, AppCell):
             body_items=[
                 
                 self.aidu_upload,
-                self.upload_warning
+                self.data_information
 
             ],
             body_size={
@@ -166,11 +170,17 @@ class TabularAIDUImport(BaseCard, AppCell):
         uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding,sep = self.seperator_widgets.seperator, filepath = file_path)
         if uploaded_data is not None:
             self.app_context.tabular_workbook.create_new_work(data_name,uploaded_data) 
-            self.upload_widgets.complete(data_name)         
+            self.upload_widgets.complete(data_name)
+        self.data_shape = uploaded_data.shape
+        buf = io.StringIO()
+        uploaded_data.info(buf = buf)
+        # self.data_info = buf.getvalue().split('\n')
+        self.data_info = buf.getvalue()   
         self.data_select.value = None
         self.workspace_data_select.value = None
         self.button.disabled = False
-
+        self.data_information.children = [self.data_info]
+        
    
 
 class TabularLocalImport(BaseCard, AppCell):
