@@ -150,50 +150,71 @@ class TabularTrainActivator(v.Col):
     ):
         self.app_context = app_context
         self.style = {
-            'row':'display:flex; flex-direction:row; padding:0; padding-top:12px; width:50%; justify-content:flex-end;',
-            'button':'width:100px; height:35px; background-color:#636efa; color:white;',
+            'row': 'display:flex; flex-direction:row; padding:0; padding-top:12px; width:50%; justify-content:flex-end;',
+            'text': 'padding-right:15px; padding-top:10px;',
+            'button_result': 'width:100px; height:36px; margin-right:5px; background-color:#388e3c; color:white;',
+            'button_train': 'width:100px; height:35px; background-color:#636efa; color:white;',
             } 
-
-        self.train_activator = v.Btn(
-            style_ = self.style['button'],
-            children = ['학습하기'],
-            rounded = True,
-            disabled = True,
-        )
 
         self.target_yn = v.Html(
             tag = 'h4',
             children = ['출력 데이터가 없습니다'],
             attributes = {
-                'style': 'padding-right:15px; padding-top:10px;',
+                'style': self.style['text'],
             },
+        )
+
+        self.train_activator = v.Btn(
+            style_ = self.style['button_train'],
+            children = ['학습하기'],
+            rounded = True,
+            disabled = True,
+        )
+
+        self.show_result_btn = v.Btn(
+            style_ = self.style['button_result'],
+            children = ['결과 보기'],
+            rounded = True,
+        )
+        self.show_result_btn.hide()
+
+        super().__init__(
+            children = [ self.target_yn, self.show_result_btn, self.train_activator],
+            style_ = self.style['row'],
         )
 
         def _activate_model_train(item, event=None, data=None):
 
-            train_result = self.app_context.tabular_ai_training__train_result
-            train_result.button_chart_view.hide()
-            train_result.button_chart_view.disabled = True
+            self.train_result = self.app_context.tabular_ai_training__train_result
+            self.train_result.button_chart_view.hide()
+            self.train_result.button_chart_view.disabled = True
 
-            train_result.clear_contents()
-            train_result.children[0].children[1].children = [train_result.output_logs]
+            self.train_result.clear_contents()
+            self.train_result.children[0].children[1].children = [self.train_result.output_logs]
 
-            train_result.show()
+            self.train_result.show()
             
             self.model = self.app_context.tabular_model
             self.model.train(
-                output_logs = train_result.output_logs,
-                output_plots = train_result.output_plots,
+                output_logs = self.train_result.output_logs,
+                output_plots = self.train_result.output_plots,
             )
-            train_result.button_chart_view.disabled = False
-            train_result.button_chart_view.show()
+            self.train_result.button_chart_view.disabled = False
+            self.train_result.button_chart_view.show()
+
+            self.show_result_btn.show()
+
+        def _show_train_result(item, event=None, data=None):
+            
+            self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
+            self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
+            self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
+            
+            self.train_result.show()
 
         self.train_activator.on_event('click', _activate_model_train)
+        self.show_result_btn.on_event('click', _show_train_result)
 
-        super().__init__(
-            children = [ self.target_yn, self.train_activator],
-            style_ = self.style['row'],
-        )
 
 class TabularTrainResult(BaseDialog):
 
@@ -242,7 +263,6 @@ class TabularTrainResult(BaseDialog):
             self.children[0].children[2].children = [self.output_plots]
             self.button_chart_view.disabled = True
             self.button_text_view.disabled = False
-            
 
         def _on_click_button_text_view(item, event=None, data=None):
             self.children[0].children[2].children = [self.output_logs]
@@ -252,7 +272,7 @@ class TabularTrainResult(BaseDialog):
         self.button_chart_view.on_event('click', _on_click_button_chart_view)
         self.button_text_view.on_event('click', _on_click_button_text_view)
 
-        self.selector = v.Row(
+        self.output_selector = v.Row(
             style_ = "margin: 0px; width:100%; max-height:33px; padding:0 12px; background-color:#f1f1f1; border-top:1px solid #e0e0e0;",
             children = [self.button_text_view, self.button_chart_view],
         )
@@ -265,7 +285,7 @@ class TabularTrainResult(BaseDialog):
                 }],
             header_title_main = '학습 결과',
             header_title_sub = '모델명: ',
-            header_bottom = self.selector,
+            header_bottom = self.output_selector,
             body_items = body_items,
             body_size = {'width': '90vw', 'height': ['80vh']},
             body_border_bottom = [True],

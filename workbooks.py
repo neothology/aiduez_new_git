@@ -3,6 +3,7 @@ import re
 import zipfile
 import ipyvuetify as v
 from utils import get_or_create_class, delete_files_in_dir
+from utils import logging_time
 
 class TabularWorkbook:
     def __init__(self, app_context, context_key:str = ""):
@@ -122,9 +123,10 @@ class TabularWorkbook:
             self.app_context.tabular_analytics_basicinfo = None
 
         # preprocessing 변경
-        # self.app_context.tabular_data_single_processing.update_display()
         tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
         tabular_data_single_processing.update_display()
+
+        self.app_context.progress_overlay.update(20)
 
         # training 변경
         tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
@@ -139,6 +141,8 @@ class TabularWorkbook:
             title = '학습 로그',
             size = {'width':'90vw', 'height':'80vh'}, 
         )
+        
+        self.app_context.progress_overlay.update(60)
 
         training_options = get_or_create_class(
             'tabular_training_options', 
@@ -148,6 +152,8 @@ class TabularWorkbook:
             title = '학습 Parameter 설정',
         )
 
+        self.app_context.progress_overlay.update(90)
+
         column_summary = get_or_create_class(
             'column_summary',
             self.app_context,
@@ -156,6 +162,11 @@ class TabularWorkbook:
             title = '데이터 요약',
             col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
         ) 
+
+        self.app_context.progress_overlay.update(100)
+
+        # hide show_result button
+        self.app_context.tabular_ai_training__train_activator.show_result_btn.hide()
 
         tabular_ai_training.children = [
             tabular_ai_training.top_area,
@@ -167,10 +178,10 @@ class TabularWorkbook:
         ]
         
     def change_work(self, work_name):
-        self.app_context.base_overlay.value = True
+        self.app_context.progress_overlay.start()
         self.save_current_work()
         self.load_existing_work(work_name)
-        self.app_context.base_overlay.value = False
+        self.app_context.progress_overlay.finish()
 
     def save_current_work_as(self, work_name):
         pass

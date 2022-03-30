@@ -17,7 +17,8 @@ class Aian:
             os.makedirs(tmp_dir)
 
         # initialize layout
-        self.overlay = get_or_create_class('base_overlay', self.app_context)
+        self.p_overlay = get_or_create_class('progress_overlay', self.app_context)
+        self.b_overlay = get_or_create_class('base_overlay', self.app_context)
         self.background = get_or_create_class('background', self.app_context)
         self.top_area = get_or_create_class('top_area', self.app_context)
         self.work_area = get_or_create_class('work_area', self.app_context)
@@ -29,7 +30,7 @@ class Aian:
 
         # merge components into layouts
         self.side_nav.children = [self.side_nav_menu]
-        self.background.children = [self.overlay, self.top_area, self.side_nav, self.work_area]
+        self.background.children = [self.p_overlay, self.b_overlay, self.top_area, self.side_nav, self.work_area]
 
         # when re-loaded, establish from thst last saved state
         # ...

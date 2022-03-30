@@ -11,11 +11,13 @@ class TabularBase(v.Container):
         self.context_key = context_key
         self.tmp_workbook_dir = self.app_context.env_values['tmp_workbook_dir']
 
-        self.app_context.base_overlay.value = True
+        self.app_context.progress_overlay.start()
 
         # init workbook
         self.workbook = get_or_create_class('tabular_workbook', self.app_context)
         self.workbook.create_new() # tabular, text, image, video, audio, etc.
+
+        self.app_context.progress_overlay.update(5)
 
         # code will be removed: add data from /aihub/data to workbook data list---------
         from os import listdir, path
@@ -28,6 +30,8 @@ class TabularBase(v.Container):
             self.workbook.create_new_work(work_name = Path(data_path).stem, data = data)
         # ---------------------------------------------------------------
 
+        self.app_context.progress_overlay.update(8)
+
         # initialize components to view
         work_area_contents = get_or_create_class('sub_area', self.app_context, context_key = 'tabular_contents')
 
@@ -39,10 +43,18 @@ class TabularBase(v.Container):
             target_area = work_area_contents
             )
 
+        self.app_context.progress_overlay.update(15)
+
         # initialize each workflow 
         tabular_workflow_names = [tab.value for tab in self.tab_menu.tab_menu.children]
-        for workflow_name in tabular_workflow_names:
+        init_intervals = [10,25,40,10,5]
+        init_progress = 15
+        for i, workflow_name in enumerate(tabular_workflow_names):
             _ = get_or_create_class(workflow_name, self.app_context)
+            init_progress += init_intervals[i]
+            self.app_context.progress_overlay.update(init_progress)
+
+        self.app_context.progress_overlay.update(100)
 
         # put components into layout
         super().__init__(
@@ -54,7 +66,7 @@ class TabularBase(v.Container):
                 ],
         )
 
-        self.app_context.base_overlay.value = False
+        self.app_context.progress_overlay.finish()
 
     def update_workflow_stages(self):
         pass
