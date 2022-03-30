@@ -121,6 +121,11 @@ class TabularWorkbook:
             self.app_context.tabular_analytics_basicinfo__data_range_selector = None
             self.app_context.tabular_analytics_basicinfo = None
 
+        # preprocessing 변경
+        # self.app_context.tabular_data_single_processing.update_display()
+        tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
+        tabular_data_single_processing.update_display()
+
         # training 변경
         tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
         

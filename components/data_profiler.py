@@ -228,6 +228,8 @@ class ColumnSummary(BaseCard):
         self.app_context = app_context
 
         self.column_summary_tables =  ColumnSummaryTables(app_context, col, **kwargs)
+
+        width = kwargs.get("width") if kwargs.get("width") else "1570px"
         
         super().__init__(
             class_ = context_key,
@@ -235,7 +237,7 @@ class ColumnSummary(BaseCard):
             body_items = [
                 self.column_summary_tables
             ],
-            body_size = {"width":"1570px", "height":"auto"},
+            body_size = {"width":width, "height":"auto"},
             align = 'center',
             app_context = app_context
         )
