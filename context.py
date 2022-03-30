@@ -24,6 +24,7 @@ class AppContext:
     top_area: object = None
     work_area: object = None
     base_overlay: object = None
+    progress_overlay: object = None
 
 ## workflow stages object ##
     # --------------------------------------------------
@@ -49,6 +50,7 @@ class AppContext:
 
     # tabular data analytics objects
     tabular_data_analytics: object = None
+    tabular_data_analytics__sub_menu: object = None
     tabular_data_analytics__options: object = None
     tabular_analytics_basicinfo: object = None
     tabular_analytics_basicinfo__column_selector: object = None

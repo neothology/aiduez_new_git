@@ -82,7 +82,7 @@ class TabularDataContext(v.Col):
         def _on_data_selector_change(item, event=None, data=None):
             self.workbook.change_work(item.v_model)
 
-        self.data_selector.on_event('change', _on_data_selector_change)        
+        self.data_selector.children[0].on_event('change', _on_data_selector_change)        
 
         super().__init__(
             style_ = self.style['col'],

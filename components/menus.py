@@ -254,17 +254,6 @@ class TabMenu(v.Col):
         for tab in self.tab_menu.children:
             tab.on_event('click', _proceed_to_target)
 
-
-        # initialize each tab in advance
-        def _activate_tab_in_background(tab):
-            _ = get_or_create_class(tab.value, self.app_context)
-
-        # initialize each tab in advance
-        self.app_context.base_overlay.value = True
-        for tab in self.tab_menu.children:
-            _activate_tab_in_background(tab)
-        self.app_context.base_overlay.value = False
-
         # set default
         default_tab_name: str = self.tab_props['default']
         default_tab = list(filter(lambda x: x.value == default_tab_name, self.tab_menu.children))[0]

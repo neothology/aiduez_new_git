@@ -20,6 +20,7 @@ class_paths:
   column_summary: components.data_profiler.ColumnSummary
   column_summary_simple: components.data_profiler.ColumnSummarySimple
   base_overlay: components.overlays.BaseOverlay
+  progress_overlay: components.overlays.ProgressOverlay
   select_table_card: components.tables.SelectTableCard
   simple_slider_card: components.forms.SimpleSliderCard
   data_info: components.data_profiler.DataInfo

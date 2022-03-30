@@ -57,11 +57,9 @@ class TabularSingleProcessing(v.Container):
         self.column_summary = self._get_column_sumary()
 
         super().__init__(
-            class_ = self.context_key,
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
             children = [
                 v.Col(
-                    class_="d-lg",
                     children=[
                         self.processing_menu,
                         self.processing_dialog,
@@ -81,6 +79,7 @@ class TabularSingleProcessing(v.Container):
             title = '데이터 요약',
             col = self.data[initial_column_name],
         )
+        column_summary.style_ = column_summary.style_.replace("width:1570px;", "width:auto")
         return column_summary
 
     def update_display(self):
@@ -91,7 +90,6 @@ class TabularSingleProcessing(v.Container):
 
         self.children = [
             v.Col(
-                class_="d-lg",
                 children=[
                     self.processing_menu,
                     self.processing_dialog,
@@ -121,7 +119,7 @@ class TabularSingleProcessingMenu(BaseCard):
             header_title_main=title,
             body_items=[self.processing_ui],
             body_size={
-                "width":"lg",
+                "width": "lg",
                 "height":["340px"],
             },
             body_border_bottom = [True],
@@ -701,20 +699,25 @@ class TabularSingleProcessingDialog(v.Dialog):
             result = string
         return result
 
-class TabularMultipleProcessing(BaseCard):
-    def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
+class TabularMultipleProcessing(v.Container):
+    def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        title = "복합칼럼변환"
+
+        self.data = self.app_context.tabular_dataset.current_data
+
+        self.processing_menu = BaseCard(
+            app_context=self.app_context,
+            context_key=self.context_key,
+            title="복합칼럼변환"
+        )
         super().__init__(
-            class_=context_key,
-            header_title_main=title,
-            body_items=[],
-            body_size={
-                "width":"1570px",
-                "height":["340px", "100px"],
-            },
-            body_border_bottom = [True, True],
-            body_background_color = ["rgb(255, 255, 255)", "rgb(248, 250, 252)"],
-            align='center'
+            # style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            children = [
+                v.Col(
+                    children=[
+                        self.processing_menu
+                    ]
+                )
+            ],
         )
