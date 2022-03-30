@@ -4,6 +4,8 @@ import zipfile
 import ipyvuetify as v
 from utils import get_or_create_class, delete_files_in_dir
 from utils import logging_time
+from components.upload.upload_widgets import UploadWidgets
+
 
 class TabularWorkbook:
     def __init__(self, app_context, context_key:str = ""):
@@ -18,9 +20,11 @@ class TabularWorkbook:
         self.work_name_list = []
         self.work_dir_list = []
         self.current_work_name: str = ''
+        self.current_data_column = []
         self.current_work_dir: str = ''
         self.current_work_state_dir: str = ''
         self.current_models_dir: str = ''
+       
         
     def create_new(self):
 
@@ -71,8 +75,23 @@ class TabularWorkbook:
 
             return work_name
 
+        # def _check_data_column(data):
+
+        #     # Column명은 영문이랑 '_'만 허용
+        #     chk_col_all = re.compile('[^a-zA-Z0-9_]')
+        #     column_list = data.columns.tolist()
+
+        #     for i in range(0, len(column_list)):
+        #         if chk_col_all.search(column_list[i]) is not None:
+        #             raise Exception("데이터 컬러명은 영문, 숫자, 그리고 '_'만 가능합니다. ")
+            
+        #     return data
+
+            
+
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
+        # self.current_data_column = _check_data_column(data)
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'  # e.g. /aihub/workspace/tmp/workbook/works/titanic_train
         os.makedirs(self.current_work_dir)
 

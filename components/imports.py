@@ -163,7 +163,6 @@ class TabularAIDUImport(BaseCard, AppCell):
     # 버튼 핸들러-------------------------------------------------------------------------
     def on_clicked(self, widget, event = None, data = None):
         data_name = self.data_select.value.split('.')[0]
-        # file_path = f"../../../aihub/data/{self.data_select.value}"
         data_dir = self.app_context.env_values["data_dir"]
         file_path = data_dir + self.data_select.value
         info = [True, ""]
@@ -222,9 +221,11 @@ class TabularLocalImport(BaseCard, AppCell):
         )
 
         # (2) 데이터 업로드 경고 문구 추가
-        self.upload_warning = v.Container(
+        self.data_information = v.Container(
             style_ = "font-size:15x; font-weigth: bold; color = rgb(255,255,255)",
-            children = ["데이터 필드명에 공백, 특수문자 포함시 에러가 발생할 수 있습니다. 해당 사항 발생 시 확인 부탁드립니다."]
+            children = [
+                
+            ]
         )
         
         super().__init__(
@@ -233,11 +234,11 @@ class TabularLocalImport(BaseCard, AppCell):
             header_title_main=title,
             body_items=[
                 self.local_upload,
-                self.upload_warning
+                self.data_information
             ],
             body_size={
                 "width":"lg",
-                "height":["340px", "100px"],
+                "height":["540px", "100px"],
             },
             body_border_bottom = [True, True],
             body_background_color = ["rgb(255, 255, 255)", "rgb(248, 250, 252)"],
@@ -256,7 +257,12 @@ class TabularLocalImport(BaseCard, AppCell):
             if uploaded_data is not None:
                 self.app_context.tabular_workbook.create_new_work(data_name, uploaded_data)
                 self.upload_widgets.complete(data_name)
-              
+            self.data_shape = uploaded_data.shape
+            buf = io.StringIO()
+            uploaded_data.info(buf = buf)
+            # self.data_info = buf.getvalue().split('\n')
+            self.data_info = buf.getvalue() 
+            self.data_information.children = [self.data_info]   
 
             self.reset_uploader()
 

@@ -2,6 +2,7 @@ from IPython.core.display import HTML
 import ipywidgets as widgets
 import ipyvuetify as v
 import os
+import re
 from pathlib import Path
 import pandas as pd
 from IPython.display import display, clear_output
@@ -128,6 +129,7 @@ class UploadWidgets:
                 children = [f" {data_name} : 이미 업로드된 데이터입니다. "])]
         return uploaded_data
 
+
     def complete(self, data_name):
         self.box.children = [v.Html(
             tag = 'h5',
@@ -147,15 +149,34 @@ class UploadWidgets:
                 # raise error
                 filepath_or_buffer = None
             uploaded_data = pd.read_csv(filepath_or_buffer, sep=sep, encoding=encoding).replace({True: 1, False: 0})
+            chk_col_all = re.compile('[^a-zA-Z0-9_]')
+            column_list = uploaded_data.columns.tolist()
+            for i in range(0, len(column_list)):
+                if chk_col_all.search(column_list[i]) is not None:
+                    self.box.children = [v.Html(
+                        tag = 'h5',
+                        children = [f"{data_name} 업로드 중 에러가 발생했습니다. "]
+                    )]
+                    raise Exception("데이터 컬러명은 영문, 숫자, 그리고 '_'만 가능합니다. ")
+            
+            return uploaded_data
         except (UnicodeDecodeError, pd.errors.EmptyDataError) as e:
             pass
         except Exception as e:
-            self.box.children = [v.Html(
+            self.box.children = [
+            v.Html(
                 tag = 'h5',
-                children = [f"{data_name} : 에러가 발생하였습니다."]), 
-                v.Html(
-                    children = [f"에러 메시지 : {e} "])]                
-        return uploaded_data
+                children = [
+                    f"{data_name} : 에러가 발생하였습니다. "]
+                ),
+            v.Html(
+                tag = 'h5',
+                children = [
+                    f"에러 메시지 : {e} "]
+                )
+            ]
+            raise               
+       
 
 
 
