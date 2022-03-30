@@ -178,13 +178,11 @@ class TabularSingleProcessingMenu(BaseCard):
         self.last_clicked_processing_options_rows = None
         def _on_click_processing_options_rows(item, event=None, data=None):
             index = int(item.index)
-            print(index, self.last_clicked_processing_options_rows)
             if self.last_clicked_processing_options_rows != index:
                 self.last_clicked_processing_options_rows = index
                 self.app_context.tabular_data_processing_column_summary.update_data(self.dataset[self.dataset.columns[index]])
 
         for row in self.processing_options_rows:
-            print(row)
             row.on_event('click', _on_click_processing_options_rows)
 
         processing_options_body = v.List(
@@ -218,7 +216,7 @@ class TabularSingleProcessingMenu(BaseCard):
                                         color="red lighten-1",
                                         children=[v.Icon(children = ['mdi-delete'])]
             )
-            delete_column_button.on_event('click', _on_click_delete_column_button)
+            delete_column_button.on_event('click.stop', _on_click_delete_column_button)
             delete_column_buttons.append(delete_column_button)
         return delete_column_buttons
 
