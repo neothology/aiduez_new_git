@@ -16,3 +16,4 @@ ludwig==0.4
 petastorm==0.11.4
 impala==0.2
 impyla==0.17.0
+pandas-profiling==3.1.0
