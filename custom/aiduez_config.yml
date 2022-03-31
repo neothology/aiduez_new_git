@@ -56,7 +56,6 @@ class_paths:
   tabular_analytics_datasample: components.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
-  tabular_data_processing_tab: components.processing.TabularProcessingTab
   tabular_data_single_processing: components.processing.TabularSingleProcessing
   tabular_data_single_processing_dialog: components.processing.TabularSingleProcessingDialog
   tabular_data_multiple_processing: components.processing.TabularMultipleProcessing
@@ -293,7 +292,7 @@ theme:
         base:
           default: >
             min-width:250px; height:1800px; 
-            padding:10px; z-index:1000; 
+            padding:10px; z-index:999; 
             display:flex; flex-direction:column; 
             background-color:#0f172a
     top_area:

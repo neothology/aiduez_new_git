@@ -35,7 +35,6 @@ class AppContext:
 
     tabular_tab_menu: object = None
     tabular_contents: object = None
-    tabular_contents_sub: object = None
     tabular_data_context: object = None
     tabular_model: object = None
     tabular_dataset: object = None
@@ -50,6 +49,7 @@ class AppContext:
 
     # tabular data analytics objects
     tabular_data_analytics: object = None
+    tabular_data_analytics__contents_sub: object = None
     tabular_data_analytics__sub_menu: object = None
     tabular_data_analytics__options: object = None
     tabular_analytics_basicinfo: object = None
@@ -68,10 +68,12 @@ class AppContext:
 
     #tabular data processing objects
     tabular_data_processing: object = None
-    tabular_data_processing_tab: object = None
+    tabular_data_processing__contents_sub: object = None
+    tabular_data_processing__sub_menu: object = None
+    tabular_data_processing__column_summary: object = None
     tabular_data_single_processing: object = None
     tabular_data_single_processing_dialog: object = None
-    tabular_data_processing_column_summary: object = None
+    tabular_data_multiple_processing: object = None
 
     # tabilar ai training objects
     tabular_ai_training: object = None

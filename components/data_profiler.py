@@ -228,6 +228,8 @@ class ColumnSummary(BaseCard):
         self.app_context = app_context
 
         self.column_summary_tables =  ColumnSummaryTables(app_context, col, **kwargs)
+
+        width = kwargs.get("width") if kwargs.get("width") else "1570px"
         
         super().__init__(
             class_ = context_key,
@@ -235,14 +237,15 @@ class ColumnSummary(BaseCard):
             body_items = [
                 self.column_summary_tables
             ],
-            body_size = {"width":"1570px", "height":"auto"},
+            body_size = {"width":width, "height":"auto"},
             align = 'center',
             app_context = app_context
         )
 
     def update_data(self, col:pd.Series):
-        self.app_context.tabular_ai_training__column_summary.children[2].children = [ColumnSummaryTables(self.app_context, col)]
- 
+        column_summary_obj = getattr(self.app_context, self.class_)
+        column_summary_obj.children[2].children = [ColumnSummaryTables(self.app_context, col)]
+         
 class DataInfo(SimpleCard):
     def __init__(
         self,

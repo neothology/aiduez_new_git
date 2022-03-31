@@ -207,7 +207,7 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
-            context_key = 'tabular_contents_sub',
+            context_key = 'tabular_data_analytics__contents_sub',
             style = "width:100%; \
                     padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
@@ -233,25 +233,80 @@ class TabularDataProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-         # data_context
+        self.menu_tree = [
+            {   
+                'icon': 'mdi-clipboard-text-outline',
+                'title': '단일 칼럼 변환',
+                'target': 'tabular_data_single_processing',
+            },
+            {
+                'icon': 'mdi-clipboard-text-multiple-outline',
+                'title': '복합 칼럼 변환',
+                'target': 'tabular_data_multiple_processing',
+            },
+        ]
+
+        # progress bar
+        self.progress_bar = v.ProgressLinear(
+            indeterminate = True,
+            color = 'primary',
+        )
+        self.progress_bar.active = False
+
+        # top area(data_context, button)
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
         )
 
+        self.top_area = v.Row(
+            children = [
+                self.data_context
+            ],
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
+        )
+
+        # sub menu area
+        self.work_area_contents_sub_menu = get_or_create_class(
+            'sub_menu_area',
+            self.app_context,
+            context_key = 'tabular_data_processing_sub_menu',
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; border: 1px solid #cbcbcb; \
+                    border-top:0; border-bottom:0; z-index:100;",
+        )
+
         # vertical tab
-        self.processing_tab = get_or_create_class(
-            'tabular_data_processing_tab',
+        self.processing_sub_menu = get_or_create_class(
+            'list_menu_sub',
             app_context=self.app_context,
-            context_key='tabular_data_processing_tab',
+            context_key='tabular_data_processing__sub_menu',
+            menu_tree = self.menu_tree,
+        )
+
+        self.work_area_contents_sub_menu.children = [self.processing_sub_menu]
+
+        # sub work area
+        self.work_area_contents_sub_area = get_or_create_class(
+            'sub_area',
+            self.app_context,
+            context_key = 'tabular_data_processing__contents_sub',
+            style = "width:100%; \
+                    padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
-                self.data_context,
-                self.processing_tab,
+                self.top_area,
+                self.progress_bar,
+                v.Col(
+                    style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    children = [
+                        self.work_area_contents_sub_menu,
+                        self.work_area_contents_sub_area
+                    ],
+                )
             ],
         )
 
