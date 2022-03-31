@@ -243,8 +243,9 @@ class ColumnSummary(BaseCard):
         )
 
     def update_data(self, col:pd.Series):
-        self.app_context.tabular_ai_training__column_summary.children[2].children = [ColumnSummaryTables(self.app_context, col)]
- 
+        column_summary_obj = getattr(self.app_context, self.class_)
+        column_summary_obj.children[2].children = [ColumnSummaryTables(self.app_context, col)]
+         
 class DataInfo(SimpleCard):
     def __init__(
         self,

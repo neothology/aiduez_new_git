@@ -55,7 +55,6 @@ class_paths:
   tabular_analytics_datasample: components.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
-  tabular_data_processing_tab: components.processing.TabularProcessingTab
   tabular_data_single_processing: components.processing.TabularSingleProcessing
   tabular_data_single_processing_dialog: components.processing.TabularSingleProcessingDialog
   tabular_data_multiple_processing: components.processing.TabularMultipleProcessing

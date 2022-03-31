@@ -13,34 +13,12 @@ import plotly.express as px
 import os
 import ipywidgets
 # from konlpy.tag import Komoran, Hannanum
-
-class TabularProcessingTab(BaseTab):
-    def __init__(self, app_context, context_key, **kwags) -> None:
-        self.app_context = app_context
-        # side tab
-        tab_menus = []
-        tab_items = []
-        for stage in self.app_context.workflows_list['tabular']['stages']:
-            if stage['title'] == "데이터 가공":
-                for menu in stage['menu_list']:
-                    tab_menus.append(menu["title"])
-                    tab_items.append(menu["target"])
-                break
-        super().__init__(
-            app_context=app_context,
-            context_key=context_key,
-            tab_menus=tab_menus,
-            tab_items=tab_items,
-            vertical=True,
-            centered=False,
-        )
-
 class TabularSingleProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
 
-        # self.dataset = self.app_context.tabular_dataset.current_data
+        self.app_context.tabular_data_processing.progress_bar.active = True
 
         self.processing_menu = TabularSingleProcessingMenu(
             app_context=self.app_context,
@@ -55,9 +33,11 @@ class TabularSingleProcessing(v.Container):
         )
         # column summary
         self.column_summary = self._get_column_sumary(dataset=self.app_context.tabular_dataset.current_data)
+        self.app_context.tabular_data_processing.progress_bar.active = False
 
-        super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+        super().__init__( 
+            class_ = self.context_key,
+            style_ = "min-width:100%; min-height:100%; background-color:#ffffff; padding:0; display:flex; flex-direction:row;",
             children = [
                 v.Col(
                     children=[
@@ -75,7 +55,7 @@ class TabularSingleProcessing(v.Container):
         column_summary = get_or_create_class(
             'column_summary',
             self.app_context,
-            context_key = 'tabular_data_processing_column_summary',
+            context_key = 'tabular_data_processing__column_summary',
             title = '데이터 요약',
             col = dataset[initial_column_name],
             update=update,
@@ -84,9 +64,11 @@ class TabularSingleProcessing(v.Container):
         return column_summary
 
     def update_display(self):
+        self.app_context.tabular_data_processing.progress_bar.active = True
         self.processing_menu.update()
         # column summary
         self.column_summary = self._get_column_sumary(self.app_context.tabular_dataset.current_data, update=True)
+        self.app_context.tabular_data_processing.progress_bar.active = False
         self.children = [
             v.Col(
                 children=[
@@ -180,7 +162,7 @@ class TabularSingleProcessingMenu(BaseCard):
             index = int(item.index)
             if self.last_clicked_processing_options_rows != index:
                 self.last_clicked_processing_options_rows = index
-                self.app_context.tabular_data_processing_column_summary.update_data(self.dataset[self.dataset.columns[index]])
+                self.app_context.tabular_data_processing__column_summary.update_data(self.dataset[self.dataset.columns[index]])
 
         for row in self.processing_options_rows:
             row.on_event('click', _on_click_processing_options_rows)

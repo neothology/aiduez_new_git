@@ -68,10 +68,11 @@ class AppContext:
 
     #tabular data processing objects
     tabular_data_processing: object = None
-    tabular_data_processing_tab: object = None
+    tabular_data_processing__sub_menu: object = None
+    tabular_data_processing__column_summary: object = None
     tabular_data_single_processing: object = None
     tabular_data_single_processing_dialog: object = None
-    tabular_data_processing_column_summary: object = None
+    tabular_data_multiple_processing: object = None
 
     # tabilar ai training objects
     tabular_ai_training: object = None
