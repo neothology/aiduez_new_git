@@ -291,7 +291,7 @@ theme:
         base:
           default: >
             min-width:250px; height:1800px; 
-            padding:10px; z-index:1000; 
+            padding:10px; z-index:999; 
             display:flex; flex-direction:column; 
             background-color:#0f172a
     top_area:

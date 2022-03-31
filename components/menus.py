@@ -388,24 +388,29 @@ class ListMenuSub(v.List):
 
         self.last_activated_item = None
         def _proceed_to_target(item, event=None, data=None): 
+            stage = self.context_key.split("__")[0]
             if self.last_activated_item == None:
                 self.last_activated_item = item
                 self.last_activated_item.class_list.add("now_active")
 
                 # get target and set
-                self.app_context.current_workflow_stage_sub = item.value 
-                target_area = self.app_context.tabular_contents_sub        
-                target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
+                self.app_context.current_workflow_stage_sub = item.value
+                target_area = getattr(self.app_context, stage + "__contents_sub")        
+                target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo의 경우 여기서 options가 생성
                 target_area.children = [target_instance]
 
-                self.app_context.tabular_data_analytics__options.v_model = True
+                options = getattr(self.app_context, stage + "__options") if hasattr(self.app_context, stage + "__options") else None
+                if options is not None:
+                    options.v_model = True
 
             else:
+                options = getattr(self.app_context, stage + "__options") if hasattr(self.app_context, stage + "__options") else None
                 if self.last_activated_item == item:
-                    if self.app_context.tabular_data_analytics__options.v_model == False:
-                        self.app_context.tabular_data_analytics__options.v_model = True
-                    else:
-                        pass
+                    if options is not None:
+                        if options.v_model == False:
+                            options.v_model = True
+                        else:
+                            pass
                 else:
                     self.last_activated_item.class_list.remove("now_active")
                     item.class_list.add("now_active")
@@ -413,11 +418,13 @@ class ListMenuSub(v.List):
 
                     # get target and set
                     self.app_context.current_workflow_stage_sub = item.value 
-                    target_area = self.app_context.tabular_contents_sub        
+                    target_area = getattr(self.app_context, stage + "__contents_sub")        
                     target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo
                     target_area.children = [target_instance]
-
-                    self.app_context.tabular_data_analytics__options.v_model = True
+    
+                    options = getattr(self.app_context, stage + "__options") if hasattr(self.app_context, stage + "__options") else None
+                    if options is not None:
+                        options.v_model = True
 
         # set event listener
         for item in self.menu_to_target:

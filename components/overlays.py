@@ -12,6 +12,7 @@ class BaseOverlay(v.Overlay):
             ],
             class_ = kwargs.get('class_'),
             app_context = kwargs.get('app_context'),
+            z_index=1000,
         )
 
 class ProgressOverlay(v.Overlay):
@@ -29,6 +30,7 @@ class ProgressOverlay(v.Overlay):
             ],
             class_ = kwargs.get('class_'),
             app_context = kwargs.get('app_context'),
+            z_index=1000,
         )
 
     def start(self):

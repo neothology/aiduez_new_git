@@ -207,7 +207,7 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
-            context_key = 'tabular_contents_sub',
+            context_key = 'tabular_data_analytics__contents_sub',
             style = "width:100%; \
                     padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
@@ -289,7 +289,7 @@ class TabularDataProcessing(v.Container):
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
-            context_key = 'tabular_contents_sub',
+            context_key = 'tabular_data_processing__contents_sub',
             style = "width:100%; \
                     padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )

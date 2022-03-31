@@ -113,7 +113,7 @@ class TabularWorkbook:
 
         # analytics 변경
         if self.app_context.tabular_data_analytics__options:
-            self.app_context.tabular_contents_sub.children = []
+            self.app_context.tabular_data_analytics__contents_sub.children = []
             self.app_context.tabular_data_analytics__options = None
             self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
             self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
@@ -123,8 +123,13 @@ class TabularWorkbook:
             self.app_context.tabular_analytics_basicinfo = None
 
         # preprocessing 변경
-        tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-        tabular_data_single_processing.update_display()
+        self.app_context.tabular_data_processing__contents_sub.children = []
+        self.app_context.tabular_data_processing__options = None
+        if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
+            self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
+        self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
+        self.app_context.tabular_data_single_processing = None
+        self.app_context.tabular_data_processing__column_summary = None
 
         self.app_context.progress_overlay.update(20)
 
