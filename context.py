@@ -42,6 +42,8 @@ class AppContext:
 
     # tabular data import objects
     tabular_data_import: object = None
+    tabular_data_import__sub_menu: object = None
+    
     tabular_data_import_tab: object = None
     tabular_data_import_aidu: object = None
     tabular_data_import_local: object = None
@@ -51,6 +53,7 @@ class AppContext:
     # tabular data analytics objects
     tabular_data_analytics: object = None
     tabular_data_analytics__sub_menu: object = None
+    tabular_data_analytics__contents_sub: object = None
     tabular_data_analytics__options: object = None
     tabular_analytics_basicinfo: object = None
     tabular_analytics_basicinfo__column_selector: object = None

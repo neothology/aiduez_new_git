@@ -132,7 +132,7 @@ class BaseCard(v.Card):
             self.model_save_body = v.TextField(
                 v_model = "",
                 prefix = "",
-                style_ ="padding:15px 20px 0 20px;",
+                style_ ="padding:10px 20px 0 20px;",
             )
 
             self.save_confrim_btn = v.Btn(

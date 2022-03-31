@@ -63,7 +63,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
             self.app_context,
             context_key = f'{self.context_key}__data_range_selector', 
             title = '행 범위',
-            range = [0, len(self.data), 1, default],
+            range = [1, len(self.data), 1, default],
             size = {'width':'210px', 'height':'90px'},
             style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )

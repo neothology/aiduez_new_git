@@ -71,7 +71,7 @@ class TabularBase(v.Container):
     def update_workflow_stages(self):
         pass
 
-class TabularDataImport(v.Container):
+class TabularDataImport_old(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
@@ -90,12 +90,129 @@ class TabularDataImport(v.Container):
             ],
         )
 
+class TabularDataImport(v.Container):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+
+        self.data_name_list = self.app_context.tabular_dataset.data_name_list
+
+        self.menu_tree = [
+            {   
+                'icon': 'mdi-file-document-edit-outline',
+                'title': 'AIDU에서 가져오기',
+                'target': 'tabular_import_aidu',
+            },
+            {   
+                'icon': 'mdi-file-chart-outline',
+                'title': 'PC에서 가져오기',
+                'target': 'tabular_import_pc',
+            },
+            {   
+                'icon': 'mdi-file-chart-outline',
+                'title': 'EDAP에서 가져오기',
+                'target': 'tabular_import_edap',
+            },
+        ]
+
+        # progress bar
+        self.progress_bar = v.ProgressLinear(
+            indeterminate = True,
+            color = 'primary',
+        )
+        self.progress_bar.active = False
+
+        # top area(data_context)
+        self.data_context = get_or_create_class(
+            'tabular_data_context',
+            self.app_context,
+        )
+
+        self.top_area = v.Row(
+            children = [
+                self.data_context
+            ],
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
+        )
+
+        # sub menu area
+        self.work_area_contents_sub_menu = get_or_create_class(
+            'sub_menu_area',
+            self.app_context,
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; border: 1px solid #cbcbcb; \
+                    border-top:0; border-bottom:0; z-index:100;",
+        )
+
+        self.sub_menu = get_or_create_class(
+            'list_menu_sub',
+            self.app_context,
+            context_key = 'tabular_data_import__sub_menu',
+            menu_tree = self.menu_tree,
+        )
+
+        self.work_area_contents_sub_menu.children = [self.sub_menu]
+
+        # work area left side - current data list in workbook
+        self.work_area_contents_sub_area__left = v.Col(
+            children = [],
+            style_ = "margin:0; padding:0; max-height:500px;",
+            class_ = "",
+        )
+
+        # work area right side - data list to be imported
+        self.work_area_contents_sub_area__right = v.Col(
+            children = [],
+            style_ = "margin:0; padding:0; max-height:500px;",
+            class_ = "",
+        )
+
+        # merge left + right 
+        self.work_area_contents_sub_area__top = v.Row(
+            children = [
+                self.work_area_contents_sub_area__left,
+                self.work_area_contents_sub_area__right,
+            ],
+            style_ = "margin:0; padding:0; max-height:100%;",
+            class_ = "",
+        )
+
+        # work area bottom side - data info, etc.
+        self.work_area_contents_sub_area__bottom = v.Row(
+            children = [],
+            style_ = "margin:0; padding:0; max-height:100%;",
+            class_ = "",
+        )         
+
+        # merge top + bottom
+        self.work_area_contents_sub_area = v.Col(
+            children = [
+                self.work_area_contents_sub_area__top,
+                self.work_area_contents_sub_area__bottom,
+            ],
+            style_ = "margin:0; padding:0; max-height:100%;",
+            class_ = "",
+        )
+
+        super().__init__(
+            class_ = self.context_key,
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            children = [
+                self.top_area,
+                self.progress_bar,
+                v.Col(
+                    style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    children = [
+                        self.work_area_contents_sub_menu,
+                        self.work_area_contents_sub_area,
+                    ],
+                ),
+            ]
+        )
+
 class TabularDataAnalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        self.style = {}
-
         self.data = self.app_context.tabular_dataset.current_data
         self.menu_tree = [
             {   
@@ -189,7 +306,6 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_menu = get_or_create_class(
             'sub_menu_area',
             self.app_context,
-            context_key = 'tabular_data_analytics_sub_menu',
             style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; border: 1px solid #cbcbcb; \
                     border-top:0; border-bottom:0; z-index:100;",
         )
@@ -207,7 +323,7 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
-            context_key = 'tabular_contents_sub',
+            context_key = 'tabular_data_analytics__contents_sub',
             style = "width:100%; \
                     padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
