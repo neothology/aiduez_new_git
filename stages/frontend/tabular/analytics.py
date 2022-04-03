@@ -104,7 +104,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
             children = [
                 self.output_part
                 ],

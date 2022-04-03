@@ -17,6 +17,15 @@
 		},
 		{
 			"path": "../../../aihub/workspace"
+		},
+		{
+			"path": "../../../usr/local/lib/python3.8/dist-packages/ipyvuetify"
+		},
+		{
+			"path": "../../../usr/local/lib/python3.8/dist-packages/ipywidgets"
+		},
+		{
+			"path": "../../../usr/local/lib/python3.8/dist-packages/ipyvue"
 		}
 	],
 	"settings": {}

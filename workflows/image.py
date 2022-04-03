@@ -20,41 +20,41 @@ class ImageBase(v.Container):
             )
 
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [self.tab_menu, self.work_area_contents],
         )
 
 class ImageDataImport(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class ImageDataanalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class ImageDataProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class ImageAITraining(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class ImageAIEvaluation(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )

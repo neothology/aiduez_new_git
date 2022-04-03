@@ -91,6 +91,7 @@ class SelectTableCard(SimpleCard):
 class SelectTable(v.VuetifyTemplate):    
     headers = traitlets.List([]).tag(sync=True, allow_null=True)
     items = traitlets.List([]).tag(sync=True, allow_null=True)
+    single_select = traitlets.Bool(False).tag(sync=True)
     selected = traitlets.List([]).tag(sync=True, allow_null=True)
     index_col = traitlets.Unicode('').tag(sync=True)
     style = traitlets.Unicode('').tag(sync=True)
@@ -104,6 +105,7 @@ class SelectTable(v.VuetifyTemplate):
                 :style="style"
                 :items-per-page=-1
                 show-select
+                :single-select="single_select"
                 dense
                 hide-default-footer
             >
@@ -115,6 +117,7 @@ class SelectTable(v.VuetifyTemplate):
         self, 
         data=pd.DataFrame(),
         size:dict = {},
+        single_select:bool = False,
         *args,
         **kwargs
         ):
@@ -125,6 +128,7 @@ class SelectTable(v.VuetifyTemplate):
         self.index_col = data.columns[0]
         self.style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};' \
                      + "overflow-y:auto; overflow-x:hidden; font-weight:400;"
+        self.single_select = single_select
         headers = [{
               "text": col,
               "value": col
@@ -135,3 +139,90 @@ class SelectTable(v.VuetifyTemplate):
         self.headers = headers        
         self.items = json.loads(
             data.to_json(orient='records'))
+
+class SelectTableCardNH(SimpleCard): 
+    def _make_table(self, data, size):
+        df = pd.DataFrame(data, columns = ['data_name']).iloc[:,0]
+        return SelectTableNH(
+            data = df,
+            size = size,
+        )
+
+    def __init__(
+        self, 
+        app_context:object, 
+        context_key:str, 
+        title:str,
+        data:list,
+        size:dict = {},
+        **kwargs
+    ):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.title = title
+        self.data = data
+        self.size = size
+
+        super().__init__(
+            class_ = self.context_key,
+            title = self.title,
+            body = self._make_table(data, size),
+            no_footer=True,
+            size = {'width':self.size.get('width')},
+            **kwargs,
+        )
+    
+    def update_data(self, data):
+        self.children[1].children = [self._make_table(data, self.size)]
+        print('here2')
+        print(self.children[1].children)
+
+class SelectTableNH(v.VuetifyTemplate):    
+    headers = traitlets.List([]).tag(sync=True, allow_null=True)
+    items = traitlets.List([]).tag(sync=True, allow_null=True)
+    single_select = traitlets.Bool(False).tag(sync=True)
+    selected = traitlets.List([]).tag(sync=True, allow_null=True)
+    index_col = traitlets.Unicode('').tag(sync=True)
+    style = traitlets.Unicode('').tag(sync=True)
+    template = traitlets.Unicode('''
+        <template>
+            <v-data-table
+                v-model="selected"
+                :headers="headers"
+                :items="items"
+                :item-key="index_col"
+                :style="style"
+                :items-per-page=-1
+                hide-default-header
+                hide-default-footer
+            >
+            </v-data-table>
+        </template>
+        ''').tag(sync=True)
+    
+    def __init__(
+        self, 
+        data=pd.DataFrame(),
+        size:dict = {},
+        single_select:bool = False,
+        *args,
+        **kwargs
+        ):
+        
+        super().__init__(*args, **kwargs)
+        
+        data = data.reset_index()
+        self.index_col = data.columns[0]
+        self.style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};' \
+                     + "overflow-y:auto; overflow-x:hidden; font-weight:400;"
+        self.single_select = single_select
+        headers = [{
+              "text": col,
+              "value": col
+            } for col in data.columns]
+        headers[0].update({'align': ' d-none'})
+        
+        self.headers = headers        
+        self.items = json.loads(
+            data.to_json(orient='records'))
+
