@@ -42,6 +42,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
 
         # column selection
         df_col_names = pd.DataFrame(self.data.columns, columns=['col_names'])
+        
         self.column_selector = get_or_create_class(
             'select_table_card',
             self.app_context,
@@ -125,6 +126,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
             # data
             self.df = self.app_context.tabular_dataset.current_data.iloc[:selected_num_rows, selected_cols_to_idx]
 
+            print(f'{self.context_key}__data_info')
             # make output & show
             self.data_info = get_or_create_class(
                 'data_info',
@@ -134,6 +136,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
                 data = self.df,
                 update = True,
             )
+            display(self.data_info)
 
             self.columns_info = [
                 get_or_create_class(
@@ -163,6 +166,7 @@ class TabularAnalyticsScatter(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+
         super().__init__(
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
             children = [self.context_key]
