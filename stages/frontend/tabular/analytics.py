@@ -174,51 +174,72 @@ class TabularAnalyticsScatter(v.Container):
             self.data
         ) 
 
-        self.setting_part = get_or_create_class(
-            'tabular_data_analytics_options',
-            self.app_context,
-            context_key = 'tabular_data_analytics__options',
+        # when no class_name in app_context
+        self.setting_part = v.NavigationDrawer(
+            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:0px; background-color:#eeeeee;",
             children = [
-                option_widjets.column_selector,
-                v.Spacer(style_ = "min-height:10px"),
-                option_widjets.selector_dict['Hue 선택'],
-                v.Spacer(style_ = "min-height:10px"),
-                option_widjets.data_range_selector,
-                v.Spacer(style_ = "min-height:10px"),
-                option_widjets.run_button,
+                v.Col(
+                    children = [
+                        option_widjets.column_selector,
+                        v.Spacer(style_ = "min-height:10px"),
+                        option_widjets.selector_dict['Hue 선택'],
+                        v.Spacer(style_ = "min-height:10px"),
+                        option_widjets.data_range_selector,
+                        v.Spacer(style_ = "min-height:10px"),
+                        option_widjets.run_button,
+                    ],
+                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                )
             ],
+
         )
 
-        self._layout=v.Row(
+        '''
+        self._layout=v.Layout(
             children=[
-                v.Col(
-                    #cols=12, md=6,
-                    cols="6", md="4",
+                v.Row(
+                    style="min-heght: 500px;",
                     children=[
-                        v.Card(outlined=True,color="secondary")
-                    ]
-                ),
-                v.Col(
-                    #cols=12, md=6,
-                    cols="12", md="8",
-                    children=[
-                        v.Card(outlined=True,color="secondary")
+                        v.Col(
+                            md="4",
+                            children=[
+                                v.Card(
+                                    outlined=True,
+                                    color="yellow",
+                                    style="min-heght: 500px;",
+                                    children=[
+
+                                    ]
+                                )
+                            ]
+                        ),
+                        v.Col(
+                            md="8",
+                            style="min-heght: 500px;",
+                            children=[
+                                v.Card(
+                                    outlined=True,
+                                    style="min-heght: 500px;",
+                                    color="secondary",
+                                )
+                            ]
+                        )
                     ]
                 )
             ]
-        ) 
-
+        )
+        '''
+        
         self.output_part = v.Row(
             class_ = 'tabular_analytics_basicinfo__output_part',
-            style_ = "max-height:100%; margin:0; padding:0; background-color:#ffffff; \
-                      display:flex, flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
             children = [
-                self.setting_part
+                self.setting_part,
             ],
         )
 
         super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            style_ = "margin:0; padding:0; min-width:100%; min-height:100%; display:flex; flex-direction:column;",
             children = [self.output_part]
         )
 

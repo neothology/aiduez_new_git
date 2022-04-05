@@ -17,14 +17,14 @@ class SelectorCard(v.VuetifyTemplate):
         return '''
         <template>
             <div>
-                <v-card class="mx-auto" width="200px" outlined>
-                    <v-card style="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 100%; color: rgb(100, 116, 139); padding: 0px 0px 0px 16px; background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); ">
-                        <v-card-text style="font-size: 0.875rem; padding: 4px; ">
+                <v-card class="mx-auto" width="208px" style="box-shadow: unset;">
+                    <v-card style="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 100%; color: rgb(100, 116, 139); padding: 0px 0px 0px 16px; background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset;">
+                        <v-card-text style="font-size: 0.875rem; padding-top: 4px; padding-left: 0px; margin-left: 0px;">
                             {{headline}}
                         </v-card-text>
                     </v-card>
-                    <v-card>
-                        <v-select :items="items" v-model="selected" style="width: 170px; margin-left: 12px"/>
+                    <v-card style="max-height: 55px; min-height: 55px;">
+                        <v-select :items="items" v-model="selected" style="width: 180px; margin-left: 12px"/>
                     </v-card>
                 </v-card>   
             </div>
