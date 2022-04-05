@@ -1,4 +1,4 @@
-# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 4/4/22 - 03:00AM)</span>
+# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/28/22 - 03:30AM)</span>
 
 ## Development
 
@@ -13,7 +13,7 @@
 
 ```console
 # Container 실행
--$ docker run -itd -p 8888:8888 -v (source code path for volume mount):/opt/code/aiduez --name (container name) (image name) /bin/bash
+-$ docker run -itd -p 8888:8888 -v /Users/yusomang/aiduez_new_git:/opt/code/aiduez --name aiduez_new_git aiduez_new_git:3 /bin/bash
 
 # Container 접속 후, Jupyter Notebook 실행
 -$ jupyter notebook --ip 0.0.0.0 --notebook-dir /aihub/workspace --allow-root --no-browser
@@ -33,7 +33,7 @@
 - OKD Ez실행 yaml에 아래와 같이 적용
 
 ```console
-source /etc/bash.bashrc && voila /aihub/workspace/.AIDUez.ipynb --port 8888 --no-browser --enable_nbextensions False 
+source /etc/bash.bashrc && voila /aihub/workspace/AIDUez.ipynb --port 8888 --no-browser --enable_nbextensions False 
 ```
 <br>
 

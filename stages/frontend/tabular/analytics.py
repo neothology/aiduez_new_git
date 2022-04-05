@@ -3,6 +3,7 @@ from numpy import absolute
 import pandas as pd
 import ipyvuetify as v
 from utils import get_or_create_class
+from components.selector import SettingsPartsOptions
 
 class TabualrAnalyticsOptionArea(v.NavigationDrawer):
     def __init__(
@@ -108,7 +109,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
             style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
             children = [
                 self.output_part
-                ],
+            ],
         )
 
         def _show_base_info(item, event, data):
@@ -126,7 +127,6 @@ class TabularaAnalyticsBasicinfo(v.Container):
             # data
             self.df = self.app_context.tabular_dataset.current_data.iloc[:selected_num_rows, selected_cols_to_idx]
 
-            print(f'{self.context_key}__data_info')
             # make output & show
             self.data_info = get_or_create_class(
                 'data_info',
@@ -136,7 +136,6 @@ class TabularaAnalyticsBasicinfo(v.Container):
                 data = self.df,
                 update = True,
             )
-            display(self.data_info)
 
             self.columns_info = [
                 get_or_create_class(
@@ -167,9 +166,60 @@ class TabularAnalyticsScatter(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
+        self.data = self.app_context.tabular_dataset.current_data
+
+        option_widjets=SettingsPartsOptions(
+            self.app_context,
+            self.context_key,
+            self.data
+        ) 
+
+        self.setting_part = get_or_create_class(
+            'tabular_data_analytics_options',
+            self.app_context,
+            context_key = 'tabular_data_analytics__options',
+            children = [
+                option_widjets.column_selector,
+                v.Spacer(style_ = "min-height:10px"),
+                option_widjets.selector_dict['Hue 선택'],
+                v.Spacer(style_ = "min-height:10px"),
+                option_widjets.data_range_selector,
+                v.Spacer(style_ = "min-height:10px"),
+                option_widjets.run_button,
+            ],
+        )
+
+        self._layout=v.Row(
+            children=[
+                v.Col(
+                    #cols=12, md=6,
+                    cols="6", md="4",
+                    children=[
+                        v.Card(outlined=True,color="secondary")
+                    ]
+                ),
+                v.Col(
+                    #cols=12, md=6,
+                    cols="12", md="8",
+                    children=[
+                        v.Card(outlined=True,color="secondary")
+                    ]
+                )
+            ]
+        ) 
+
+        self.output_part = v.Row(
+            class_ = 'tabular_analytics_basicinfo__output_part',
+            style_ = "max-height:100%; margin:0; padding:0; background-color:#ffffff; \
+                      display:flex, flex-direction:column;",
+            children = [
+                self.setting_part
+            ],
+        )
+
         super().__init__(
             style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [self.context_key]
+            children = [self.output_part]
         )
 
 class TabularAnalyticsHeatmap(v.Container):

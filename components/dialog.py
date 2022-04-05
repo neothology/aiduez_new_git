@@ -1,4 +1,5 @@
 import ipyvuetify as v
+
 class BaseDialog(v.Dialog):
     def __init__(
         self,

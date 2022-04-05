@@ -1,5 +1,6 @@
 import ipyvuetify as v
 from utils import get_or_create_class
+
 class BaseTab(v.Tabs):
     def __init__(
         self,
