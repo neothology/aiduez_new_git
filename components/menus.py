@@ -99,17 +99,6 @@ class ListMenu(v.List):
 
                 self.menu_to_target.append(list_item)
 
-        # # add save button
-        # btn_save = v.Btn(
-        #     children = "저장하기",
-        # )
-
-        # list_menu.append(
-        #     v.Row(
-        #         children = [btn_save],
-        #     )
-        # )
-
         super().__init__(
             class_ = self.context_key,
             style_ = set_theme_style(self.app_context, self.context_key),
@@ -129,14 +118,20 @@ class ListMenu(v.List):
                 self.last_activated_item.disabled = False  
 
             # disable clicked item and keep it as last activated item
-            item.disabled = True
+            if task_type == 'task':
+                item.disabled = True
             self.last_activated_item = item
 
             # get target and set
             self.app_context.current_workflow = task_type  
-            target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area           
-            target_instance = get_or_create_class(item.value, self.app_context) # tabluar, text, image, video, audio, etc ~base
-            target_area.children = [target_instance]
+            if task_type != 'task':
+                target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area           
+                target_instance = get_or_create_class(item.value, self.app_context, update=True) # item.value = tabluar, text, image, video, audio, etc ~base
+                target_area.children = [target_instance]
+
+            else:        
+                target_instance = get_or_create_class(item.value, self.app_context) # item.value = 'task_recent, task_favorite, task_all'
+                target_instance.load()
 
             # other actions
             if task_type == 'task':
@@ -156,8 +151,8 @@ class ListMenu(v.List):
                 self.app_context.top_area.change_style('default')
 
         # set default
-        default_target_name: str = self.app_context.side_nav_menu_list['default']
-        default_menu_item = list(filter(lambda x: x.value == default_target_name, self.menu_to_target))[0]
+        default_target_name: str = self.app_context.side_nav_menu_list['default'] # task_recent_view
+        default_menu_item = list(filter(lambda x: x.value == default_target_name, self.menu_to_target))[0] # value = task_recent_view
         _proceed_to_target(default_menu_item)
 
         # set event listener

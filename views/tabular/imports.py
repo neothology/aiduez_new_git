@@ -3,7 +3,7 @@ import pandas as pd
 import ipyvuetify as v
 from utils import get_or_create_class
 
-class TabularImportLayout(v.Container):
+class TabularImportBaseView(v.Container):
     def __init__(
         self,
         app_context,
@@ -34,7 +34,7 @@ class TabularImportLayout(v.Container):
             class_ = f'{self.context_key}__work_area_contents_sub_area__left', # tabular_import_common_layout__work_area_contents_sub_area__left",
         )
 
-        # work area right side - data list to be imported
+        # work area right side - data list to be imported, etc
         self.work_area_contents_sub_area__right = v.Col(
             children = right_area,
             style_ = self.style['right'],
@@ -75,7 +75,7 @@ class TabularImportLayout(v.Container):
             ],
         )
 
-class TabularImportPC(v.Container):
+class TabularImportPCView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
@@ -147,8 +147,7 @@ class TabularImportPC(v.Container):
             class_ = "",
         )
 
-        self.work_area_contents_sub_area = get_or_create_class(
-            'tabular_import_layout',
+        super().__init__(
             self.app_context,
             self.context_key,
             left_area = [self.workbook_data_list],
@@ -160,17 +159,8 @@ class TabularImportPC(v.Container):
                 'top':"max-height:250px;",
                 'middle':"max-height:80px;",
             },
-            update = True
         )
 
-        super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row;",
-            children = [
-                self.work_area_contents_sub_area
-                ],
-        )    
-        
         # event handlers : '가져오기' (비)활성화
         def _on_select_file(change):
             if self.upload_file_textfield.file_info == []:
@@ -199,42 +189,22 @@ class TabularImportPC(v.Container):
 
         self.file_upload_button.on_event('click', _upload_file)
 
-class TabularImportAIDU(v.Container):
+class TabularImportAIDUView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.work_area_contents_sub_area = get_or_create_class(
-            'tabular_import_layout',
-            self.app_context,
-            self.context_key,
-            update = True
-        )
-
         super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row;",
-            children = [
-                self.work_area_contents_sub_area
-                ],
+            self.app_context,
+            self.context_key
         )
 
-class TabularImportEDAP(v.Container):
+class TabularImportEDAPView(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.work_area_contents_sub_area = get_or_create_class(
-            'tabular_import_layout',
-            self.app_context,
-            self.context_key,
-            update = True
-        )
-
         super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row;",
-            children = [
-                self.work_area_contents_sub_area
-                ],
+            self.app_context,
+            self.context_key
         )

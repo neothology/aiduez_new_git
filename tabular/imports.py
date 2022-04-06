@@ -18,4 +18,4 @@ class FileObjectHandler:
                 sep=delimiter_option
                 )
 
-        self.app_context.tabular_workbook.create_new_work(self.data_name, self.data)
+        self.app_context.current_workbook.create_new_work(self.data_name, self.data)

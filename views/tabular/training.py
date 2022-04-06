@@ -38,7 +38,7 @@ class TabularModel:
         self.current_model_name = 'latest'
         self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
         self.dataset = self.app_context.tabular_dataset.current_data
-        self.output_directory =  self.app_context.tabular_workbook.current_models_dir # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models
+        self.output_directory =  self.app_context.current_workbook.current_models_dir # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models
 
         # 모델 결과 Dialog 에 모델명 추가
         self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
@@ -77,7 +77,7 @@ class TabularModel:
         self.app_context.tabular_ai_training__training_options.save_config(self.current_train_result_dir)
 
         # save training options
-        self.work_state_dir = self.app_context.tabular_workbook.current_work_state_dir
+        self.work_state_dir = self.app_context.current_workbook.current_work_state_dir
 
         # set model in model_save_dialog text_field
         self.app_context.tabular_ai_training__train_result.children[0].model_save_body.v_model = self.current_model_name
@@ -87,6 +87,9 @@ class TabularModel:
         self.app_context.tabular_ai_training__train_result.children[0].save_button.disabled = False
         self.app_context.tabular_ai_training__train_result.children[0].more_button.disabled = False
         self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
+
+        # update workbook profile
+        self.app_context.current_workbook.save_workbook(model = self.current_model_name)
 
         self.app_context.tabular_ai_training__train_result.children[0].progress_bar.active = False
 
@@ -103,12 +106,13 @@ class TabularModel:
 
     def load_model(self, model_name: str):
         pass
+
 class TabularModelContext(v.Row):
     def __init__(self, app_context:object = None, context_key:str = '', **kwargs):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.workbook = self.app_context.tabular_workbook
+        self.workbook = self.app_context.current_workbook
         self.dataset = self.app_context.tabular_dataset
 
         self.data_name_list = self.dataset.data_name_list

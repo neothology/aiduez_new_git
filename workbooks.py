@@ -3,11 +3,15 @@ import re
 import zipfile
 import ipyvuetify as v
 from utils import get_or_create_class, delete_files_in_dir
+import json
+import time
+import shutil
 
 class TabularWorkbook:
     def __init__(self, app_context, context_key:str = ""):
         self.app_context = app_context
         self.context_key = context_key
+        self.flow_type = 'tabular'
         self.workspace_dir = self.app_context.env_values['workspace_dir']
         self.tmp_dir = app_context.env_values['tmp_dir']
         self.tmp_workbook_dir = f'{self.tmp_dir}/workbook'
@@ -20,6 +24,8 @@ class TabularWorkbook:
         self.current_work_dir: str = ''
         self.current_work_state_dir: str = ''
         self.current_models_dir: str = ''
+
+        self.profile = None
        
         
     def create_new(self):
@@ -55,6 +61,31 @@ class TabularWorkbook:
         # initialize dataset object
         self.dataset = get_or_create_class('tabular_dataset', self.app_context)
 
+        # create new workbook profile and save it
+        import random
+        icon_random = random.randint(0, 19)
+        color_random = random.randint(0, 6)
+        self.profile = {
+            'workbook_type': 'tabular',
+            'name': self.workbook_name,
+            'works': [],
+            'models': [],
+            'workbook_icon': self.app_context.workbook_icons[icon_random],
+            'workbook_color': self.app_context.workbook_colors[color_random],
+            'favorite': False,
+            'description': '',
+            'created_at': str(time.time()),
+            'opened_at': '',
+            'modified_at': str(time.time()),
+            'deleted_at': '',
+        }
+
+        with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'w') as f:
+            json.dump(self.profile, f)
+
+        # save tmp into workbook file
+        self.save_workbook()
+
     def create_new_work(self, work_name, data):
 
         def _check_work_name(work_name:str):
@@ -86,8 +117,6 @@ class TabularWorkbook:
             
         #     return data
 
-            
-
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'  # e.g. /aihub/workspace/tmp/workbook/works/titanic_train
@@ -107,6 +136,9 @@ class TabularWorkbook:
         self.work_name_list.append(work_name)
         self.work_dir_list.append(self.current_work_dir)
 
+        # update workbook profile
+        self.save_workbook(work = self.current_work_name)
+
     def save_current_work(self):
         # save current work -(1) 데이터 입수
         # save current work -(2) 데이터 분석
@@ -115,7 +147,6 @@ class TabularWorkbook:
         # save current work -(4) AI모델 학습(모델관련 내용은 '학습'할 때 저장되므로 여기서는 training options 만 저장)
         self.app_context.tabular_ai_training__training_options.save_config(self.current_work_state_dir)
         # save current work -(5) AI모델 평가
-
 
     def load_existing_work(self, work_name):
 
@@ -139,13 +170,13 @@ class TabularWorkbook:
             self.app_context.tabular_analytics_basicinfo = None
 
         # preprocessing 변경
-        self.app_context.tabular_data_processing__sub_contents.children = []
-        self.app_context.tabular_data_processing__options = None
-        if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
-            self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
-        self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
-        self.app_context.tabular_data_single_processing = None
-        self.app_context.tabular_data_processing__column_summary = None
+        # self.app_context.tabular_data_processing__sub_contents.children = []
+        # self.app_context.tabular_data_processing__options = None
+        # if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
+        #     self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
+        # self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
+        # self.app_context.tabular_data_single_processing = None
+        # self.app_context.tabular_data_processing__column_summary = None
 
         self.app_context.progress_overlay.update(20)
 
@@ -200,14 +231,29 @@ class TabularWorkbook:
         
     def change_work(self, work_name):
         self.app_context.progress_overlay.start()
+
+        # decide which stages to update
+        stages = ['tabular_data_analytics', 'tabular_data_processing', 'tabular_ai_training']
+        
         self.save_current_work()
         self.load_existing_work(work_name)
         self.app_context.progress_overlay.finish()
 
-    def save_current_work_as(self, work_name):
-        pass
+    def save_workbook(self, **kwargs):
+        if kwargs.get('work'):
+            self.profile['works'].append(kwargs['work'])
+        if kwargs.get('model'):
+            self.profile['models'].append(kwargs['model'])
+        self.profile['modified_at'] = str(time.time())
 
-    def save_workbook():
+        with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'w') as f:
+            json.dump(self.profile, f)
+
+        shutil.make_archive(f'{self.tmp_dir}/tmp_workbook', 'zip', self.tmp_workbook_dir)
+        shutil.move(f'{self.tmp_dir}/tmp_workbook.zip', self.workbook_path)
+
+
+    def save_current_work_as(self, work_name):
         pass
 
     def save_workbook_as():
@@ -215,3 +261,6 @@ class TabularWorkbook:
 
     def rename_workbook():
         pass
+
+
+

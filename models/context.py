@@ -15,6 +15,7 @@ class AppContext:
     current_workflow: str = None
     current_workflow_stage: str = None
     current_workflow_stage_sub: str = None
+    current_workbook: object = None
 
 ## base layout object ##
     background: object = None
@@ -27,8 +28,15 @@ class AppContext:
     base_overlay: object = None
     progress_overlay: object = None
 
+## workbook list ##
+    workbooks: dict = None
+
 ## workflow stages object ##
     # --------------------------------------------------
+    task_recent: object = None
+    task_recent_view: object = None
+
+
     tabular_base: object = None
     tabular_workbook: object = None
     tabular_dataset: object = None
@@ -148,8 +156,5 @@ class AppContext:
         self.env_values: dict = app_config['envs']
         self.processing_params: dict = app_config['processing_params']
         self.training_params: dict = app_config['training_params']
-
-    
-    
-    # def createJob(self, currPjtName, data_name):
-    #     self.info = [True, "작업 생성 완료"]
+        self.workbook_icons: list = app_config['workbook_icons']
+        self.workbook_colors: list = app_config['workbook_colors']

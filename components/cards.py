@@ -344,3 +344,101 @@ class SimpleCard(v.Card):
             style_ = self.style['card'],
             children = [self.header, self.body, self.footer],
         )
+
+class IconCard(v.Card):
+    def __init__(
+        self,
+        workbook_type:str,
+        title:str,
+        text:str,
+        workbook_icon:str,
+        workbook_color:str,
+        favorite:bool,
+        size:dict,
+    ):
+        self.workbook_type = workbook_type
+        self.title = title
+        self.text = text
+        self.workbook_icon = workbook_icon
+        self.workbook_color = workbook_color
+        self.size = size
+        self.favorite = favorite
+
+        # header: icon, title, more menu button
+        self.icon = v.Col(
+            class_ = "",
+            style_ = "padding:0; max-width:50px; height:50px;",
+            children = [
+                v.Html(
+                    tag = 'span',
+                    attributes = {
+                        'class': 'material-icons',
+                        'style': "",
+                        },
+                    children = [self.workbook_icon],
+                )
+            ],
+        )
+
+        self.title = v.Col(
+            class_ = "",
+            style_ = "",
+            children = [self.title]
+        )
+
+        self.more_items = v.List(
+                children = ["선택"]
+            )   
+
+        self.more_button = v.Btn(
+            v_on='menu_data.on',
+            disabled = True,
+            icon = True,
+            children=[v.Icon(children = "mdi-dots-vertical")], 
+        )
+        self.more_menu_col = v.Col(
+            class_ = "",
+            style_ = "padding:0; max-width:30px;",
+            children = [
+                v.Menu(
+                    offset_y=True,
+                    attach=True,
+                    v_slots=[{
+                        'name': 'activator',
+                        'variable': 'menu_data',
+                        'children': self.more_button,
+                    }],
+                    children=[
+                        v.List(children=[self.more_items]),
+                    ],
+                ),    
+            ],
+        )
+
+        self.header = v.CardTitle(
+            class_ = "",
+            style_ = "max-height:90px; min-height:90px; margin:0; \
+                font-size: 0.875rem; color:rgb(100, 116, 139); \
+                align-content:flex-end; padding-left:16px; \
+                display:flex; flex-direction:row;",
+            children = [self.icon, self.title, self.more_menu_col],
+        )
+
+        self.body = v.CardText(
+            class_ = "",
+            style_ = "padding:0;",
+            children = [
+                v.Row(
+                    class_ = "",
+                    style_ = "margin:0; padding-left:10px; padding-right:10px;",
+                    children = text
+                ) for text in self.text
+            ]
+        )
+
+        super().__init__(
+            class_ = "",
+            style_ = f"width:{size.get('width')}; height:{size.get('height')}; \
+                margin-right:20px; margin-bottom:20px; padding:0; display:flex; flex-direction:column;",
+            children = [self.header, self.body],
+        )

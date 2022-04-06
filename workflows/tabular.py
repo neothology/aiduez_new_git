@@ -1,18 +1,21 @@
 import ipyvuetify as v
 import os
-import json
-import pandas as pd
-from matplotlib.style import context
-from utils import get_or_create_class
+from utils import get_or_create_class, delete_files_in_dir
 class TabularBase(v.Container):
 
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        self.tmp_workbook_dir = self.app_context.env_values['tmp_workbook_dir']
+
+        # delete tmp directory contents if exists, else make tmp directory
+        tmp_dir = self.app_context.env_values['tmp_dir']
+        if os.path.exists(tmp_dir):
+            delete_files_in_dir(tmp_dir)
+        else:
+            os.makedirs(tmp_dir)
 
         # init workbook
-        self.workbook = get_or_create_class('tabular_workbook', self.app_context)
+        self.workbook = get_or_create_class('tabular_workbook', self.app_context, 'current_workbook')
         self.workbook.create_new() # tabular, text, image, video, audio, etc.
 
         # initialize components to view

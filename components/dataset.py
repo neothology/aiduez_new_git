@@ -9,7 +9,7 @@ class TabularDataset:
     def __init__(self, app_context:object = None, context_key:str = '', **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        self.tmp_works_dir = self.app_context.tabular_workbook.tmp_works_dir
+        self.tmp_works_dir = self.app_context.current_workbook.tmp_works_dir
         self.data_name_list = []
         self.data_path_list = []
         self.current_data_name = ''
@@ -74,7 +74,7 @@ class TabularDataContext(v.Col):
         )
 
         def _on_data_selector_change(item, event=None, data=None):
-            self.workbook = self.app_context.tabular_workbook
+            self.workbook = self.app_context.current_workbook
             self.workbook.change_work(item.v_model)
 
         self.data_selector.children[0].on_event('change', _on_data_selector_change)  
