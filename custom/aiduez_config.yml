@@ -2,7 +2,6 @@ envs:
   workspace_dir: /aihub/workspace
   tmp_dir: /aihub/workspace/tmp
   tmp_workbook_dir: /aihub/workspace/tmp/workbook
-  data_dir: /aihub/data/
 
 class_paths:
   # components - layout & menu
@@ -15,6 +14,7 @@ class_paths:
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
   sub_menu_area: components.layouts.SubMenuArea
+  alert: components.alerts.Alert
   
   # other common components
   column_summary: components.data_profiler.ColumnSummary
@@ -22,8 +22,11 @@ class_paths:
   base_overlay: components.overlays.BaseOverlay
   progress_overlay: components.overlays.ProgressOverlay
   select_table_card: components.tables.SelectTableCard
+  select_table_card_no_header: components.tables.SelectTableCardNH
   simple_slider_card: components.forms.SimpleSliderCard
+  simple_radio_card: components.forms.SimpleRadioCard
   data_info: components.data_profiler.DataInfo
+
 
   task_favorite: workflows.task.TaskFavorite
   task_recent: workflows.task.TaskRecent
@@ -34,37 +37,44 @@ class_paths:
   tabular_workbook: workbooks.TabularWorkbook
   tabular_dataset: components.dataset.TabularDataset
   tabular_data_context: components.dataset.TabularDataContext
-  tabular_model: components.training.TabularModel
+  tabular_model: stages.frontend.tabular.training.TabularModel
 
   tabular_data_import: workflows.tabular.TabularDataImport
-  tabular_data_import_tab: components.imports.TabularImportTab
-  tabular_data_import_aidu: components.imports.TabularAIDUImport
-  tabular_data_import_local: components.imports.TabularLocalImport
-  tabular_data_import_edap: components.imports.TabularEDAPImport
-  tabular_data_import_pod: components.imports.TabularPodImport
+  tabular_import_layout: stages.frontend.tabular.imports.TabularImportLayout
+  tabular_import_pc: stages.frontend.tabular.imports.TabularImportPC
+  tabular_import_file_object_handler: stages.backend.tabular.imports.FileObjectHandler
+  tabular_import_aidu: stages.frontend.tabular.imports.TabularImportAIDU
+  tabular_import_edap: stages.frontend.tabular.imports.TabularImportEDAP
+
+
+  tabular_data_import_tab: stages.frontend.tabular.imports.TabularImportTab
+  tabular_data_import_aidu: stages.frontend.tabular.imports.TabularAIDUImport
+  tabular_data_import_local: stages.frontend.tabular.imports.TabularLocalImport
+  tabular_data_import_edap: stages.frontend.tabular.imports.TabularEDAPImport
+  tabular_data_import_pod: stages.frontend.tabular.imports.TabularPodImport
 
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
-  tabular_data_analytics_options: components.analytics.TabualrAnalyticsOptionArea
-  tabular_analytics_basicinfo: components.analytics.TabularaAnalyticsBasicinfo
-  tabular_analytics_scatter: components.analytics.TabularAnalyticsScatter
-  tabular_analytics_heatmap: components.analytics.TabularAnalyticsHeatmap
-  tabular_analytics_boxplot: components.analytics.TabularAnalyticsBoxplot
-  tabular_analytics_density: components.analytics.TabularAnalyticsDensity
-  tabular_analytics_wcloud: components.analytics.TabularAnalyticsWordCloud
-  tabular_analytics_reduction: components.analytics.TabularAnalyticsDimensionReduction
-  tabular_analytics_clustering: components.analytics.TabularAnalyticsClustering
-  tabular_analytics_datasample: components.analytics.TabularAnalyticsDataSample
+  tabular_data_analytics_options: stages.frontend.tabular.analytics.TabualrAnalyticsOptionArea
+  tabular_analytics_basicinfo: stages.frontend.tabular.analytics.TabularaAnalyticsBasicinfo
+  tabular_analytics_scatter: stages.frontend.tabular.analytics.TabularAnalyticsScatter
+  tabular_analytics_heatmap: stages.frontend.tabular.analytics.TabularAnalyticsHeatmap
+  tabular_analytics_boxplot: stages.frontend.tabular.analytics.TabularAnalyticsBoxplot
+  tabular_analytics_density: stages.frontend.tabular.analytics.TabularAnalyticsDensity
+  tabular_analytics_wcloud: stages.frontend.tabular.analytics.TabularAnalyticsWordCloud
+  tabular_analytics_reduction: stages.frontend.tabular.analytics.TabularAnalyticsDimensionReduction
+  tabular_analytics_clustering: stages.frontend.tabular.analytics.TabularAnalyticsClustering
+  tabular_analytics_datasample: stages.frontend.tabular.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
-  tabular_data_processing_tab: components.processing.TabularProcessingTab
-  tabular_data_single_processing: components.processing.TabularSingleProcessing
-  tabular_data_single_processing_dialog: components.processing.TabularSingleProcessingDialog
-  tabular_data_multiple_processing: components.processing.TabularMultipleProcessing
+  tabular_data_processing_tab: stages.frontend.tabular.processing.TabularProcessingTab
+  tabular_data_single_processing: stages.frontend.tabular.processing.TabularSingleProcessing
+  tabular_data_single_processing_dialog: stages.frontend.tabular.processing.TabularSingleProcessingDialog
+  tabular_data_multiple_processing: stages.frontend.tabular.processing.TabularMultipleProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
-  tabular_training_options: components.training.TabularTrainingOptions
-  tabular_train_activator: components.training.TabularTrainActivator
-  tabular_train_result: components.training.TabularTrainResult
+  tabular_training_options: stages.frontend.tabular.training.TabularTrainingOptions
+  tabular_train_activator: stages.frontend.tabular.training.TabularTrainActivator
+  tabular_train_result: stages.frontend.tabular.training.TabularTrainResult
   
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
@@ -160,19 +170,6 @@ workflows_list:
       - 
         title: 데이터 입수
         target: tabular_data_import
-        menu_list:
-          -
-            title: AIDU에서 가져오기
-            target: tabular_data_import_aidu
-          -
-            title: PC에서 가져오기
-            target: tabular_data_import_local
-          -
-            title: EDAP에서 가져오기
-            target: tabular_data_import_edap
-          -
-            title: 가공데이터 가져오기
-            target: tabular_data_import_pod 
       - 
         title: 데이터 분석
         target: tabular_data_analytics
@@ -304,11 +301,13 @@ theme:
             box-shadow:none; border:0; 
             border-bottom:1px solid #e2e8f0; 
             background-color: rgb(30, 41, 59);
+            z-index:776;
           light: >
             height:199px; padding:10px; 
             box-shadow:none; border:0; 
             border-bottom:1px solid #e2e8f0; 
             background-color: #ffffff;
+            z-index:776;
         nav_icon:
           default: >
             min-width:50px; max-width:50px; margin:0; padding:0;

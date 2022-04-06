@@ -18,6 +18,7 @@ class AppContext:
 
 ## base layout object ##
     background: object = None
+    alert: object = None
     side_nav: object = None
     side_nav_menu: object = None
     list_menu_sub: object = None
@@ -35,13 +36,23 @@ class AppContext:
 
     tabular_tab_menu: object = None
     tabular_contents: object = None
-    tabular_contents_sub: object = None
     tabular_data_context: object = None
     tabular_model: object = None
     tabular_dataset: object = None
 
     # tabular data import objects
     tabular_data_import: object = None
+    tabular_data_import__sub_menu: object = None
+    tabular_data_import__sub_contents: object = None
+    tabular_import_pc: object = None
+    tabular_import_pc__file_object_handeler: object = None
+    tabular_import_pc__select_encoding_options: object = None
+    tabular_import_pc__select_delimiter_options: object = None
+
+
+    tabular_data_import__workbook_data_list: object = None
+   
+    
     tabular_data_import_tab: object = None
     tabular_data_import_aidu: object = None
     tabular_data_import_local: object = None
@@ -51,6 +62,7 @@ class AppContext:
     # tabular data analytics objects
     tabular_data_analytics: object = None
     tabular_data_analytics__sub_menu: object = None
+    tabular_data_analytics__sub_contents: object = None
     tabular_data_analytics__options: object = None
     tabular_analytics_basicinfo: object = None
     tabular_analytics_basicinfo__column_selector: object = None
@@ -68,10 +80,12 @@ class AppContext:
 
     #tabular data processing objects
     tabular_data_processing: object = None
-    tabular_data_processing_tab: object = None
+    tabular_data_processing__sub_menu: object = None
+    tabular_data_processing__sub_contents: object = None
+    tabular_data_processing__column_summary: object = None
     tabular_data_single_processing: object = None
     tabular_data_single_processing_dialog: object = None
-    tabular_data_processing_column_summary: object = None
+    tabular_data_multiple_processing: object = None
 
     # tabilar ai training objects
     tabular_ai_training: object = None

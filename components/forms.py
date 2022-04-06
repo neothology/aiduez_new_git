@@ -139,7 +139,7 @@ class SimpleSliderCard(SimpleCard):
         range:list = [], 
         size:dict = {},
         **kwargs
-        ):
+    ):
 
         slider = v.Slider(
             min = range[0],
@@ -177,3 +177,46 @@ class SimpleSliderCard(SimpleCard):
             no_footer=True,
             size = size,
         )
+
+class SimpleRadioCard(SimpleCard):
+        def __init__(
+            self,
+            app_context:object = None, 
+            context_key:str = "",  
+            title:str = "",
+            direction:str = "",
+            options:dict = {}, 
+            size:dict = {},
+            **kwargs
+        ):
+            self.direction = True if direction == 'row' else False
+
+            radio_options = v.RadioGroup(
+                v_model = options['values'][0],
+                row = self.direction,
+                style_ = "padding:0; height:25px;",
+                children = [
+                    v.Radio(
+                        label = option[0],
+                        value = option[1],
+                    ) for option in zip(options['labels'], options['values'])],
+            )
+
+            self.selected_option = radio_options.v_model
+            def on_change_radio(item, event, data):
+                self.selected_option = item.v_model
+            radio_options.on_event('change', on_change_radio)
+
+            body = v.Row(
+                children = [radio_options],
+                style_ = "margin:0; padding-bottom:10px; align-items:center; padding-left:15px" + kwargs.get('style', ""), 
+            )
+
+            super().__init__(
+                class_ = kwargs.get('class_'),
+                title= title,
+                style_ = "margin:0;", 
+                body = body,
+                no_footer=True,
+                size = size,
+            )

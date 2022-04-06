@@ -1,7 +1,7 @@
 import ipyvuetify as v
 import os
 import json
-
+import pandas as pd
 from matplotlib.style import context
 from utils import get_or_create_class
 class TabularBase(v.Container):
@@ -11,26 +11,9 @@ class TabularBase(v.Container):
         self.context_key = context_key
         self.tmp_workbook_dir = self.app_context.env_values['tmp_workbook_dir']
 
-        self.app_context.progress_overlay.start()
-
         # init workbook
         self.workbook = get_or_create_class('tabular_workbook', self.app_context)
         self.workbook.create_new() # tabular, text, image, video, audio, etc.
-
-        self.app_context.progress_overlay.update(5)
-
-        # code will be removed: add data from /aihub/data to workbook data list---------
-        from os import listdir, path
-        import pandas as pd
-        from pathlib import Path
-        self.data_path_list = [path.join('data', data_name) for data_name in listdir('data')]
-
-        for data_path in sorted(self.data_path_list):
-            data = pd.read_csv(data_path, sep = ',', encoding = 'cp949')
-            self.workbook.create_new_work(work_name = Path(data_path).stem, data = data)
-        # ---------------------------------------------------------------
-
-        self.app_context.progress_overlay.update(8)
 
         # initialize components to view
         work_area_contents = get_or_create_class('sub_area', self.app_context, context_key = 'tabular_contents')
@@ -38,23 +21,19 @@ class TabularBase(v.Container):
         self.tab_menu = get_or_create_class(
             'tab_menu', 
             self.app_context,  
-            tab_props = self.app_context.workflows_list['tabular'],
             context_key = 'tabular_tab_menu',
+            tab_props = self.app_context.workflows_list['tabular'],
             target_area = work_area_contents
             )
 
-        self.app_context.progress_overlay.update(15)
-
         # initialize each workflow 
-        tabular_workflow_names = [tab.value for tab in self.tab_menu.tab_menu.children]
-        init_intervals = [10,25,40,10,5]
-        init_progress = 15
-        for i, workflow_name in enumerate(tabular_workflow_names):
-            _ = get_or_create_class(workflow_name, self.app_context)
-            init_progress += init_intervals[i]
-            self.app_context.progress_overlay.update(init_progress)
-
-        self.app_context.progress_overlay.update(100)
+        # tabular_workflow_names = [tab.value for tab in self.tab_menu.tab_menu.children]
+        # init_intervals = [10,25,40,10,5]
+        # init_progress = 15
+        # for i, workflow_name in enumerate(tabular_workflow_names):
+        #     _ = get_or_create_class(workflow_name, self.app_context)
+        #     init_progress += init_intervals[i]
+        #     self.app_context.progress_overlay.update(init_progress)
 
         # put components into layout
         super().__init__(
@@ -66,12 +45,7 @@ class TabularBase(v.Container):
                 ],
         )
 
-        self.app_context.progress_overlay.finish()
-
-    def update_workflow_stages(self):
-        pass
-
-class TabularDataImport(v.Container):
+class TabularDataImport_old(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
@@ -90,12 +64,99 @@ class TabularDataImport(v.Container):
             ],
         )
 
+class TabularDataImport(v.Container):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+
+        self.data_name_list = self.app_context.tabular_dataset.data_name_list
+
+        self.menu_tree = [
+            {   
+                'icon': 'mdi-laptop',
+                'title': 'AIDU에서 가져오기',
+                'target': 'tabular_import_aidu',
+            },
+            {   
+                'icon': 'mdi-folder-open-outline',
+                'title': 'PC에서 가져오기',
+                'target': 'tabular_import_pc',
+            },
+            {   
+                'icon': 'mdi-dns-outline',
+                'title': 'EDAP에서 가져오기',
+                'target': 'tabular_import_edap',
+            },
+        ]
+
+        # top area(data_context, button)
+        self.data_context = get_or_create_class(
+            'tabular_data_context',
+            self.app_context,
+        )
+
+        self.top_area = v.Row(
+            children = [
+                self.data_context
+            ],
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
+        )
+
+        # progress bar
+        self.progress_bar = v.ProgressLinear(
+            indeterminate = True,
+            color = 'primary',
+        )
+        self.progress_bar.active = False
+
+        # sub menu area
+        self.work_area_contents_sub_menu = get_or_create_class(
+            'sub_menu_area',
+            self.app_context,
+            style = "min-width:200px; max-width:200px !important; background-color:#e5e5e5; z-index:100;",
+        )
+
+        self.sub_menu = get_or_create_class(
+            'list_menu_sub',
+            self.app_context,
+            context_key = 'tabular_data_import__sub_menu',
+            menu_tree = self.menu_tree,
+        )
+
+        self.work_area_contents_sub_menu.children = [self.sub_menu]
+
+        # sub work area
+        self.work_area_contents_sub_area = get_or_create_class(
+            'sub_area',
+            self.app_context,
+            context_key = 'tabular_data_import__sub_contents',
+            style = "width:100%; \
+                    padding:0; margin:0; background-color:#ffffff00; position:relative; ",
+        )
+
+        # activate contents sub area layout
+
+
+        super().__init__(
+            class_ = self.context_key,
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            children = [
+                self.top_area,
+                self.progress_bar,
+                v.Col(
+                    style_ = "display:flex; max-height:1599px; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    children = [
+                        self.work_area_contents_sub_menu,
+                        self.work_area_contents_sub_area
+                    ],
+                )
+            ]
+        )
+
 class TabularDataAnalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        self.style = {}
-
         self.data = self.app_context.tabular_dataset.current_data
         self.menu_tree = [
             {   
@@ -189,11 +250,9 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_menu = get_or_create_class(
             'sub_menu_area',
             self.app_context,
-            context_key = 'tabular_data_analytics_sub_menu',
-            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; border: 1px solid #cbcbcb; \
-                    border-top:0; border-bottom:0; z-index:100;",
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5;z-index:100;",
         )
-
+                    
         self.sub_menu = get_or_create_class(
             'list_menu_sub',
             self.app_context,
@@ -207,7 +266,7 @@ class TabularDataAnalytics(v.Container):
         self.work_area_contents_sub_area = get_or_create_class(
             'sub_area',
             self.app_context,
-            context_key = 'tabular_contents_sub',
+            context_key = 'tabular_data_analytics__sub_contents',
             style = "width:100%; \
                     padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
@@ -233,25 +292,79 @@ class TabularDataProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-         # data_context
+        self.menu_tree = [
+            {   
+                'icon': 'mdi-clipboard-text-outline',
+                'title': '단일 칼럼 변환',
+                'target': 'tabular_data_single_processing',
+            },
+            {
+                'icon': 'mdi-clipboard-text-multiple-outline',
+                'title': '복합 칼럼 변환',
+                'target': 'tabular_data_multiple_processing',
+            },
+        ]
+
+        # progress bar
+        self.progress_bar = v.ProgressLinear(
+            indeterminate = True,
+            color = 'primary',
+        )
+        self.progress_bar.active = False
+
+        # top area(data_context, button)
         self.data_context = get_or_create_class(
             'tabular_data_context',
             self.app_context,
         )
 
+        self.top_area = v.Row(
+            children = [
+                self.data_context
+            ],
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
+        )
+
+        # sub menu area
+        self.work_area_contents_sub_menu = get_or_create_class(
+            'sub_menu_area',
+            self.app_context,
+            context_key = 'tabular_data_processing_sub_menu',
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; z-index:100;",
+        )
+
         # vertical tab
-        self.processing_tab = get_or_create_class(
-            'tabular_data_processing_tab',
+        self.processing_sub_menu = get_or_create_class(
+            'list_menu_sub',
             app_context=self.app_context,
-            context_key='tabular_data_processing_tab',
+            context_key='tabular_data_processing__sub_menu',
+            menu_tree = self.menu_tree,
+        )
+
+        self.work_area_contents_sub_menu.children = [self.processing_sub_menu]
+
+        # sub work area
+        self.work_area_contents_sub_area = get_or_create_class(
+            'sub_area',
+            self.app_context,
+            context_key = 'tabular_data_processing__sub_contents',
+            style = "width:100%; \
+                    padding:0; margin:0; background-color:#ffffff00; position:relative; ",
         )
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
-                self.data_context,
-                self.processing_tab,
+                self.top_area,
+                self.progress_bar,
+                v.Col(
+                    style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    children = [
+                        self.work_area_contents_sub_menu,
+                        self.work_area_contents_sub_area
+                    ],
+                )
             ],
         )
 
@@ -261,6 +374,34 @@ class TabularAITraining(v.Container):
         self.app_context = app_context
         self.context_key = context_key
         self.style = {}
+
+        # progress bar
+        self.progress_bar = v.ProgressLinear(
+            indeterminate = True,
+            color = 'primary',
+        )
+        self.progress_bar.active = False
+  
+
+        super().__init__(
+            class_ = self.context_key,
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            children = [
+                self.progress_bar,
+                v.Container()
+                ],
+        )  
+
+        # self.app_context.tabular_ai_training__training_options.retrieve_training_options()
+
+    def update_contents(self):
+        self.data = self.app_context.tabular_dataset.current_data
+        self.column_summary.col = self.data[self.data.columns[0]]
+        self.column_summary.update_contents()
+
+    def load_contents(self):
+
+        self.progress_bar.active = True
 
         # data_context
         self.data_context = get_or_create_class(
@@ -298,7 +439,7 @@ class TabularAITraining(v.Container):
             title = '학습 로그',
             size = {'width':'90vw', 'height':'80vh'}, 
         )
-
+     
         # training_options
         self.training_options = get_or_create_class(
             'tabular_training_options', 
@@ -314,27 +455,19 @@ class TabularAITraining(v.Container):
             context_key = 'tabular_ai_training__column_summary',
             title = '데이터 요약',
             col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
-        )       
+        )     
 
-        super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column; padding:0;",
-            children = [
+        self.children = [
                 self.top_area,
-                v.Spacer(style_ = "max-height:10px"),
+                v.Spacer(style_ = "min-height:10px; max-height:10px;"),
                 self.train_result,
                 self.training_options,
-                v.Spacer(style_ = "max-height:30px"),
+                v.Spacer(style_ = "min-height:30px; max-height:30px;"),
                 self.column_summary,
-                ],
-        )  
+                ]
+                
+        self.progress_bar.active = False
 
-        self.app_context.tabular_ai_training__training_options.retrieve_training_options()
-
-    def update_contents(self):
-        self.data = self.app_context.tabular_dataset.current_data
-        self.column_summary.col = self.data[self.data.columns[0]]
-        self.column_summary.update_contents()
 
 class TabularAIEvaluation(v.Container):
     def __init__(self, app_context, context_key, **kwargs):

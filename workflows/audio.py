@@ -20,41 +20,41 @@ class AudioBase(v.Container):
             )
 
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0px; display:flex; flex-direction:column;",
             children = [self.tab_menu, self.work_area_contents],
         )
 
 class AudioDataImport(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class AudioDataanalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class AudioDataProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class AudioAITraining(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class AudioAIEvaluation(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )

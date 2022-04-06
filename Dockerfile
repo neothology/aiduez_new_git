@@ -33,7 +33,7 @@ RUN ln -s /usr/local/bin/jupyter /opt/conda/bin/jupyter
 
 WORKDIR /opt/code/aiduez
 COPY . /opt/code/aiduez
-COPY AIDUez.ipynb /aihub/workspace
+COPY AIDUez.ipynb /aihub/workspace/.AIDUez.ipynb
 
 RUN pip3 install --upgrade pip \
     --trusted-host nexus.dspace.kt.co.kr \

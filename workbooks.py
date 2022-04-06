@@ -3,9 +3,6 @@ import re
 import zipfile
 import ipyvuetify as v
 from utils import get_or_create_class, delete_files_in_dir
-from utils import logging_time
-from components.upload.upload_widgets import UploadWidgets
-
 
 class TabularWorkbook:
     def __init__(self, app_context, context_key:str = ""):
@@ -20,7 +17,6 @@ class TabularWorkbook:
         self.work_name_list = []
         self.work_dir_list = []
         self.current_work_name: str = ''
-        self.current_data_column = []
         self.current_work_dir: str = ''
         self.current_work_state_dir: str = ''
         self.current_models_dir: str = ''
@@ -56,6 +52,9 @@ class TabularWorkbook:
         self.workbook_path = f'{self.workspace_dir}/{self.workbook_name}'
         zipfile.ZipFile(self.workbook_path, 'w').close() # e.g. /aihub/workspace/Untitled.ezx
 
+        # initialize dataset object
+        self.dataset = get_or_create_class('tabular_dataset', self.app_context)
+
     def create_new_work(self, work_name, data):
 
         def _check_work_name(work_name:str):
@@ -78,7 +77,6 @@ class TabularWorkbook:
 
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
-        # self.current_data_column = _check_data_column(data)
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'  # e.g. /aihub/workspace/tmp/workbook/works/titanic_train
         os.makedirs(self.current_work_dir)
 
@@ -91,8 +89,7 @@ class TabularWorkbook:
         os.makedirs(self.current_models_dir)
 
         # invoke dataset object and add data to it
-        self.dataset = get_or_create_class('tabular_dataset', self.app_context)
-        self.dataset.add_data(self.current_work_name, data, self.current_work_dir)
+        self.dataset.add_data(self.current_work_name, data)
 
         self.work_name_list.append(work_name)
         self.work_dir_list.append(self.current_work_dir)
@@ -119,7 +116,7 @@ class TabularWorkbook:
 
         # analytics 변경
         if self.app_context.tabular_data_analytics__options:
-            self.app_context.tabular_contents_sub.children = []
+            self.app_context.tabular_data_analytics__sub_contents.children = []
             self.app_context.tabular_data_analytics__options = None
             self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
             self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
@@ -127,6 +124,15 @@ class TabularWorkbook:
             self.app_context.tabular_analytics_basicinfo__column_selector = None
             self.app_context.tabular_analytics_basicinfo__data_range_selector = None
             self.app_context.tabular_analytics_basicinfo = None
+
+        # preprocessing 변경
+        self.app_context.tabular_data_processing__sub_contents.children = []
+        self.app_context.tabular_data_processing__options = None
+        if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
+            self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
+        self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
+        self.app_context.tabular_data_single_processing = None
+        self.app_context.tabular_data_processing__column_summary = None
 
         self.app_context.progress_overlay.update(20)
 

@@ -20,41 +20,41 @@ class VideoBase(v.Container):
             )
 
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [self.tab_menu, self.work_area_contents],
         )
 
 class VideoDataImport(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class VideoDataanalytics(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class VideoDataProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class VideoAITraining(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )
 
 class VideoAIEvaluation(v.Container):
     def __init__(self, app_context, context_key,  **kwargs):
         super().__init__(
-            style_ = "min-width:100%; min-height:100%;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = []
         )

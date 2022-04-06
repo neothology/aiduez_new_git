@@ -1,4 +1,4 @@
-# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 3/30/22 - 00:30AM)</span>
+# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 4/4/22 - 03:00AM)</span>
 
 ## Development
 
@@ -33,7 +33,7 @@
 - OKD Ez실행 yaml에 아래와 같이 적용
 
 ```console
-source /etc/bash.bashrc && voila /aihub/workspace/AIDUez.ipynb --port 8888 --no-browser --enable_nbextensions False 
+source /etc/bash.bashrc && voila /aihub/workspace/.AIDUez.ipynb --port 8888 --no-browser --enable_nbextensions False 
 ```
 <br>
 
