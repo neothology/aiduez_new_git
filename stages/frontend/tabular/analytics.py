@@ -4,6 +4,9 @@ import pandas as pd
 import ipyvuetify as v
 from utils import get_or_create_class
 from components.selector import SettingsPartsOptions
+from components.cards import SimpleCard, SmallHeaderCard
+from components.data_analysis import CreateAnalticsChart
+from IPython.display import display
 
 class TabualrAnalyticsOptionArea(v.NavigationDrawer):
     def __init__(
@@ -168,7 +171,7 @@ class TabularAnalyticsScatter(v.Container):
 
         self.data = self.app_context.tabular_dataset.current_data
 
-        option_widjets=SettingsPartsOptions(
+        self.option_widjets=SettingsPartsOptions(
             self.app_context,
             self.context_key,
             self.data
@@ -180,63 +183,90 @@ class TabularAnalyticsScatter(v.Container):
             children = [
                 v.Col(
                     children = [
-                        option_widjets.column_selector,
+                        self.option_widjets.column_selector,
                         v.Spacer(style_ = "min-height:10px"),
-                        option_widjets.selector_dict['Hue 선택'],
+                        self.option_widjets.selector_dict['Hue 선택'],
                         v.Spacer(style_ = "min-height:10px"),
-                        option_widjets.data_range_selector,
+                        self.option_widjets.data_range_selector,
                         v.Spacer(style_ = "min-height:10px"),
-                        option_widjets.run_button,
+                        self.option_widjets.run_button,
                     ],
                     style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
                 )
             ],
 
         )
-
+        #차트 생성 기능 
+        chartmaker= CreateAnalticsChart(self.app_context)
+        print(self.data.columns.to_list()[0])
+        chart=chartmaker._get_scatter_plot(
+            self.data.columns.to_list()[0],
+            self.data.columns.to_list()[0],
+            30
+        )
         '''
-        self._layout=v.Layout(
+        self.card_body=SmallHeaderCard(
+            "차트 보기",
+            v.List(
+                
+            ),
+            {'width':"650px",'height':'650px'}
+        )
+        '''
+        self.card_body=v.Row(
+            style_='width: 800px; padding-left: 50px; padding-top: 20px;',
             children=[
-                v.Row(
-                    style="min-heght: 500px;",
+                v.Card(
+                    style_='height: 567px; width: 600px; margin: 0px; padding: 0px; background-color: #F1F5F9; border:hidden; !important; ',
                     children=[
-                        v.Col(
-                            md="4",
+                        v.Card(     
+                            style_="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 600px; color: #F7FAFC; padding: 0px 0px 0px 0px; \
+                            background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset; border : none; solid transparent; border-radius: 0px;",
+                            outlined=True,            
                             children=[
-                                v.Card(
-                                    outlined=True,
-                                    color="yellow",
-                                    style="min-heght: 500px;",
-                                    children=[
-
-                                    ]
-                                )
+                                v.CardText(
+                                    style_ = "font-size: 0.875rem; color:rgb(100, 116, 139); padding: 6px; ",
+                                    children=["차트 보기"]
+                                )      
                             ]
                         ),
-                        v.Col(
-                            md="8",
-                            style="min-heght: 500px;",
+                        v.Card(
+                            outlined=True,
+                            style_='max-height: 600px; width: 600px; background-color:#FFFFFF; border-radius: 0px;',       
                             children=[
-                                v.Card(
-                                    outlined=True,
-                                    style="min-heght: 500px;",
-                                    color="secondary",
-                                )
+                                v.List(
+                                    children=[]
+                                )     
                             ]
-                        )
+                        ),
                     ]
                 )
             ]
         )
-        '''
-        
+
         self.output_part = v.Row(
             class_ = 'tabular_analytics_basicinfo__output_part',
             style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
             children = [
                 self.setting_part,
+                self.card_body
             ],
         )
+
+
+        #차트 생성 버튼 클릭 조작
+        def on_click_with_run_button(widget, event, data):
+            chart=chartmaker._get_scatter_plot(
+                [ dicElm['col_names'] for dicElm in self.option_widjets.column_selector.select_table.selected ],
+                self.option_widjets.selector_dict['Hue 선택'].selected,
+                int(self.option_widjets.data_range_selector.body.children[0].children[0].v_model)
+            )
+            display(chart)        
+            self.app_context.tabular_analytics_scatter.card_body.children[0].children[1].children=[chart]
+
+
+        # 토글 함수 연동
+        self.option_widjets.run_button.on_event('click',on_click_with_run_button)
 
         super().__init__(
             style_ = "margin:0; padding:0; min-width:100%; min-height:100%; display:flex; flex-direction:column;",

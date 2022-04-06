@@ -1,6 +1,7 @@
 import ipyvuetify as v
 from matplotlib.pyplot import title
 from components.dialog import SimpleDialog
+import traitlets
 
 class BaseCard(v.Card):
 

@@ -79,7 +79,7 @@ class SelectTableCard(SimpleCard):
             *args,
             **kwargs,
         )
-
+ 
         super().__init__(
             class_ = context_key,
             title = title,
