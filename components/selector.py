@@ -19,7 +19,7 @@ class SelectorCard(v.VuetifyTemplate):
             <div>
                 <v-card class="mx-auto" width="208px" style="box-shadow: unset; ">
                     <v-card style="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 100%; color: rgb(100, 116, 139); padding: 0px 0px 0px 16px; background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset; border-radius: 0px;">
-                        <v-card-text style="font-size: 0.875rem; padding-top: 4px; padding-left: 0px; margin-left: 0px;">
+                        <v-card-text style="font-size: 0.875rem; padding-top: 4px; padding-left: 0px; margin-left: 0px;color: rgb(100, 116, 139);">
                             {{headline}}
                         </v-card-text>
                     </v-card>
@@ -50,6 +50,8 @@ class SettingsPartsOptions():
         app_context, 
         context_key,
         data,
+        minrowlange,
+        columnChoices,
         *args,
         **kwargs
     ):
@@ -57,6 +59,8 @@ class SettingsPartsOptions():
         self.app_context=app_context 
         self.context_key=context_key
         self.data=data
+        self.minrowlange=minrowlange
+        self.columnChoices=columnChoices
 
         self.run_button = v.Col(
             children= [
@@ -84,7 +88,7 @@ class SettingsPartsOptions():
         )
 
         # column selection
-        df_col_names = pd.DataFrame(self.data.columns, columns=['col_names'])
+        df_col_names = pd.DataFrame(self.columnChoices, columns=['col_names'])
 
         self.column_selector = get_or_create_class(
             'select_table_card',
@@ -114,7 +118,7 @@ class SettingsPartsOptions():
         for selector_name in selector_names:
             s=SelectorCard(
                 index=0,
-                items=self.data.columns.to_list(),
+                items=self.columnChoices,
                 v_model=None,
                 _style="width: 350px;",
                 #color="#F8F8F8",

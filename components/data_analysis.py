@@ -53,7 +53,7 @@ class CreateAnalticsChart():
         self.y_colname = y_colname
         self.rowChosen = rowChosen
 
-        print(self.y_colname)
+        print(len(self.y_colname))
         if len(self.y_colname) > 10:
             return "최대 10개 컬럼에 대한 산포도 시각화가 가능합니다."
 

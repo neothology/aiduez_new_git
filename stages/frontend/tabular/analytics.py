@@ -170,12 +170,22 @@ class TabularAnalyticsScatter(v.Container):
         self.context_key = context_key
 
         self.data = self.app_context.tabular_dataset.current_data
+        #print(self.data.info())
+
+        # 수치형 컬럼 선택지 조정
+        _columnChoices=[]
+        for colname in self.data.columns.to_list():
+            if self.data[colname].dtype=="int64" or self.data[colname].dtype=="float64":
+                _columnChoices.append(colname)
 
         self.option_widjets=SettingsPartsOptions(
-            self.app_context,
-            self.context_key,
-            self.data
+            app_context=self.app_context,
+            context_key=self.context_key,
+            data=self.data,
+            minrowlange=100,
+            columnChoices=_columnChoices
         ) 
+
 
         # when no class_name in app_context
         self.setting_part = v.NavigationDrawer(
@@ -194,25 +204,17 @@ class TabularAnalyticsScatter(v.Container):
                     style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
                 )
             ],
-
         )
+
+
         #차트 생성 기능 
         chartmaker= CreateAnalticsChart(self.app_context)
-        print(self.data.columns.to_list()[0])
         chart=chartmaker._get_scatter_plot(
-            self.data.columns.to_list()[0],
-            self.data.columns.to_list()[0],
-            30
+            [self.data.columns.to_list()[0]],
+            "-",
+            100
         )
-        '''
-        self.card_body=SmallHeaderCard(
-            "차트 보기",
-            v.List(
-                
-            ),
-            {'width':"650px",'height':'650px'}
-        )
-        '''
+
         self.card_body=v.Row(
             style_='width: 800px; padding-left: 50px; padding-top: 20px;',
             children=[
@@ -235,7 +237,7 @@ class TabularAnalyticsScatter(v.Container):
                             style_='max-height: 600px; width: 600px; background-color:#FFFFFF; border-radius: 0px;',       
                             children=[
                                 v.List(
-                                    children=[]
+                                    children=[chart]
                                 )     
                             ]
                         ),
@@ -253,7 +255,6 @@ class TabularAnalyticsScatter(v.Container):
             ],
         )
 
-
         #차트 생성 버튼 클릭 조작
         def on_click_with_run_button(widget, event, data):
             chart=chartmaker._get_scatter_plot(
@@ -261,9 +262,7 @@ class TabularAnalyticsScatter(v.Container):
                 self.option_widjets.selector_dict['Hue 선택'].selected,
                 int(self.option_widjets.data_range_selector.body.children[0].children[0].v_model)
             )
-            display(chart)        
             self.app_context.tabular_analytics_scatter.card_body.children[0].children[1].children=[chart]
-
 
         # 토글 함수 연동
         self.option_widjets.run_button.on_event('click',on_click_with_run_button)
