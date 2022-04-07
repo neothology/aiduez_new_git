@@ -168,7 +168,7 @@ class TabularAIDUImport(BaseCard, AppCell):
         info = [True, ""]
         uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding,sep = self.seperator_widgets.seperator, filepath = file_path)
         if uploaded_data is not None:
-            self.app_context.tabular_workbook.create_new_work(data_name,uploaded_data) 
+            self.app_context.current_workbook.create_new_work(data_name,uploaded_data) 
             self.upload_widgets.complete(data_name)
         self.data_shape = uploaded_data.shape
         buf = io.StringIO()
@@ -255,7 +255,7 @@ class TabularLocalImport(BaseCard, AppCell):
             content = uploaded_dict[file_name]['content']
             uploaded_data = self.upload_widgets.upload(data_name, info, self.encoding_widgets.encoding, sep = self.seperator_widgets.seperator, content=content)
             if uploaded_data is not None:
-                self.app_context.tabular_workbook.create_new_work(data_name, uploaded_data)
+                self.app_context.current_workbook.create_new_work(data_name, uploaded_data)
                 self.upload_widgets.complete(data_name)
             self.data_shape = uploaded_data.shape
             buf = io.StringIO()

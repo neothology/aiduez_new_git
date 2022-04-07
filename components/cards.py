@@ -224,15 +224,10 @@ class BaseCard(v.Card):
                 children = [body_item]
             )for n, body_item in enumerate(body_items)]
 
-        # progress bar
-        self.progress_bar = v.ProgressLinear(
-            indeterminate = True,
-            color = 'primary',
-        )
         
-        self.progress_bar.active = False
+        self.app_context.progress_linear.active = False
 
-        self.children = [self.card_header, self.progress_bar, *self.card_body, self.card_footer]
+        self.children = [self.card_header, *self.card_body, self.card_footer]
         
         super().__init__(
             class_ = kwargs.get('class_'),
@@ -343,4 +338,104 @@ class SimpleCard(v.Card):
             class_ = kwargs.get('class_', ""),
             style_ = self.style['card'],
             children = [self.header, self.body, self.footer],
+        )
+
+class IconCard(v.Card):
+    def __init__(
+        self,
+        workbook_type:str,
+        title:str,
+        text:str,
+        workbook_icon:str,
+        workbook_color:str,
+        favorite:bool,
+        size:dict,
+    ):
+        self.workbook_type = workbook_type
+        self.title = title
+        self.text = text
+        self.workbook_icon = workbook_icon
+        self.workbook_color = workbook_color
+        self.size = size
+        self.favorite = favorite
+
+        # header: icon, title, more menu button
+        self.icon = v.Col(
+            class_ = "",
+            style_ = "padding:0; max-width:50px; height:50px; display:flex; justify-content:center; align-items:center; \
+                    border-radius:8px; background-color:#e9e9e9;",
+            children = [
+                v.Html(
+                    tag = 'span',
+                    attributes = {
+                        'class': 'material-icons',
+                        'style': "",
+                        },
+                    children = [self.workbook_icon],
+                )
+            ],
+        )
+
+        self.title = v.Col(
+            class_ = "",
+            style_ = "padding-left:18px; font-size:18px;",
+            children = [self.title]
+        )
+
+        self.more_items = v.List(
+                children = ["선택"]
+            )   
+
+        self.more_button = v.Btn(
+            v_on='menu_data.on',
+            disabled = True,
+            icon = True,
+            children=[v.Icon(children = "mdi-dots-vertical")], 
+        )
+        self.more_menu_col = v.Col(
+            class_ = "",
+            style_ = "padding:0; max-width:30px;",
+            children = [
+                v.Menu(
+                    offset_y=True,
+                    attach=True,
+                    v_slots=[{
+                        'name': 'activator',
+                        'variable': 'menu_data',
+                        'children': self.more_button,
+                    }],
+                    children=[
+                        v.List(children=[self.more_items]),
+                    ],
+                ),    
+            ],
+        )
+
+        self.header = v.CardTitle(
+            class_ = "",
+            style_ = "max-height:100px; min-height:100px; margin:0; \
+                font-size: 0.875rem; color:rgb(100, 116, 139); \
+                align-content:flex-start; padding-left:16px; padding-top:12px; \
+                display:flex; flex-direction:row;",
+            children = [self.icon, self.title, self.more_menu_col],
+        )
+
+        self.body = v.CardText(
+            class_ = "",
+            style_ = "padding:0; padding-left:10px;",
+            children = [
+                v.Row(
+                    class_ = "",
+                    style_ = "margin:0; padding-left:10px; padding-right:10px;",
+                    children = text
+                ) for text in self.text
+            ]
+        )
+
+        super().__init__(
+            class_ = "",
+            style_ = f"width:{size.get('width')}; height:{size.get('height')}; \
+                margin-right:20px; margin-bottom:20px; padding:0; display:flex; flex-direction:column; \
+                border-radius:8px; border-left:7px solid #{self.workbook_color};",
+            children = [self.header, self.body],
         )

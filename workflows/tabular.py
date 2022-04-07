@@ -1,18 +1,21 @@
 import ipyvuetify as v
 import os
-import json
-import pandas as pd
-from matplotlib.style import context
-from utils import get_or_create_class
+from utils import get_or_create_class, delete_files_in_dir
 class TabularBase(v.Container):
 
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        self.tmp_workbook_dir = self.app_context.env_values['tmp_workbook_dir']
+
+        # delete tmp directory contents if exists, else make tmp directory
+        tmp_dir = self.app_context.env_values['tmp_dir']
+        if os.path.exists(tmp_dir):
+            delete_files_in_dir(tmp_dir)
+        else:
+            os.makedirs(tmp_dir)
 
         # init workbook
-        self.workbook = get_or_create_class('tabular_workbook', self.app_context)
+        self.workbook = get_or_create_class('tabular_workbook', self.app_context, 'current_workbook')
         self.workbook.create_new() # tabular, text, image, video, audio, etc.
 
         # initialize components to view
@@ -102,13 +105,6 @@ class TabularDataImport(v.Container):
             style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
         )
 
-        # progress bar
-        self.progress_bar = v.ProgressLinear(
-            indeterminate = True,
-            color = 'primary',
-        )
-        self.progress_bar.active = False
-
         # sub menu area
         self.work_area_contents_sub_menu = get_or_create_class(
             'sub_menu_area',
@@ -142,7 +138,6 @@ class TabularDataImport(v.Container):
             style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
                 self.top_area,
-                self.progress_bar,
                 v.Col(
                     style_ = "display:flex; max-height:1599px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
@@ -226,13 +221,6 @@ class TabularDataAnalytics(v.Container):
 
         ]
 
-        # progress bar
-        self.progress_bar = v.ProgressLinear(
-            indeterminate = True,
-            color = 'primary',
-        )
-        self.progress_bar.active = False
-
         # top area(data_context, button)
         self.data_context = get_or_create_class(
             'tabular_data_context',
@@ -276,7 +264,6 @@ class TabularDataAnalytics(v.Container):
             style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
                 self.top_area,
-                self.progress_bar,
                 v.Col(
                     style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
@@ -304,13 +291,6 @@ class TabularDataProcessing(v.Container):
                 'target': 'tabular_data_multiple_processing',
             },
         ]
-
-        # progress bar
-        self.progress_bar = v.ProgressLinear(
-            indeterminate = True,
-            color = 'primary',
-        )
-        self.progress_bar.active = False
 
         # top area(data_context, button)
         self.data_context = get_or_create_class(
@@ -357,7 +337,6 @@ class TabularDataProcessing(v.Container):
             style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
                 self.top_area,
-                self.progress_bar,
                 v.Col(
                     style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
@@ -375,19 +354,10 @@ class TabularAITraining(v.Container):
         self.context_key = context_key
         self.style = {}
 
-        # progress bar
-        self.progress_bar = v.ProgressLinear(
-            indeterminate = True,
-            color = 'primary',
-        )
-        self.progress_bar.active = False
-  
-
         super().__init__(
             class_ = self.context_key,
             style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
             children = [
-                self.progress_bar,
                 v.Container()
                 ],
         )  
@@ -401,7 +371,7 @@ class TabularAITraining(v.Container):
 
     def load_contents(self):
 
-        self.progress_bar.active = True
+        self.app_context.progress_linear.active = True
 
         # data_context
         self.data_context = get_or_create_class(
@@ -466,7 +436,7 @@ class TabularAITraining(v.Container):
                 self.column_summary,
                 ]
                 
-        self.progress_bar.active = False
+        self.app_context.progress_linear.active = False
 
 
 class TabularAIEvaluation(v.Container):

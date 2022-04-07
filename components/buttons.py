@@ -1,7 +1,7 @@
 import ipyvuetify as v
 
 class StatedBtn(v.Btn):
-    def __init__(self, index:int, state:str, children:list, **kwargs):
+    def __init__(self, index:int = 0, state:str = "", children:list = [], **kwargs):
         self.index = index
         self.state = state
 

@@ -1,7 +1,6 @@
 envs: 
   workspace_dir: /aihub/workspace
-  tmp_dir: /aihub/workspace/tmp
-  tmp_workbook_dir: /aihub/workspace/tmp/workbook
+  tmp_dir: /aihub/workspace/_tmp
 
 class_paths:
   # components - layout & menu
@@ -14,67 +13,73 @@ class_paths:
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
   sub_menu_area: components.layouts.SubMenuArea
-  alert: components.alerts.Alert
   
   # other common components
   column_summary: components.data_profiler.ColumnSummary
   column_summary_simple: components.data_profiler.ColumnSummarySimple
   base_overlay: components.overlays.BaseOverlay
   progress_overlay: components.overlays.ProgressOverlay
+  progress_linear: components.progress.ProgressLinear
+  alert: components.alerts.Alert
   select_table_card: components.tables.SelectTableCard
   select_table_card_no_header: components.tables.SelectTableCardNH
   simple_slider_card: components.forms.SimpleSliderCard
   simple_radio_card: components.forms.SimpleRadioCard
   data_info: components.data_profiler.DataInfo
 
+  # workflow-task
 
-  task_favorite: workflows.task.TaskFavorite
-  task_recent: workflows.task.TaskRecent
-  task_all: workflows.task.TaskAll
+  task_recent: tasks.TaskRecent
+  task_recent_view: views.tasks.TaskRecentView
+  task_favorite: tasks.TaskFavorite
+  task_favorite_view: views.tasks.TaskFavoriteView
+  task_all: tasks.TaskAll
+  task_all_view: views.tasks.TaskAllView
+
+  task_card: views.tasks.TaskCardView
 
   # workflow-tabular
   tabular_base: workflows.tabular.TabularBase
   tabular_workbook: workbooks.TabularWorkbook
   tabular_dataset: components.dataset.TabularDataset
   tabular_data_context: components.dataset.TabularDataContext
-  tabular_model: stages.frontend.tabular.training.TabularModel
+  tabular_model: views.tabular.training.TabularModel
 
   tabular_data_import: workflows.tabular.TabularDataImport
-  tabular_import_layout: stages.frontend.tabular.imports.TabularImportLayout
-  tabular_import_pc: stages.frontend.tabular.imports.TabularImportPC
-  tabular_import_file_object_handler: stages.backend.tabular.imports.FileObjectHandler
-  tabular_import_aidu: stages.frontend.tabular.imports.TabularImportAIDU
-  tabular_import_edap: stages.frontend.tabular.imports.TabularImportEDAP
+  tabular_import_pc: views.tabular.imports.TabularImportPCView
+  tabular_import_file_object_handler: tabular.imports.FileObjectHandler
+  tabular_import_aidu: views.tabular.imports.TabularImportAIDUView
+  tabular_import_edap: views.tabular.imports.TabularImportEDAPView
 
 
-  tabular_data_import_tab: stages.frontend.tabular.imports.TabularImportTab
-  tabular_data_import_aidu: stages.frontend.tabular.imports.TabularAIDUImport
-  tabular_data_import_local: stages.frontend.tabular.imports.TabularLocalImport
-  tabular_data_import_edap: stages.frontend.tabular.imports.TabularEDAPImport
-  tabular_data_import_pod: stages.frontend.tabular.imports.TabularPodImport
+  tabular_data_import_tab: views.tabular.imports.TabularImportTab
+  tabular_data_import_aidu: views.tabular.imports.TabularAIDUImport
+  tabular_data_import_local: views.tabular.imports.TabularLocalImport
+  tabular_data_import_edap: views.tabular.imports.TabularEDAPImport
+  tabular_data_import_pod: views.tabular.imports.TabularPodImport
 
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
-  tabular_data_analytics_options: stages.frontend.tabular.analytics.TabualrAnalyticsOptionArea
-  tabular_analytics_basicinfo: stages.frontend.tabular.analytics.TabularaAnalyticsBasicinfo
-  tabular_analytics_scatter: stages.frontend.tabular.analytics.TabularAnalyticsScatter
-  tabular_analytics_heatmap: stages.frontend.tabular.analytics.TabularAnalyticsHeatmap
-  tabular_analytics_boxplot: stages.frontend.tabular.analytics.TabularAnalyticsBoxplot
-  tabular_analytics_density: stages.frontend.tabular.analytics.TabularAnalyticsDensity
-  tabular_analytics_wcloud: stages.frontend.tabular.analytics.TabularAnalyticsWordCloud
-  tabular_analytics_reduction: stages.frontend.tabular.analytics.TabularAnalyticsDimensionReduction
-  tabular_analytics_clustering: stages.frontend.tabular.analytics.TabularAnalyticsClustering
-  tabular_analytics_datasample: stages.frontend.tabular.analytics.TabularAnalyticsDataSample
+  tabular_data_analytics_options: views.tabular.analytics.TabualrAnalyticsOptionArea
+  tabular_analytics_basicinfo: views.tabular.analytics.TabularaAnalyticsBasicinfo
+  tabular_analytics_scatter: views.tabular.analytics.TabularAnalyticsScatter
+  tabular_analytics_heatmap: views.tabular.analytics.TabularAnalyticsHeatmap
+  tabular_analytics_boxplot: views.tabular.analytics.TabularAnalyticsBoxplot
+  tabular_analytics_density: views.tabular.analytics.TabularAnalyticsDensity
+  tabular_analytics_wcloud: views.tabular.analytics.TabularAnalyticsWordCloud
+  tabular_analytics_reduction: views.tabular.analytics.TabularAnalyticsDimensionReduction
+  tabular_analytics_clustering: views.tabular.analytics.TabularAnalyticsClustering
+  tabular_analytics_datasample: views.tabular.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
-  tabular_data_processing_tab: stages.frontend.tabular.processing.TabularProcessingTab
-  tabular_data_single_processing: stages.frontend.tabular.processing.TabularSingleProcessing
-  tabular_data_single_processing_dialog: stages.frontend.tabular.processing.TabularSingleProcessingDialog
-  tabular_data_multiple_processing: stages.frontend.tabular.processing.TabularMultipleProcessing
+  tabular_data_processing_tab: views.tabular.processing.TabularProcessingTab
+  tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
+  tabular_data_single_processing_dialog: views.tabular.processing.TabularSingleProcessingDialog
+  tabular_data_multiple_processing: views.tabular.processing.TabularMultipleProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
-  tabular_training_options: stages.frontend.tabular.training.TabularTrainingOptions
-  tabular_train_activator: stages.frontend.tabular.training.TabularTrainActivator
-  tabular_train_result: stages.frontend.tabular.training.TabularTrainResult
+  tabular_training_options: views.tabular.training.TabularTrainingOptions
+  tabular_train_activator: views.tabular.training.TabularTrainActivator
+  tabular_train_result: views.tabular.training.TabularTrainResult
   
   tabular_ai_evaluation: workflows.tabular.TabularAIEvaluation
   
@@ -148,21 +153,6 @@ side_nav_menu_list:
         target: video_base
 
 workflows_list:
-  task_recent:
-    default: task
-    target_area: work_area
-    stages:
-      - task_recent
-  task_favorite:
-    default: task
-    target_area: work_area
-    stages:
-      - task_favorite
-  task_all:
-    default: task
-    target_area: work_area
-    stages:
-      - task_all
   tabular:
     default: tabular_data_import
     target_area: tabular_contents
@@ -304,6 +294,7 @@ theme:
             z-index:776;
           light: >
             height:199px; padding:10px; 
+            min-width:100%;
             box-shadow:none; border:0; 
             border-bottom:1px solid #e2e8f0; 
             background-color: #ffffff;
@@ -673,3 +664,42 @@ training_params:
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
               dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+
+workbook_icons:
+  - home
+  - settings
+  - language
+  - favorite
+  - date_range
+  - savings
+  - leaderboard
+  - pan_tool
+  - flutter_dash
+  - rocket_launch
+  - outlet
+  - token
+  - location_city
+  - mood
+  - surfing
+  - send
+  - auto_awesome
+  - filter_vintage
+  - flare
+  - brightness_7
+
+workbook_colors:
+  - 'C0C0C0'
+  # - '808080'
+  # - '000000'
+  - 'FF0000'
+  # - '800000'
+  - 'FFFF00'
+  # - '808000'
+  - '00FF00'
+  # - '008000'
+  - '00FFFF'
+  # - '008080'
+  - '0000FF'
+  # - '000080'
+  - 'FF00FF'
+  # - '800080'

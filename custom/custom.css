@@ -201,3 +201,7 @@ div.output_subarea {
 .tabular_import_pc__work_area_contents_sub_area__middle .v-file-input {
     width: 820px !important;
 }
+
+.vuetify-styles .side_nav .v-list-item--link:before {
+    opacity: 0 !important
+}

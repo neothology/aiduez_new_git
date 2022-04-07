@@ -18,7 +18,7 @@ class TabularSingleProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.app_context.tabular_data_processing.progress_bar.active = True
+        self.app_context.progress_linear.active = True
 
         self.processing_menu = TabularSingleProcessingMenu(
             app_context=self.app_context,
@@ -33,7 +33,7 @@ class TabularSingleProcessing(v.Container):
         )
         # column summary
         self.column_summary = self._get_column_sumary(dataset=self.app_context.tabular_dataset.current_data)
-        self.app_context.tabular_data_processing.progress_bar.active = False
+        self.app_context.progress_linear.active = False
 
         super().__init__( 
             class_ = self.context_key,
@@ -64,11 +64,11 @@ class TabularSingleProcessing(v.Container):
         return column_summary
 
     def update_display(self):
-        self.app_context.tabular_data_processing.progress_bar.active = True
+        self.app_context.progress_linear.active = True
         self.processing_menu.update()
         # column summary
         self.column_summary = self._get_column_sumary(self.app_context.tabular_dataset.current_data, update=True)
-        self.app_context.tabular_data_processing.progress_bar.active = False
+        self.app_context.progress_linear.active = False
         self.children = [
             v.Col(
                 children=[
@@ -300,6 +300,9 @@ class TabularSingleProcessingDialog(v.Dialog):
         )
 
         def _on_click_save(widget, event=None, data=None):
+            # 박영근 추가: progress linear
+            self.app_context.progress_linear.active = True
+
             before_coulumn = self.get_sample_data(column_name=self.column_name, n=-1)
             processed_column = self.processing_data(before_coulumn)
             self.app_context.tabular_dataset.current_data[self.column_name + "_" + self.suffix[self.method]] = processed_column
@@ -307,6 +310,10 @@ class TabularSingleProcessingDialog(v.Dialog):
             tabular_data_single_processing.update_display()
             self.value = 0
             
+            # 박영근 추가: save workbook
+            self.app_context.current_workbook.save_workbook()
+            self.app_context.progress_linear.active = False
+
         save_btn.on_event('click', _on_click_save)
 
         # dialog contents
