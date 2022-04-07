@@ -189,24 +189,28 @@ class TabularAnalyticsScatter(v.Container):
         ) 
 
         # when no class_name in app_context
+        
         self.setting_part = v.NavigationDrawer(
             style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:0px; background-color:#eeeeee;",
             children = [
                 v.Col(
                     children = [
-                        self.option_widjets.column_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.selector_dict['Hue 선택'],
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.data_range_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.run_button,
+                        v.List(
+                            children=[
+                                self.option_widjets.column_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.selector_dict['Hue 선택'],
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.data_range_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.run_button,
+                            ]
+                        )
                     ],
-                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                    style_ = "height:1539px; padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
                 )
             ],
         )
-
         #차트 생성 모듈 가져오기
         chartmaker= CreateAnalticsChart(self.app_context)
         #디폴트 차트 생성
@@ -273,16 +277,20 @@ class TabularAnalyticsHeatmap(v.Container):
             children = [
                 v.Col(
                     children = [
-                        v.Spacer(style_ = "min-height:5px"),
-                        self.option_widjets.column_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.color_option_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.data_range_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.run_button,
+                        v.List(
+                            children=[
+                                v.Spacer(style_ = "min-height:5px"),
+                                self.option_widjets.column_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.color_option_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.data_range_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.run_button,
+                            ]
+                        )
                     ],
-                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                    style_ = "height:1539px; padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
                 )
             ],
         )
@@ -308,7 +316,7 @@ class TabularAnalyticsHeatmap(v.Container):
             chart=chartmaker._get_heatmap_plot(
                 self.option_widjets.color_option_selector.selected,
                 int(self.option_widjets.data_range_selector.body.children[0].children[0].v_model),
-                [ dicElm['col_names'] for dicElm in self.option_widjets.column_selector.select_table.selected ],
+                [dicElm['col_names'] for dicElm in self.option_widjets.column_selector.select_table.selected],
             )
             self.app_context.tabular_analytics_heatmap.card_body.children[0].children[1].children=[chart]
 
@@ -349,18 +357,22 @@ class TabularAnalyticsBoxplot(v.Container):
             children = [
                 v.Col(
                     children = [
-                        v.Spacer(style_ = "min-height:5px"),
-                        self.option_widjets.data_range_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.selector_dict['X축 컬럼 선택'],
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.selector_dict['Y축 컬럼 선택'],
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.selector_dict['Hue 선택'],
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.run_button,
+                        v.List(
+                            children=[
+                                v.Spacer(style_ = "min-height:5px"),
+                                self.option_widjets.data_range_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.selector_dict['X축 컬럼 선택'],
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.selector_dict['Y축 컬럼 선택'],
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.selector_dict['Hue 선택'],
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.run_button,
+                            ]
+                        )
                     ],
-                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                    style_ = "height:1539px; padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
                 )
             ],
         )
@@ -433,16 +445,20 @@ class TabularAnalyticsDensity(v.Container):
             children = [
                 v.Col(
                     children = [
-                        v.Spacer(style_ = "min-height:5px"),
-                        self.option_widjets.selector_dict['컬럼 선택'],
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.selector_dict['Hue 선택'],
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.color_option_selector,
-                        v.Spacer(style_ = "min-height:10px"),
-                        self.option_widjets.run_button,
+                        v.List(
+                            children=[
+                                v.Spacer(style_ = "min-height:5px"),
+                                self.option_widjets.selector_dict['컬럼 선택'],
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.selector_dict['Hue 선택'],
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.color_option_selector,
+                                v.Spacer(style_ = "min-height:10px"),
+                                self.option_widjets.run_button,
+                            ]
+                        )
                     ],
-                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                    style_ = "height:1539px; padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
                 )
             ],
         )
