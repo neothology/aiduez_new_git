@@ -13,13 +13,14 @@ class_paths:
   tab_menu:  components.menus.TabMenu
   sub_area: components.layouts.SubArea
   sub_menu_area: components.layouts.SubMenuArea
-  alert: components.alerts.Alert
   
   # other common components
   column_summary: components.data_profiler.ColumnSummary
   column_summary_simple: components.data_profiler.ColumnSummarySimple
   base_overlay: components.overlays.BaseOverlay
   progress_overlay: components.overlays.ProgressOverlay
+  progress_linear: components.progress.ProgressLinear
+  alert: components.alerts.Alert
   select_table_card: components.tables.SelectTableCard
   select_table_card_no_header: components.tables.SelectTableCardNH
   simple_slider_card: components.forms.SimpleSliderCard
@@ -293,6 +294,7 @@ theme:
             z-index:776;
           light: >
             height:199px; padding:10px; 
+            min-width:100%;
             box-shadow:none; border:0; 
             border-bottom:1px solid #e2e8f0; 
             background-color: #ffffff;
