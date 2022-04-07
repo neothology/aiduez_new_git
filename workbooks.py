@@ -74,6 +74,7 @@ class TabularWorkbook:
             'workbook_color': self.app_context.workbook_colors[color_random],
             'favorite': False,
             'description': '',
+            'workflow_stage': '',
             'created_at': str(time.time()),
             'opened_at': '',
             'modified_at': str(time.time()),
@@ -136,6 +137,9 @@ class TabularWorkbook:
         self.work_name_list.append(work_name)
         self.work_dir_list.append(self.current_work_dir)
 
+        # update 
+        self.change_work(self.current_work_name)
+
         # update workbook profile
         self.save_workbook(work = self.current_work_name)
 
@@ -145,7 +149,8 @@ class TabularWorkbook:
         # self.app_context.current_workflow_stage_sub
         # save current work -(3) 데이터 가공
         # save current work -(4) AI모델 학습(모델관련 내용은 '학습'할 때 저장되므로 여기서는 training options 만 저장)
-        self.app_context.tabular_ai_training__training_options.save_config(self.current_work_state_dir)
+        if self.app_context.tabular_ai_training:
+            self.app_context.tabular_ai_training__training_options.save_config(self.current_work_state_dir)
         # save current work -(5) AI모델 평가
 
     def load_existing_work(self, work_name):
@@ -159,15 +164,16 @@ class TabularWorkbook:
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
         # analytics 변경
-        if self.app_context.tabular_data_analytics__options:
-            self.app_context.tabular_data_analytics__sub_contents.children = []
-            self.app_context.tabular_data_analytics__options = None
-            self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
-            self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
-        if self.app_context.tabular_analytics_basicinfo:
-            self.app_context.tabular_analytics_basicinfo__column_selector = None
-            self.app_context.tabular_analytics_basicinfo__data_range_selector = None
-            self.app_context.tabular_analytics_basicinfo = None
+        if self.app_context.tabular_data_analytics:
+            if self.app_context.tabular_data_analytics__options:
+                self.app_context.tabular_data_analytics__sub_contents.children = []
+                self.app_context.tabular_data_analytics__options = None
+                self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
+                self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
+            if self.app_context.tabular_analytics_basicinfo:
+                self.app_context.tabular_analytics_basicinfo__column_selector = None
+                self.app_context.tabular_analytics_basicinfo__data_range_selector = None
+                self.app_context.tabular_analytics_basicinfo = None
 
         # preprocessing 변경
         # self.app_context.tabular_data_processing__sub_contents.children = []
@@ -181,56 +187,57 @@ class TabularWorkbook:
         self.app_context.progress_overlay.update(20)
 
         # training 변경
-        tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
-        
-        tabular_ai_training.train_button.disabled = True
+        if self.app_context.tabular_ai_training:
+            tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
+            
+            tabular_ai_training.train_button.disabled = True
 
-        train_result = get_or_create_class(
-            'tabular_train_result',
-            self.app_context,
-            context_key = 'tabular_ai_training__train_result',
-            update = True,
-            title = '학습 로그',
-            size = {'width':'90vw', 'height':'80vh'}, 
-        )
-        
-        self.app_context.progress_overlay.update(60)
+            train_result = get_or_create_class(
+                'tabular_train_result',
+                self.app_context,
+                context_key = 'tabular_ai_training__train_result',
+                update = True,
+                title = '학습 로그',
+                size = {'width':'90vw', 'height':'80vh'}, 
+            )
+            
+            self.app_context.progress_overlay.update(60)
 
-        training_options = get_or_create_class(
-            'tabular_training_options', 
-            self.app_context, 
-            context_key = 'tabular_ai_training__training_options',
-            update = True,
-            title = '학습 Parameter 설정',
-        )
+            training_options = get_or_create_class(
+                'tabular_training_options', 
+                self.app_context, 
+                context_key = 'tabular_ai_training__training_options',
+                update = True,
+                title = '학습 Parameter 설정',
+            )
 
-        self.app_context.progress_overlay.update(90)
+            self.app_context.progress_overlay.update(90)
 
-        column_summary = get_or_create_class(
-            'column_summary',
-            self.app_context,
-            context_key = 'tabular_ai_training__column_summary',
-            update = True,
-            title = '데이터 요약',
-            col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
-        ) 
+            column_summary = get_or_create_class(
+                'column_summary',
+                self.app_context,
+                context_key = 'tabular_ai_training__column_summary',
+                update = True,
+                title = '데이터 요약',
+                col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
+            ) 
 
-        self.app_context.progress_overlay.update(100)
+            self.app_context.progress_overlay.update(100)
 
-        # hide show_result button
-        self.app_context.tabular_ai_training__train_activator.show_result_btn.hide()
+            # hide show_result button
+            self.app_context.tabular_ai_training__train_activator.show_result_btn.hide()
 
-        tabular_ai_training.children = [
-            tabular_ai_training.top_area,
-            v.Spacer(style_ = "max-height:20px"),
-            train_result,
-            training_options,
-            v.Spacer(style_ = "max-height:30px"),
-            column_summary,
-        ]
+            tabular_ai_training.children = [
+                tabular_ai_training.top_area,
+                v.Spacer(style_ = "max-height:20px"),
+                train_result,
+                training_options,
+                v.Spacer(style_ = "max-height:30px"),
+                column_summary,
+            ]
         
     def change_work(self, work_name):
-        self.app_context.progress_overlay.start()
+        # self.app_context.progress_overlay.start()
 
         # decide which stages to update
         stages = ['tabular_data_analytics', 'tabular_data_processing', 'tabular_ai_training']
@@ -242,8 +249,11 @@ class TabularWorkbook:
     def save_workbook(self, **kwargs):
         if kwargs.get('work'):
             self.profile['works'].append(kwargs['work'])
+
         if kwargs.get('model'):
             self.profile['models'].append(kwargs['model'])
+
+        self.profile['workflow_stage'] = self.app_context.current_workflow_stage
         self.profile['modified_at'] = str(time.time())
 
         with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'w') as f:

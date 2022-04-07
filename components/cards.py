@@ -224,15 +224,10 @@ class BaseCard(v.Card):
                 children = [body_item]
             )for n, body_item in enumerate(body_items)]
 
-        # progress bar
-        self.progress_bar = v.ProgressLinear(
-            indeterminate = True,
-            color = 'primary',
-        )
         
-        self.progress_bar.active = False
+        self.app_context.progress_linear.active = False
 
-        self.children = [self.card_header, self.progress_bar, *self.card_body, self.card_footer]
+        self.children = [self.card_header, *self.card_body, self.card_footer]
         
         super().__init__(
             class_ = kwargs.get('class_'),

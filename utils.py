@@ -77,3 +77,4 @@ class JsonEncoder(json.JSONEncoder):
         else:
             return super(JsonEncoder, self).default(obj)
 
+

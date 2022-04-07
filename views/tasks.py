@@ -63,6 +63,7 @@ class TaskBaseView(v.Container):
             ) for card_data in self.workbook_card_data
         ]   
 
+
         self.middle_area = v.Row(
             style_ = 'margin:0; padding:0; padding-left:40px; padding-right:25px; padding-top:20px;',
             class_ = "",
@@ -84,6 +85,14 @@ class TaskBaseView(v.Container):
                 self.bottom_area,
             ],
         )
+
+        # callbacks:
+        ##  click on workbook card
+        def _on_click_workbook_card(item, event, data):
+            self.selected = item
+
+        for workbook_card in self.workbook_cards:
+            workbook_card.on_event('click', _on_click_workbook_card)
 
     def show(self, target_area:object):
         self.target_area = target_area

@@ -111,7 +111,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
         )
 
         def _show_base_info(item, event, data):
-            self.app_context.tabular_data_analytics.progress_bar.active = True
+            self.app_context.progress_linear.active = True
 
             # selected col_names
             selected_cols = self.app_context.tabular_analytics_basicinfo__column_selector.children[1].children[0].selected
@@ -155,7 +155,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
                               padding-top:15px; padding-left:15px",
                 ),
             ]
-            self.app_context.tabular_data_analytics.progress_bar.active = False
+            self.app_context.progress_linear.active = False
 
         self.run_button.on_event('click', _show_base_info)
 

@@ -27,6 +27,7 @@ class AppContext:
     work_area: object = None
     base_overlay: object = None
     progress_overlay: object = None
+    progress_linear: object = None
 
 ## workbook list ##
     workbooks: dict = None
