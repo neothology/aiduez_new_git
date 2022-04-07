@@ -197,6 +197,7 @@ class TabularAnalyticsScatter(v.Container):
                     children = [
                         v.List(
                             children=[
+                                v.Spacer(style_ = "min-height:5px"),
                                 self.option_widjets.column_selector,
                                 v.Spacer(style_ = "min-height:10px"),
                                 self.option_widjets.selector_dict['Hue 선택'],
