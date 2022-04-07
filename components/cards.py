@@ -351,16 +351,17 @@ class AnalyticsChartCard(v.Card):
         self,
         title:str = "",
         body:object = "",
+        height:int = 600,
         **kwargs
         ):
 
         self.card_body=v.Row(
-            style_='width: 800px; height: 616px; padding-left: 50px; padding-top: 20px;',
+            style_='width: 800px; height: '+str(height+16)+'px; padding-left: 50px; padding-top: 20px;',
             children=[
                 v.Card(
                     elevation="1",
                     outlined=True,            
-                    style_='height: 616px; width: 600px; margin: 0px; padding: 0px; background-color: #F1F5F9; border:hidden; !important; border-radius: 3px;',
+                    style_='height: '+str(height+16)+'px; width: 600px; margin: 0px; padding: 0px; background-color: #F1F5F9; border:hidden; !important; border-radius: 3px;',
                     children=[
                         v.Card(    
                             elevation="1", 
@@ -375,10 +376,10 @@ class AnalyticsChartCard(v.Card):
                         ),
                         v.Card(
                             elevation="1",
-                            style_='max-height: 599px; width: 600px; background-color:#FFFFFF; border-radius: 0px; padding:0px;',       
+                            style_='max-height: '+str(height-1)+'px; width: 600px; background-color:#FFFFFF; border-radius: 0px; padding:0px;',       
                             children=[
                                 v.List(
-                                    style_='max-height: 599px; width: 600px; padding:0px;',
+                                    style_='max-height: '+str(height-1)+'px; width: 600px; padding:0px;',
                                     children=[body]
                                 )     
                             ]

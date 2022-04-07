@@ -29,18 +29,20 @@ class CreateAnalticsChart():
                 self.columnChoices.append(colname)
 
     #히트맵 그래프 얻기
-    def _get_heatmap_plot(self, color, rowChosen):
+    def _get_heatmap_plot(self, color, rowChosen, colnames):
         self.rowChosen =rowChosen
-        corr = self.df.head(self.rowChosen).corr()
+        labels=colnames
 
-        fig = go.Figure(go.Heatmap(z=corr, x=self.columnChoices, y=self.columnChoices,
+        corr = self.df.head(self.rowChosen).filter(labels).corr()
+
+        fig = go.Figure(go.Heatmap(z=corr, x=labels, y=labels,
                                    colorscale=color, reversescale=True, zmid=0))
         
         fig.update_layout(title='Heatmap', yaxis=dict(autorange='reversed'), width=599, height=599) 
         #fig.write_image("fig1forTEST.png")
         return go.FigureWidget(fig)
     
-    def _get_box_plot(self, rowChosen, x_colname, y_colname, hue,):
+    def _get_box_plot(self, rowChosen, x_colname, y_colname, hue):
         self.rowChosen = rowChosen
         if self.rowChosen < 100:
             return "최소 100개 이상의 샘플을 선택해 주세요."

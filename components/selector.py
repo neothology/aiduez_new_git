@@ -83,7 +83,7 @@ class SettingsPartsOptions():
             self.app_context,
             context_key = f'{self.context_key}__data_range_selector', 
             title = '행 범위',
-            range = [1, len(self.data), 1, default],
+            range = [self.minrowlange, len(self.data), self.minrowlange, default],
             size = {'width':'210px', 'height':'90px'},
             style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
@@ -110,7 +110,7 @@ class SettingsPartsOptions():
         )
 
         # 설렉터 모음 딕셔너리 생성
-        selector_names =["컬럼 선택","Hue 선택"]
+        selector_names =["컬럼 선택","Hue 선택","X축 컬럼 선택","Y축 컬럼 선택"]
         self.selector_dict= {}
         for selector_name in selector_names:
             s=SelectorCard(

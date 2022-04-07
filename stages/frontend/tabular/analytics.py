@@ -274,6 +274,8 @@ class TabularAnalyticsHeatmap(v.Container):
                 v.Col(
                     children = [
                         v.Spacer(style_ = "min-height:5px"),
+                        self.option_widjets.column_selector,
+                        v.Spacer(style_ = "min-height:10px"),
                         self.option_widjets.color_option_selector,
                         v.Spacer(style_ = "min-height:10px"),
                         self.option_widjets.data_range_selector,
@@ -288,7 +290,7 @@ class TabularAnalyticsHeatmap(v.Container):
         #차트 생성 모듈 가져오기
         chartmaker= CreateAnalticsChart(self.app_context)
         #디폴트 차트 생성
-        chart=chartmaker._get_heatmap_plot("Reds",100)
+        chart=chartmaker._get_heatmap_plot("Reds",100,_columnChoices)
 
         self.card_body=AnalyticsChartCard("차트 보기",chart).card_body
 
@@ -303,12 +305,10 @@ class TabularAnalyticsHeatmap(v.Container):
 
         #차트 생성 버튼 클릭 조작
         def on_click_with_run_button(widget, event, data):
-            print(self.app_context)
-            print(dir(self.app_context))
-            print(self.option_widjets.color_option_selector.selected)
             chart=chartmaker._get_heatmap_plot(
                 self.option_widjets.color_option_selector.selected,
                 int(self.option_widjets.data_range_selector.body.children[0].children[0].v_model),
+                [ dicElm['col_names'] for dicElm in self.option_widjets.column_selector.select_table.selected ],
             )
             self.app_context.tabular_analytics_heatmap.card_body.children[0].children[1].children=[chart]
 
@@ -324,18 +324,165 @@ class TabularAnalyticsBoxplot(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+
+        self.data = self.app_context.tabular_dataset.current_data
+        #print(self.data.info())
+
+        # 수치형 컬럼 선택지 조정
+        _columnChoices=[]
+        for colname in self.data.columns.to_list():
+            if self.data[colname].dtype=="int64" or self.data[colname].dtype=="float64":
+                _columnChoices.append(colname)
+
+        # 옵션 위젯 모음 생성
+        self.option_widjets=SettingsPartsOptions(
+            app_context=self.app_context,
+            context_key=self.context_key,
+            data=self.data,
+            minrowlange=100,
+            columnChoices=_columnChoices
+        ) 
+
+        # when no class_name in app_context
+        self.setting_part = v.NavigationDrawer(
+            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:0px; background-color:#eeeeee;",
+            children = [
+                v.Col(
+                    children = [
+                        v.Spacer(style_ = "min-height:5px"),
+                        self.option_widjets.data_range_selector,
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.selector_dict['X축 컬럼 선택'],
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.selector_dict['Y축 컬럼 선택'],
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.selector_dict['Hue 선택'],
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.run_button,
+                    ],
+                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                )
+            ],
+        )
+
+        #차트 생성 모듈 가져오기
+        chartmaker= CreateAnalticsChart(self.app_context)
+        #디폴트 차트 생성 
+        #smy 예외처리 
+        chart=chartmaker._get_box_plot(100, _columnChoices[0],_columnChoices[1], _columnChoices[1])
+
+        self.card_body=AnalyticsChartCard(
+            title="차트 보기",
+            body=chart,
+            height=450,
+        ).card_body
+
+        self.output_part = v.Row(
+            class_ = 'tabular_analytics_basicinfo__output_part',
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
+            children = [
+                self.setting_part,
+                self.card_body
+            ],
+        )
+
+        #차트 생성 버튼 클릭 조작
+        def on_click_with_run_button(widget, event, data):
+            chart=chartmaker._get_box_plot(
+                int(self.option_widjets.data_range_selector.body.children[0].children[0].v_model),
+                self.option_widjets.selector_dict['X축 컬럼 선택'].selected,
+                self.option_widjets.selector_dict['Y축 컬럼 선택'].selected,
+                self.option_widjets.selector_dict['Hue 선택'].selected,
+            )
+            self.app_context.tabular_analytics_boxplot.card_body.children[0].children[1].children=[chart]
+
+        # 토글 함수 연동
+        self.option_widjets.run_button.on_event('click',on_click_with_run_button)
+
         super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [self.context_key]
+            style_ = "margin:0; padding:0; min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            children = [self.output_part]
         )
 
 class TabularAnalyticsDensity(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+
+        self.data = self.app_context.tabular_dataset.current_data
+        #print(self.data.info())
+
+        # 수치형 컬럼 선택지 조정
+        _columnChoices=[]
+        for colname in self.data.columns.to_list():
+            if self.data[colname].dtype=="int64" or self.data[colname].dtype=="float64":
+                _columnChoices.append(colname)
+
+        # 옵션 위젯 모음 생성
+        self.option_widjets=SettingsPartsOptions(
+            app_context=self.app_context,
+            context_key=self.context_key,
+            data=self.data,
+            minrowlange=100,
+            columnChoices=_columnChoices
+        ) 
+
+        # when no class_name in app_context
+        self.setting_part = v.NavigationDrawer(
+            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:0px; background-color:#eeeeee;",
+            children = [
+                v.Col(
+                    children = [
+                        v.Spacer(style_ = "min-height:5px"),
+                        self.option_widjets.selector_dict['컬럼 선택'],
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.selector_dict['Hue 선택'],
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.color_option_selector,
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.run_button,
+                    ],
+                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                )
+            ],
+        )
+
+        #차트 생성 모듈 가져오기
+        chartmaker= CreateAnalticsChart(self.app_context)
+        #디폴트 차트 생성 
+        #smy 예외처리 
+        chart=chartmaker._get_density_plot(_columnChoices[0],_columnChoices[1], "Reds")
+
+        self.card_body=AnalyticsChartCard(
+            title="차트 보기",
+            body=chart,
+            height=450,
+        ).card_body
+
+        self.output_part = v.Row(
+            class_ = 'tabular_analytics_basicinfo__output_part',
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
+            children = [
+                self.setting_part,
+                self.card_body
+            ],
+        )
+
+        #차트 생성 버튼 클릭 조작
+        def on_click_with_run_button(widget, event, data):
+            chart=chartmaker._get_density_plot(
+                self.option_widjets.selector_dict['컬럼 선택'].selected,
+                self.option_widjets.selector_dict['Hue 선택'].selected,
+                self.option_widjets.color_option_selector.selected,
+            )
+            self.app_context.tabular_analytics_density.card_body.children[0].children[1].children=[chart]
+
+        # 토글 함수 연동
+        self.option_widjets.run_button.on_event('click',on_click_with_run_button)
+
         super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [self.context_key]
+            style_ = "margin:0; padding:0; min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            children = [self.output_part]
         )
 
 class TabularAnalyticsWordCloud(v.Container):
