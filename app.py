@@ -16,7 +16,6 @@ class Aian:
         self.top_area = get_or_create_class('top_area', self.app_context)
         self.work_area = get_or_create_class('work_area', self.app_context)
         self.side_nav = get_or_create_class('side_nav', self.app_context)
-        self.top_area = get_or_create_class('top_area', self.app_context) 
 
         # initialize components
         self.side_nav_menu = get_or_create_class('list_menu', self.app_context, context_key='side_nav_menu') # use context_key when context key differs from class name

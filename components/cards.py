@@ -367,7 +367,7 @@ class IconCard(v.Card):
         # header: icon, title, more menu button
         self.icon = v.Col(
             class_ = "",
-            style_ = "padding:0; max-width:50px; height:50px;",
+            style_ = "padding:0; max-width:50px; height:50px; display:flex; justify-content:center; align-items:center;",
             children = [
                 v.Html(
                     tag = 'span',
