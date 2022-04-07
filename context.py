@@ -74,6 +74,8 @@ class AppContext:
     tabular_analytics_boxplot: object = None
     tabular_analytics_density: object = None
     tabular_analytics_wcloud: object = None
+    tabular_analytics_wcloud__column_selector: object = None
+    tabular_analytics_wcloud__data_range_selector: object = None
     tabular_analytics_reduction: object = None
     tabular_analytics_clustering: object = None
     tabular_analytics_datasample: object = None
