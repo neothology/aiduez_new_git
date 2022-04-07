@@ -74,7 +74,7 @@ class TabularWorkbook:
             'workbook_color': self.app_context.workbook_colors[color_random],
             'favorite': False,
             'description': '',
-            'workflow_stage': '',
+            'workflow_stage': self.app_context.current_workflow_stage,
             'created_at': str(time.time()),
             'opened_at': '',
             'modified_at': str(time.time()),
@@ -84,7 +84,6 @@ class TabularWorkbook:
         with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'w') as f:
             json.dump(self.profile, f)
 
-        # save tmp into workbook file
         self.save_workbook()
 
     def create_new_work(self, work_name, data):
@@ -118,6 +117,8 @@ class TabularWorkbook:
             
         #     return data
 
+        self.app_context.progress_linear.active = True
+
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'  # e.g. /aihub/workspace/tmp/workbook/works/titanic_train
@@ -142,6 +143,8 @@ class TabularWorkbook:
 
         # update workbook profile
         self.save_workbook(work = self.current_work_name)
+
+        self.app_context.progress_linear.active = False
 
     def save_current_work(self):
         # save current work -(1) 데이터 입수
@@ -176,13 +179,14 @@ class TabularWorkbook:
                 self.app_context.tabular_analytics_basicinfo = None
 
         # preprocessing 변경
-        # self.app_context.tabular_data_processing__sub_contents.children = []
-        # self.app_context.tabular_data_processing__options = None
-        # if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
-        #     self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
-        # self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
-        # self.app_context.tabular_data_single_processing = None
-        # self.app_context.tabular_data_processing__column_summary = None
+        if self.app_context.tabular_data_processing:
+            self.app_context.tabular_data_processing__sub_contents.children = []
+            self.app_context.tabular_data_processing__options = None
+            if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
+                self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
+            self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
+            self.app_context.tabular_data_single_processing = None
+            self.app_context.tabular_data_processing__column_summary = None
 
         self.app_context.progress_overlay.update(20)
 
@@ -237,7 +241,7 @@ class TabularWorkbook:
             ]
         
     def change_work(self, work_name):
-        # self.app_context.progress_overlay.start()
+        self.app_context.progress_overlay.start()
 
         # decide which stages to update
         stages = ['tabular_data_analytics', 'tabular_data_processing', 'tabular_ai_training']
@@ -247,6 +251,9 @@ class TabularWorkbook:
         self.app_context.progress_overlay.finish()
 
     def save_workbook(self, **kwargs):
+
+        self.app_context.progress_linear.active = True
+
         if kwargs.get('work'):
             self.profile['works'].append(kwargs['work'])
 
@@ -262,6 +269,7 @@ class TabularWorkbook:
         shutil.make_archive(f'{self.tmp_dir}/tmp_workbook', 'zip', self.tmp_workbook_dir)
         shutil.move(f'{self.tmp_dir}/tmp_workbook.zip', self.workbook_path)
 
+        self.app_context.progress_linear.active = False
 
     def save_current_work_as(self, work_name):
         pass

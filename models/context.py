@@ -39,7 +39,6 @@ class AppContext:
 
 
     tabular_base: object = None
-    tabular_workbook: object = None
     tabular_dataset: object = None
     tabular_model: object = None
 
@@ -89,6 +88,7 @@ class AppContext:
 
     #tabular data processing objects
     tabular_data_processing: object = None
+    tabular_data_processing__changed: bool = False
     tabular_data_processing__sub_menu: object = None
     tabular_data_processing__sub_contents: object = None
     tabular_data_processing__column_summary: object = None
@@ -98,6 +98,7 @@ class AppContext:
 
     # tabilar ai training objects
     tabular_ai_training: object = None
+    tabular_ai_training__changed: bool = False
     tabular_ai_training__train_activator: object = None
     tabular_ai_training__training_options: object = None
     tabular_ai_training__column_summary: object = None

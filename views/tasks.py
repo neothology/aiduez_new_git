@@ -58,7 +58,7 @@ class TaskBaseView(v.Container):
                 workbook_icon = card_data['workbook_icon'],
                 workbook_color = card_data['workbook_color'],
                 favorite = card_data['favorite'],
-                size = {'width': '280px', 'height': '200px'},
+                size = {'width': '280px', 'height': '170px'},
 
             ) for card_data in self.workbook_card_data
         ]   

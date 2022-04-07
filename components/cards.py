@@ -362,7 +362,8 @@ class IconCard(v.Card):
         # header: icon, title, more menu button
         self.icon = v.Col(
             class_ = "",
-            style_ = "padding:0; max-width:50px; height:50px; display:flex; justify-content:center; align-items:center;",
+            style_ = "padding:0; max-width:50px; height:50px; display:flex; justify-content:center; align-items:center; \
+                    border-radius:8px; background-color:#e9e9e9;",
             children = [
                 v.Html(
                     tag = 'span',
@@ -377,7 +378,7 @@ class IconCard(v.Card):
 
         self.title = v.Col(
             class_ = "",
-            style_ = "",
+            style_ = "padding-left:18px; font-size:18px;",
             children = [self.title]
         )
 
@@ -412,16 +413,16 @@ class IconCard(v.Card):
 
         self.header = v.CardTitle(
             class_ = "",
-            style_ = "max-height:90px; min-height:90px; margin:0; \
+            style_ = "max-height:100px; min-height:100px; margin:0; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
-                align-content:flex-end; padding-left:16px; \
+                align-content:flex-start; padding-left:16px; padding-top:12px; \
                 display:flex; flex-direction:row;",
             children = [self.icon, self.title, self.more_menu_col],
         )
 
         self.body = v.CardText(
             class_ = "",
-            style_ = "padding:0;",
+            style_ = "padding:0; padding-left:10px;",
             children = [
                 v.Row(
                     class_ = "",
@@ -434,6 +435,7 @@ class IconCard(v.Card):
         super().__init__(
             class_ = "",
             style_ = f"width:{size.get('width')}; height:{size.get('height')}; \
-                margin-right:20px; margin-bottom:20px; padding:0; display:flex; flex-direction:column;",
+                margin-right:20px; margin-bottom:20px; padding:0; display:flex; flex-direction:column; \
+                border-radius:8px; border-left:7px solid #{self.workbook_color};",
             children = [self.header, self.body],
         )

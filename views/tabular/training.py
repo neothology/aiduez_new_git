@@ -91,6 +91,9 @@ class TabularModel:
         # update workbook profile
         self.app_context.current_workbook.save_workbook(model = self.current_model_name)
 
+        # save workbook
+        self.app_context.current_workbook.save_workbook()
+
         self.app_context.progress_linear.active = False
 
     def save_as(self, exp_name, model_name: str):
