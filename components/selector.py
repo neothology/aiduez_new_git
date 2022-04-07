@@ -17,19 +17,20 @@ class SelectorCard(v.VuetifyTemplate):
         return '''
         <template>
             <div>
-                <v-card class="mx-auto" width="208px" style="box-shadow: unset; ">
-                    <v-card style="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 100%; color: rgb(100, 116, 139); padding: 0px 0px 0px 16px; background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset; border-radius: 0px;">
-                        <v-card-text style="font-size: 0.875rem; padding-top: 4px; padding-left: 0px; margin-left: 0px;color: rgb(100, 116, 139);">
+                <v-card elevation="0" outlined class="mx-auto" width="208px" style="box-shadow: none; !important; border-radius: 3px;">
+                    <v-card elevation="0" style=" border-bottom: 1px solid rgb(224, 224, 224); box-shadow: none; !important; align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 100%; color: rgb(100, 116, 139); padding: 0px 0px 0px 16px; background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset; border-radius: 0px; ">
+                        <v-card-text style="font-size: 0.875rem; padding-top: 4px; padding-left: 0px; margin-left: 0px;color: rgb(100, 116, 139); ">
                             {{headline}}
                         </v-card-text>
                     </v-card>
-                    <v-card style="max-height: 55px; min-height: 55px; border-radius: 0px;">
+                    <v-card style="max-height: 55px; min-height: 55px; border-radius: 0px; box-shadow: none; !important;">
                         <v-select :items="items" v-model="selected" style="width: 180px; margin-left: 12px"/>
                     </v-card>
                 </v-card>   
             </div>
         </template>
         '''
+
 
     def __init__(
         self, 
@@ -101,15 +102,11 @@ class SettingsPartsOptions():
         )
 
         # 색상 설렉터 정의
-        self.color_option_selector = DataSelect(
-            label = "Color",
-            index = 0,
-            items = color_options,
-            v_model = None,
-            dense = False,
-            style_ = "max-width:250px; margin-left:0px;margin-right:0px; align-items: left;margin-top: 2px; ",
-            readonly = False,
-            autofocus = True,
+        self.color_option_selector = SelectorCard(
+            items=color_options,
+            v_model=None,
+            _style="width: 350px;",
+            headline="Color"
         )
 
         # 설렉터 모음 딕셔너리 생성

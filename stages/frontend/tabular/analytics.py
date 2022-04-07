@@ -7,6 +7,7 @@ from components.selector import SettingsPartsOptions
 from components.cards import SimpleCard, SmallHeaderCard
 from components.data_analysis import CreateAnalticsChart
 from IPython.display import display
+from components.cards import AnalyticsChartCard
 
 class TabualrAnalyticsOptionArea(v.NavigationDrawer):
     def __init__(
@@ -178,6 +179,7 @@ class TabularAnalyticsScatter(v.Container):
             if self.data[colname].dtype=="int64" or self.data[colname].dtype=="float64":
                 _columnChoices.append(colname)
 
+        # 옵션 위젯 모음 생성
         self.option_widjets=SettingsPartsOptions(
             app_context=self.app_context,
             context_key=self.context_key,
@@ -185,7 +187,6 @@ class TabularAnalyticsScatter(v.Container):
             minrowlange=100,
             columnChoices=_columnChoices
         ) 
-
 
         # when no class_name in app_context
         self.setting_part = v.NavigationDrawer(
@@ -206,45 +207,16 @@ class TabularAnalyticsScatter(v.Container):
             ],
         )
 
-
-        #차트 생성 기능 
+        #차트 생성 모듈 가져오기
         chartmaker= CreateAnalticsChart(self.app_context)
+        #디폴트 차트 생성
         chart=chartmaker._get_scatter_plot(
             [self.data.columns.to_list()[0]],
             "-",
             100
         )
 
-        self.card_body=v.Row(
-            style_='width: 800px; padding-left: 50px; padding-top: 20px;',
-            children=[
-                v.Card(
-                    style_='height: 567px; width: 600px; margin: 0px; padding: 0px; background-color: #F1F5F9; border:hidden; !important; ',
-                    children=[
-                        v.Card(     
-                            style_="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 600px; color: #F7FAFC; padding: 0px 0px 0px 0px; \
-                            background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset; border : none; solid transparent; border-radius: 0px;",
-                            outlined=True,            
-                            children=[
-                                v.CardText(
-                                    style_ = "font-size: 0.875rem; color:rgb(100, 116, 139); padding: 6px; ",
-                                    children=["차트 보기"]
-                                )      
-                            ]
-                        ),
-                        v.Card(
-                            outlined=True,
-                            style_='max-height: 600px; width: 600px; background-color:#FFFFFF; border-radius: 0px;',       
-                            children=[
-                                v.List(
-                                    children=[chart]
-                                )     
-                            ]
-                        ),
-                    ]
-                )
-            ]
-        )
+        self.card_body=AnalyticsChartCard("차트 보기",chart).card_body
 
         self.output_part = v.Row(
             class_ = 'tabular_analytics_basicinfo__output_part',
@@ -276,9 +248,76 @@ class TabularAnalyticsHeatmap(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+
+        self.data = self.app_context.tabular_dataset.current_data
+        #print(self.data.info())
+
+        # 수치형 컬럼 선택지 조정
+        _columnChoices=[]
+        for colname in self.data.columns.to_list():
+            if self.data[colname].dtype=="int64" or self.data[colname].dtype=="float64":
+                _columnChoices.append(colname)
+
+        # 옵션 위젯 모음 생성
+        self.option_widjets=SettingsPartsOptions(
+            app_context=self.app_context,
+            context_key=self.context_key,
+            data=self.data,
+            minrowlange=100,
+            columnChoices=_columnChoices
+        ) 
+
+        # when no class_name in app_context
+        self.setting_part = v.NavigationDrawer(
+            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:0px; background-color:#eeeeee;",
+            children = [
+                v.Col(
+                    children = [
+                        v.Spacer(style_ = "min-height:5px"),
+                        self.option_widjets.color_option_selector,
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.data_range_selector,
+                        v.Spacer(style_ = "min-height:10px"),
+                        self.option_widjets.run_button,
+                    ],
+                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                )
+            ],
+        )
+
+        #차트 생성 모듈 가져오기
+        chartmaker= CreateAnalticsChart(self.app_context)
+        #디폴트 차트 생성
+        chart=chartmaker._get_heatmap_plot("Reds",100)
+
+        self.card_body=AnalyticsChartCard("차트 보기",chart).card_body
+
+        self.output_part = v.Row(
+            class_ = 'tabular_analytics_basicinfo__output_part',
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
+            children = [
+                self.setting_part,
+                self.card_body
+            ],
+        )
+
+        #차트 생성 버튼 클릭 조작
+        def on_click_with_run_button(widget, event, data):
+            print(self.app_context)
+            print(dir(self.app_context))
+            print(self.option_widjets.color_option_selector.selected)
+            chart=chartmaker._get_heatmap_plot(
+                self.option_widjets.color_option_selector.selected,
+                int(self.option_widjets.data_range_selector.body.children[0].children[0].v_model),
+            )
+            self.app_context.tabular_analytics_heatmap.card_body.children[0].children[1].children=[chart]
+
+        # 토글 함수 연동
+        self.option_widjets.run_button.on_event('click',on_click_with_run_button)
+
         super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [self.context_key]
+            style_ = "margin:0; padding:0; min-width:100%; min-height:100%; display:flex; flex-direction:column;",
+            children = [self.output_part]
         )
 
 class TabularAnalyticsBoxplot(v.Container):

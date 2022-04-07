@@ -345,3 +345,45 @@ class SimpleCard(v.Card):
             style_ = self.style['card'],
             children = [self.header, self.body, self.footer],
         )
+
+class AnalyticsChartCard(v.Card):
+    def __init__(
+        self,
+        title:str = "",
+        body:object = "",
+        **kwargs
+        ):
+
+        self.card_body=v.Row(
+            style_='width: 800px; height: 616px; padding-left: 50px; padding-top: 20px;',
+            children=[
+                v.Card(
+                    elevation="1",
+                    outlined=True,            
+                    style_='height: 616px; width: 600px; margin: 0px; padding: 0px; background-color: #F1F5F9; border:hidden; !important; border-radius: 3px;',
+                    children=[
+                        v.Card(    
+                            elevation="1", 
+                            style_="align-content: space-around; outline-style: none; max-height: 33px; min-height: 33px; width: 600px; color: #F7FAFC; padding: 0px 0px 0px 0px; \
+                            background-color: rgb(248, 250, 252); border-bottom: 1px solid rgb(224, 224, 224); box-shadow: unset; border : none; solid transparent; border-radius: 0px;",
+                            children=[
+                                v.CardText(
+                                    style_ = "font-size: 0.875rem; color:rgb(100, 116, 139); padding: 6px; text-align: center; border-bottom: 1px solid rgb(224, 224, 224);",
+                                    children=[title]
+                                )      
+                            ]
+                        ),
+                        v.Card(
+                            elevation="1",
+                            style_='max-height: 599px; width: 600px; background-color:#FFFFFF; border-radius: 0px; padding:0px;',       
+                            children=[
+                                v.List(
+                                    style_='max-height: 599px; width: 600px; padding:0px;',
+                                    children=[body]
+                                )     
+                            ]
+                        ),
+                    ]
+                )
+            ]
+        )

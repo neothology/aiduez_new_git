@@ -12,7 +12,7 @@ import ipyvuetify as v
 import ipywidgets as widgets
 #from common.font_utils import get_korean_font_path
 
-color_options=["Greys", "OrRd", "PuBu", "BuPu", "Oranges", "BuGn", "YlOrBr", "YlGn", "Reds", "RdPu", "Greens", "YlGnBu", "Purples", "GnBu", "Greys", "YlOrRd", "PuRd", "Blues", "PuBuGn", "viridis", "plasma", "inferno", "magma",]
+color_options=[ "OrRd", "PuBu", "BuPu", "Oranges", "BuGn", "YlOrBr", "YlGn", "Reds", "RdPu", "Greens", "YlGnBu", "Purples", "GnBu", "Greys", "YlOrRd", "PuRd", "Blues", "PuBuGn", "viridis", "plasma", "inferno", "magma",]
 
 class CreateAnalticsChart():
     def __init__(self, app_context):
@@ -22,16 +22,21 @@ class CreateAnalticsChart():
         self.y_colname = ""
         self.color='RdBu'
         self.hue= ""
+        # 수치형 컬럼 선택지 조정
+        self.columnChoices=[]
+        for colname in self.df.columns.to_list():
+            if self.df[colname].dtype=="int64" or self.df[colname].dtype=="float64":
+                self.columnChoices.append(colname)
 
     #히트맵 그래프 얻기
     def _get_heatmap_plot(self, color, rowChosen):
         self.rowChosen =rowChosen
         corr = self.df.head(self.rowChosen).corr()
 
-        fig = go.Figure(go.Heatmap(z=corr, x=self.df.columns.tolist(), y=self.df.columns.tolist(),
+        fig = go.Figure(go.Heatmap(z=corr, x=self.columnChoices, y=self.columnChoices,
                                    colorscale=color, reversescale=True, zmid=0))
         
-        fig.update_layout(title='Heatmap', yaxis=dict(autorange='reversed'), width=700, height=700) 
+        fig.update_layout(title='Heatmap', yaxis=dict(autorange='reversed'), width=599, height=599) 
         #fig.write_image("fig1forTEST.png")
         return go.FigureWidget(fig)
     
@@ -66,7 +71,7 @@ class CreateAnalticsChart():
                 .head(self.rowChosen))
 
         fig = go.Figure(px.scatter_matrix(df, dimensions=self.y_colname, color=self.hue, title='Scatter plot'))
-        fig.update_layout(width=600, height=600)
+        fig.update_layout(width=599, height=599)
         return go.FigureWidget(fig)
     '''
     def _get_wordcloud_plot(self ,rowChosen, color):
