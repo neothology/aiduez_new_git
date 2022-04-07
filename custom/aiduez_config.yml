@@ -26,6 +26,7 @@ class_paths:
   simple_slider_card: components.forms.SimpleSliderCard
   simple_radio_card: components.forms.SimpleRadioCard
   data_info: components.data_profiler.DataInfo
+  select_autocomplete: components.forms.SelectAutoComplete
 
   # workflow-task
 
@@ -71,9 +72,9 @@ class_paths:
   tabular_analytics_datasample: views.tabular.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
-  tabular_data_processing_tab: views.tabular.processing.TabularProcessingTab
+  tabular_data_processing_options: views.tabular.processing.TabularProcessingOptionArea
   tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
-  tabular_data_single_processing_dialog: views.tabular.processing.TabularSingleProcessingDialog
+  tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard
   tabular_data_multiple_processing: views.tabular.processing.TabularMultipleProcessing
 
   tabular_ai_training: workflows.tabular.TabularAITraining
@@ -349,6 +350,22 @@ theme:
 # 데이터가공 paramater 정의
 processing_params:
   single_process:
+    type:
+      -
+        title: 결측값처리
+        name: fill
+      -
+        title: 변환
+        name: transform
+      -
+        title: 추출
+        name: extract
+      -
+        title: 스케일링
+        name: scale
+      -
+        title: 자연어처리
+        name: nlp
     config:
       dtype:
         int64:
@@ -384,6 +401,16 @@ processing_params:
           nlp:
             values: [형태소 분석, 명사 추출]
             default: 형태소 분석
+        datetime64[ns]:
+          fill:
+            values: [missing_cat_imputer]
+            default: missing_cat_imputer
+          transform:
+            values: [ordinal_encoder]
+            default: ordinal_encoder
+          extract:
+            values: [re_extract]
+            default: re_extract
       additional_config:
         quantile_transformer:
           option:

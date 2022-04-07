@@ -220,3 +220,29 @@ class SimpleRadioCard(SimpleCard):
                 no_footer=True,
                 size = size,
             )
+
+class SelectAutoComplete(v.Autocomplete):
+    def __init__(
+        self,
+        label:str="",
+        items:list=[],
+        size:dict={'width':'210px', 'height':'200px'},
+        style:str="",
+        **kwargs
+        ):
+        self.value = ""     # autocomplete의 선택 값
+        self.label = label
+        self.items = items  # autocomplete의 item list
+
+        style += f"width:{size['width']}; height:{size['height']};"
+
+        super().__init__(
+            v_model=self.value,
+            items=self.items,
+            label=self.label,
+            style_=style,
+            attach=True
+        )
+
+    def change_value(self, widget, event=None, data=None):
+        self.value = widget.v_model
