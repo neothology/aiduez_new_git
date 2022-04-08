@@ -12,8 +12,8 @@ class TaskBase:
 
     def _make_workbook_card_data(self, workbook_profile):
         import datetime
-        created_at =  datetime.datetime.fromtimestamp(int(float(workbook_profile["created_at"]))).strftime('%Y-%m-%d %H:%M')
-        modified_at = datetime.datetime.fromtimestamp(int(float(workbook_profile["modified_at"]))).strftime('%Y-%m-%d %H:%M')
+        created_at =  datetime.datetime.fromtimestamp(int(float(workbook_profile["created_at"]))).strftime('%Y-%m-%d')
+        modified_at = datetime.datetime.fromtimestamp(int(float(workbook_profile["modified_at"]))).strftime('%Y-%m-%d')
         if len(workbook_profile["works"]) > 0:
             text = [
                 f'{workbook_profile["works"][0]} 등, {len(workbook_profile["works"])}개 작업',

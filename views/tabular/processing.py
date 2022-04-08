@@ -260,6 +260,9 @@ class TabularSingleProcessingCard(v.Card):
         )
 
         def _on_click_save(widget, event=None, data=None):
+            # 박영근 추가: progress linear
+            self.app_context.progress_linear.active = True
+
             before_coulumn = self.get_sample_data(column_name=self.column_name, n=-1)
             processed_column = self.processing_data(before_coulumn)
             new_colunm_name = self.column_name + "_" + self.suffix[self.method]
@@ -271,6 +274,10 @@ class TabularSingleProcessingCard(v.Card):
             alert.type = "success"
             alert.v_model = True
             
+            # 박영근 추가: save workbook
+            self.app_context.current_workbook.save_workbook()
+            self.app_context.progress_linear.active = False
+
         save_btn.on_event('click', _on_click_save)
 
         # card contents

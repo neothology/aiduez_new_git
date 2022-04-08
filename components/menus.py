@@ -108,7 +108,6 @@ class ListMenu(v.List):
         )     
 
         self.last_activated_item = None
-         # code_add: run progress circular: with...
         def _proceed_to_target(item, event=None, data=None): 
 
             task_type = item.value.split('_')[0] # code_add: to use different workbook by task_type
@@ -121,7 +120,7 @@ class ListMenu(v.List):
             if task_type == 'task':
                 item.disabled = True
             self.last_activated_item = item
-
+            
             # get target and set
             self.app_context.current_workflow = task_type  
             if task_type != 'task':
@@ -252,6 +251,8 @@ class TabMenu(v.Col):
             # temporary code for 'training': 
             if tab.value == 'tabular_ai_training':
                 target_instance.load_contents()
+
+            self.app_context.current_workbook.save_workbook()
 
         for tab in self.tab_menu.children:
             tab.on_event('click', _proceed_to_target)
