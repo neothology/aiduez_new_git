@@ -75,8 +75,9 @@ class_paths:
   tabular_data_processing_save_activator: views.tabular.processing.TabularProcessingSaveActivator
   tabular_data_processing_options: views.tabular.processing.TabularProcessingOptionArea
   tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
-  tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard
+  tabular_data_single_processing_dialog: views.tabular.processing.TabularSingleProcessingDialog
   tabular_data_multiple_processing: views.tabular.processing.TabularMultipleProcessing
+  # tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard
 
   tabular_ai_training: workflows.tabular.TabularAITraining
   tabular_training_options: views.tabular.training.TabularTrainingOptions
@@ -353,20 +354,20 @@ processing_params:
   single_process:
     type:
       -
-        title: 결측값처리
         name: fill
+        title: 결측값처리
       -
-        title: 변환
         name: transform
+        title: 변환
       -
-        title: 추출
         name: extract
+        title: 추출
       -
-        title: 스케일링
         name: scale
+        title: 스케일링
       -
-        title: 자연어처리
         name: nlp
+        title: 자연어처리
     config:
       dtype:
         int64:
