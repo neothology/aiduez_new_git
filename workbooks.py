@@ -105,6 +105,8 @@ class TabularWorkbook:
 
             return work_name
 
+
+
         # def _check_data_column(data):
 
         #     # Column명은 영문이랑 '_'만 허용
@@ -118,6 +120,7 @@ class TabularWorkbook:
         #     return data
 
         self.app_context.progress_linear.active = True
+
 
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
@@ -167,6 +170,7 @@ class TabularWorkbook:
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
         # analytics 변경
+
         if self.app_context.tabular_data_analytics:
             if self.app_context.tabular_data_analytics__options:
                 self.app_context.tabular_data_analytics__sub_contents.children = []
@@ -177,6 +181,11 @@ class TabularWorkbook:
                 self.app_context.tabular_analytics_basicinfo__column_selector = None
                 self.app_context.tabular_analytics_basicinfo__data_range_selector = None
                 self.app_context.tabular_analytics_basicinfo = None
+            if self.app_context.tabular_analytics_wcloud:
+                self.app_context.tabular_analytics_wcloud__column_selector = None
+                self.app_context.tabular_analytics_wcloud__data_range_selector = None
+                self.app_context_tabular_analytics_wcloud = None
+
 
         # preprocessing 변경
         if self.app_context.tabular_data_processing:
@@ -187,6 +196,7 @@ class TabularWorkbook:
             self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
             if self.app_context.tabular_data_single_processing is not None:
                 self.app_context.tabular_data_single_processing.update()
+
 
         self.app_context.progress_overlay.update(20)
 

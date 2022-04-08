@@ -153,11 +153,7 @@ class UploadWidgets:
             column_list = uploaded_data.columns.tolist()
             for i in range(0, len(column_list)):
                 if chk_col_all.search(column_list[i]) is not None:
-                    self.box.children = [v.Html(
-                        tag = 'h5',
-                        children = [f"{data_name} 업로드 중 에러가 발생했습니다. "]
-                    )]
-                    raise Exception("데이터 컬러명은 영문, 숫자, 그리고 '_'만 가능합니다. ")
+                    raise Exception("데이터 컬럼명은 영문, 숫자, 그리고 '_'만 가능합니다. ")
             
             return uploaded_data
         except (UnicodeDecodeError, pd.errors.EmptyDataError) as e:
@@ -167,7 +163,7 @@ class UploadWidgets:
             v.Html(
                 tag = 'h5',
                 children = [
-                    f"{data_name} : 에러가 발생하였습니다. "]
+                    f"{data_name}.csv : 에러가 발생하였습니다. "]
                 ),
             v.Html(
                 tag = 'h5',

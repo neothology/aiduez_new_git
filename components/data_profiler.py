@@ -244,7 +244,7 @@ class ColumnSummary(BaseCard):
 
     def update_data(self, col:pd.Series):
         column_summary_obj = getattr(self.app_context, self.class_)
-        column_summary_obj.children[2].children = [ColumnSummaryTables(self.app_context, col)]
+        column_summary_obj.children[1].children = [ColumnSummaryTables(self.app_context, col)]
          
 class DataInfo(SimpleCard):
     def __init__(
