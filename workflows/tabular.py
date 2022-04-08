@@ -297,10 +297,16 @@ class TabularDataProcessing(v.Container):
             'tabular_data_context',
             self.app_context,
         )
+        self.save_button = get_or_create_class(
+            'tabular_data_processing_save_activator',
+            self.app_context,
+            context_key="tabular_data_processing__save_activator",
+        )
 
         self.top_area = v.Row(
             children = [
-                self.data_context
+                self.data_context,
+                self.save_button,
             ],
             style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
         )

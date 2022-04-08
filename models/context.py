@@ -89,10 +89,10 @@ class AppContext:
     #tabular data processing objects
     tabular_data_processing: object = None
     tabular_data_processing__changed: bool = False
+    tabular_data_processing__save_activator: object = None
     tabular_data_processing__sub_menu: object = None
     tabular_data_processing__sub_contents: object = None
     tabular_data_processing__options: object = None
-    tabular_data_processing__column_summary: object = None
     tabular_data_single_processing: object = None
     tabular_data_single_processing__card: object = None
     tabular_data_multiple_processing: object = None

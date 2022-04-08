@@ -72,6 +72,7 @@ class_paths:
   tabular_analytics_datasample: views.tabular.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
+  tabular_data_processing_save_activator: views.tabular.processing.TabularProcessingSaveActivator
   tabular_data_processing_options: views.tabular.processing.TabularProcessingOptionArea
   tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
   tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard

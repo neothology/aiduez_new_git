@@ -38,6 +38,31 @@ class TabularProcessingOptionArea(v.NavigationDrawer):
     def toggle(self):
         self.toggle_value = not self.v_model
 
+class TabularProcessingSaveActivator(v.Col):
+    def __init__(self, app_context:object=None, context_key:str=None, **kwargs) -> None:
+        self.app_context = app_context
+        self.style = {
+            'row': 'display:flex; flex-direction:row; padding:0; padding-top:12px; width:50%; justify-content:flex-end;',
+            'data_save_button': 'width:150px; height:35px; background-color:#636efa; color:white;',
+            } 
+
+        self.data_save_button = v.Btn(
+            style_ = self.style['data_save_button'],
+            children = ['가공 데이터 저장'],
+            rounded = True,
+        )
+
+        def _save_data(widget, event=None, data=None):
+            data_name = self.app_context.tabular_dataset.current_data_name + "_preprocessed"
+            self.app_context.current_workbook.create_new_work(data_name, self.app_context.tabular_dataset.current_data)
+
+        self.data_save_button.on_event("click", _save_data)
+        
+        super().__init__(
+            children = [self.data_save_button],
+            style_ = self.style["row"]
+        )
+
 class TabularSingleProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
