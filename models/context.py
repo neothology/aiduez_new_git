@@ -87,6 +87,8 @@ class AppContext:
     tabular_analytics_reduction: object = None
     tabular_analytics_clustering: object = None
     tabular_analytics_datasample: object = None
+    tabular_analytics_datasample__column_selector: object = None
+    tabular_analytics_datasample__data_range_selector: object = None
 
     #tabular data processing objects
     tabular_data_processing: object = None
