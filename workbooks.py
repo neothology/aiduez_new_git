@@ -188,6 +188,7 @@ class TabularWorkbook:
             if self.app_context.tabular_data_single_processing is not None:
                 self.app_context.tabular_data_single_processing.update()
 
+
         self.app_context.progress_overlay.update(20)
 
         # training 변경
