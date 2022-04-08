@@ -215,9 +215,11 @@ class TabularSingleProcessingMenu(BaseCard):
             tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
             tabular_data_single_processing.update()
             alert = get_or_create_class('alert', self.app_context)
-            alert.children = [f"'{column_name}'이 삭제되었습니다!"]
-            alert.type = "success"
-            alert.v_model = True
+            alert.show_and_auto_close(
+                message=f"'{column_name}'이(가) 삭제되었습니다!", 
+                alert_type="success",
+                seconds=3
+            )
             
             
         for i in range(len(self.dataset.columns)):
@@ -342,9 +344,11 @@ class TabularSingleProcessingDialog(v.Dialog):
             tabular_data_single_processing.update()
             self.value = 0
             alert = get_or_create_class('alert', self.app_context)
-            alert.children = [f"'{new_colunm_name}'이 생성되었습니다!"]
-            alert.type = "success"
-            alert.v_model = True
+            alert.show_and_auto_close(
+                message=f"'{new_colunm_name}'이(가) 생성되었습니다!", 
+                alert_type="success",
+                seconds=3
+            )
 
         save_btn.on_event('click', _on_click_save)
 
