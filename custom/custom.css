@@ -205,11 +205,3 @@ div.output_subarea {
 .vuetify-styles .side_nav .v-list-item--link:before {
     opacity: 0 !important
 }
-
-.v-autocomplete__content {
-    background-color: #ffffff;
-}
-
-.v-menu__content {
-    background-color: #ffffff;
-}
