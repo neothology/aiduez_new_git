@@ -5,7 +5,7 @@ class Alert(v.Alert):
         self,
         app_context:object = None,
         context_key:str = "",
-        message:str="",
+        message:str="message",
         alert_type:str="success",
         # v_model:bool=True,
         **kwargs
