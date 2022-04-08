@@ -1,18 +1,43 @@
 import re
 import ipyvuetify as v
 from utils import get_or_create_class
-from components.tab import BaseTab
-from components.cards import BaseCard, SmallHeaderCard
-from components.forms import DataSelect, LabeledSelect, SimpleSlider, DataSlider
-from components.buttons import StatedBtn
-from components.layouts import IndexRow
+from components.cards import BaseCard, SimpleCard
+from components.forms import DataSelect, SelectAutoComplete
 import re
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, OrdinalEncoder, KBinsDiscretizer, quantile_transform
 import plotly.express as px
 import os
 import ipywidgets
-# from konlpy.tag import Komoran, Hannanum
+from konlpy.tag import Komoran, Hannanum
+
+class TabularProcessingOptionArea(v.NavigationDrawer):
+    def __init__(
+        self,
+        app_context,
+        context_key,
+        children,
+    ):
+        self.children = children
+        self.toggle_value = False
+
+        super().__init__(
+            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:8px; background-color:#eeeeee;",
+            children = [
+                v.Col(
+                    children = self.children,
+                    style_ = "padding:0; margin:0; display:flex; flex-direction:column; align-items:center",
+                )
+            ],
+            v_model = self.toggle_value,
+            class_ = context_key,
+            absolute = True,
+            temporary = True,
+        )
+    
+    def toggle(self):
+        self.toggle_value = not self.v_model
+
 class TabularSingleProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
@@ -20,234 +45,176 @@ class TabularSingleProcessing(v.Container):
 
         self.app_context.progress_linear.active = True
 
-        self.processing_menu = TabularSingleProcessingMenu(
-            app_context=self.app_context,
-            context_key=self.context_key,
-            title="단일칼럼변환"
-        )
+        self.column_name=""     # selected column name
+        self.process_type=""    # selected process type
 
-        self.processing_dialog = get_or_create_class(
-            'tabular_data_single_processing_dialog',
-            app_context=self.app_context,
-            context_key= 'tabular_data_single_processing_dialog'
-        )
-        # column summary
-        self.column_summary = self._get_column_sumary(dataset=self.app_context.tabular_dataset.current_data)
+        self.processing_options = self._make_single_process_options()
+
+        self.processing_card = get_or_create_class(
+                'tabular_data_single_processing_card',
+                app_context=self.app_context,
+                context_key= 'tabular_data_single_processing__card'
+        )   
+
         self.app_context.progress_linear.active = False
 
         super().__init__( 
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; background-color:#ffffff; padding:0; display:flex; flex-direction:row;",
+            style_ = "min-width:100%; min-height:100%; background-color:#ffffff; padding:0;",
             children = [
-                v.Col(
-                    children=[
-                        self.processing_menu,
-                        self.processing_dialog,
-                        v.Spacer(style_="height:20px"),
-                        self.column_summary,
-                    ]
-                )
+                self.processing_options,
             ],
         )
 
-    def _get_column_sumary(self, dataset, update=False):
-        initial_column_name = dataset.columns[0]
-        column_summary = get_or_create_class(
-            'column_summary',
+    def _make_single_process_options(self):
+        processing_options = get_or_create_class(
+            'tabular_data_processing_options',    # TabularProcessingOptionArea
             self.app_context,
-            context_key = 'tabular_data_processing__column_summary',
-            title = '데이터 요약',
-            col = dataset[initial_column_name],
-            update=update,
-            width="auto"
+            context_key = 'tabular_data_processing__options',
+            children = [],
         )
-        return column_summary
 
-    def update_display(self):
-        self.app_context.progress_linear.active = True
-        self.processing_menu.update()
-        # column summary
-        self.column_summary = self._get_column_sumary(self.app_context.tabular_dataset.current_data, update=True)
-        self.app_context.progress_linear.active = False
-        self.children = [
-            v.Col(
-                children=[
-                    self.processing_menu,
-                    self.processing_dialog,
-                    v.Spacer(style_="height:20px"),
-                    self.column_summary,
-                ]
-        )]
-
-class TabularSingleProcessingMenu(BaseCard):
-    def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
-        self.app_context = app_context
-        self.dataset = self.app_context.tabular_dataset.current_data
-        self.context_key = context_key
-
-        self.style = {
-            'processing_options_body': "padding:0px;",
-            'processing_options_body_item': "min-height:62px; padding:0", # border-bottom:1px solid #e0e0e0; 
+        single_process_type = {
+            x["title"]: x["name"] for x in self.app_context.processing_params["single_process"]["type"]
         }
 
-        title = "단일칼럼변환"
-
-        self.processing_ui = self._make_single_processing_ui()
-        
-        super().__init__(
-            app_context=self.app_context,
-            class_=context_key,
-            header_title_main=title,
-            body_items=[self.processing_ui],
-            body_size={
-                "width": "lg",
-                "height":["340px"],
-            },
-            body_border_bottom = [True],
-            body_background_color = ["rgb(255, 255, 255)"],
-            align='center',
-            style = self.style
+        # column selector
+        column_selector = SelectAutoComplete(
+            label="변수",
+            v_model="",
+            items = list(self.app_context.tabular_dataset.current_data.columns),
+            size={'width':'210px', 'height':'70px'},
+            style = "margin:5px;",
         )
+
+        column_selector_card = SimpleCard(
+            title="변수 선택",
+            body=column_selector,
+            size = {'width':'210px'},
+            style= 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;'
+        )
+
+        # preprocess selector
+        preprocess_selector = DataSelect(
+            index=0,
+            items=list(single_process_type.keys()),
+            v_model=self.process_type,
+            label="가공",
+            style_='width:210px; height:70px; margin:5px;',
+        )
+
+        preprocess_selector_card = SimpleCard(
+            title="가공 선택",
+            body=preprocess_selector,
+            size = {'width': '210px'},
+            style= 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;'
+        )
+        
+
+        # 칼럼 삭제 버튼
+        delete_button = v.Col(
+            children= [
+                v.Btn(
+                    style_ = "",
+                    children = ['변수 삭제'],
+                    v_model=self.column_name,
+                    rounded = True,
+                    depressed = True,
+                    color = "red lighten-1",
+                ),
+            ],
+            style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:center; align-items:center; width:210px;",
+        )
+
+        # 가공하기 버튼
+        preprocess_button = v.Col(
+            children= [
+                v.Btn(
+                    style_ = "",
+                    children = ['가공하기'],
+                    v_model={'column_name': '', 'process': ''},
+                    rounded = True,
+                    depressed = True,
+                    dark = True,
+                ),
+            ],
+            style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:center; align-items:center; width:210px;",
+        )
+
+        # column_selector handler
+        def _change_column(widget, event=None, data=None):
+            config = self.app_context.processing_params['single_process']['config']
+            column = self.app_context.tabular_dataset.current_data[widget.v_model]
+            self.column_name = widget.v_model
+            preprocess_types = config["dtype"][column.dtype.name].keys()
+            preprocess_type_titles = [title for title, name in single_process_type.items() if name in preprocess_types]
+            preprocess_selector.items = preprocess_type_titles
+            preprocess_selector.v_model = preprocess_type_titles[0]
+            # preprocess_selector_card's body's children
+            preprocess_selector_card.children[1].children = [preprocess_selector]
+
+        column_selector.on_event("change", _change_column)
+
+        # delete_button handler
+        def _click_delete_button(widget, event=None, data=None):
+            self.app_context.tabular_dataset.current_data = self.app_context.tabular_dataset.current_data.drop(column_selector.v_model, axis=1)
+            self.update()
+        delete_button.on_event('click', _click_delete_button)
+
+        # preprocess_button handler
+        def _click_preprocess_button(widget, event=None, data=None):
+            alert = get_or_create_class('alert', self.app_context)
+            if column_selector.v_model == '' or preprocess_selector.v_model == '':
+                if column_selector.v_model == '':
+                    message = "변수를 선택해주세요!"
+                else:
+                    message = "가공 방식을 선택해 주세요!"
+                alert.children = [message]
+                alert.type = "error"
+                alert.v_model = True
+            else:
+                alert.v_model = False
+                self.app_context.progress_linear.active = True
+                self.column_name = column_selector.v_model
+                self.process_type = single_process_type[preprocess_selector.v_model]
+                self.processing_card.initialize(column_name=self.column_name, process_type=self.process_type)
+                self.children = [
+                    self.processing_options,
+                    self.processing_card
+                ]
+                self.app_context.progress_linear.active = False
+                self.processing_options.v_model = False
+            
+        preprocess_button.on_event("click", _click_preprocess_button)
+
+        # processing_options -> v.Col -> children
+        processing_options.children[0].children = [                
+            column_selector_card,
+            v.Spacer(style_ = "min-height:10px"),
+            preprocess_selector_card,
+            v.Spacer(style_ = "min-height:10px"),
+            # run_button,
+            v.Row(
+                children=[delete_button, preprocess_button],
+                style_="margin:0; padding:0;"
+            ),
+        ]
+        return processing_options
 
     def update(self):
-        self.dataset = self.app_context.tabular_dataset.current_data
-        self.processing_ui= self._make_single_processing_ui()
-        self.update_body_items(body_items=[self.processing_ui])
-
-    def _make_single_processing_ui(self) -> list:
-        num_rows = len(self.dataset.columns)
-
-        # (1) delete column icon ------------------------------------------------------
-        delete_column_buttons = self._make_delete_column_buttons()
-
-        # (2) column_names ------------------------------------------------------
-        column_names = [
-            v.Col(
-                class_ = '',
-                children = [column_name],
-                style_ = "font-size:1rem; max-width:200px; min-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;",
-            ) for column_name in self.dataset.columns
+        self.app_context.progress_linear.active = True
+        self.processing_options = self._make_single_process_options()
+        self.children = [
+            self.processing_options,
         ]
+        self.app_context.progress_linear.active = False
+        self.processing_options.v_model = True
 
 
-        # (3) pandas_data_types -------------------------------------------------
-        pandas_data_types = [
-            v.Col(
-                class_ = '',
-                v_model = dtype,
-                style_ = "text-align: center; font-size:1rem; max-width:100px; min-width:100px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;",
-                children= [dtype]
-            ) for dtype in self.dataset.dtypes.apply(lambda x: x.name).to_list()
-        ]
-
-        # (4) process method button -------------------------------------------------
-        processing_buttons = self._make_processing_dialog_buttons()
-
-        self.processing_options_rows = [
-            IndexRow(
-                class_="align-center",
-                index = str(i),
-                children = [
-                    delete_column_buttons[i], column_names[i], pandas_data_types[i],
-                    processing_buttons[i]['fill'], processing_buttons[i]['transform'], processing_buttons[i]['extract'],
-                    processing_buttons[i]['scale'], processing_buttons[i]['nlp'],
-                ],
-                style_ = "min-height:61px; margin:0;",
-            ) for i in range(num_rows)
-        ]
-
-
-        self.last_clicked_processing_options_rows = None
-        def _on_click_processing_options_rows(item, event=None, data=None):
-            index = int(item.index)
-            if self.last_clicked_processing_options_rows != index:
-                self.last_clicked_processing_options_rows = index
-                self.app_context.tabular_data_processing__column_summary.update_data(self.dataset[self.dataset.columns[index]])
-
-        for row in self.processing_options_rows:
-            row.on_event('click', _on_click_processing_options_rows)
-
-        processing_options_body = v.List(
-            class_ = self.context_key + " align-center",
-            style_ = self.style['processing_options_body'],
-            children = [
-                v.ListItem(
-                    children = [row],
-                    dense = True,
-                    style_ = self.style['processing_options_body_item'],
-                ) for row in self.processing_options_rows
-            ],    
-        )
-        return processing_options_body
-
-    def _make_delete_column_buttons(self) -> list:
-        delete_column_buttons = []
-
-        def _on_click_delete_column_button(btn, event=None, data=None):
-            index= int(btn.index)
-            self.dataset = self.dataset.drop(self.dataset.columns[index], axis=1)
-            self.app_context.tabular_dataset.current_data = self.dataset
-            tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-            tabular_data_single_processing.update_display()
-            
-        for i in range(len(self.dataset.columns)):
-            delete_column_button = StatedBtn(
-                                        index=i,
-                                        state="delete",
-                                        icon=True,
-                                        color="red lighten-1",
-                                        children=[v.Icon(children = ['mdi-delete'])]
-            )
-            delete_column_button.on_event('click.stop', _on_click_delete_column_button)
-            delete_column_buttons.append(delete_column_button)
-        return delete_column_buttons
-
-    def _make_processing_dialog_buttons(self) -> list:
-        config= self.app_context.processing_params['single_process']['config']
-
-        dialog_buttons = []
-        def _activate_process_dialog(widget=None, event=None, data=None):
-            column_name = widget.v_model["column_name"]
-            process = widget.v_model["process"]
-            dialog = self.app_context.tabular_data_single_processing_dialog
-            
-            def _close_dialog(widget, event=None, data=None):
-                widget.value = 0
-
-            dialog.on_event('click:outside', _close_dialog)
-            dialog.initialize(column_name=column_name, process=process)
-
-        for col_name in self.dataset.columns:
-            process_type_dialog = {
-                'fill': None,
-                'transform': None,
-                'extract': None,
-                'scale': None,
-                'nlp': None,
-            }
-
-            dtype = self.dataset[col_name].dtype.name
-            for process in process_type_dialog.keys():
-                disabled = True
-                if process in config['dtype'][dtype].keys():
-                    disabled=False
-                process_type_dialog[process] = v.Btn(
-                    v_model={'column_name': col_name, 'process': process},
-                    class_='mx-2',
-                    color='blue lighten-5',
-                    disabled=disabled,
-                    children=[process],
-                )
-
-                process_type_dialog[process].on_event('click', _activate_process_dialog)       
-
-            dialog_buttons.append(process_type_dialog)
-
-        return dialog_buttons
-
-class TabularSingleProcessingDialog(v.Dialog):
-    def __init__(self, app_context, context_key) -> None:
+class TabularSingleProcessingCard(v.Card):
+    def __init__(self, app_context, context_key="", **kwargs) -> None:
         self.app_context = app_context
+        self.context_key = context_key
 
         self.process = ''
         self.method = ''
@@ -261,22 +228,15 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.chart_file_dir = self.app_context.env_values['tmp_dir']+f"/processing_charts/{app_context.tabular_dataset.current_data_name}"
         if not os.path.exists(self.chart_file_dir):
             os.makedirs(self.chart_file_dir)
-        # close button
-        self.close_btn = v.Btn(
-            icon=True,
-            children=[v.Icon(children=['mdi-close'])],
-        )
-        def _close_dialog(widget, event=None, data=None):
-            self.value = 0
             
-        self.close_btn.on_event('click', _close_dialog)
-
         # method selector
         self.method_selector = v.Select(
+            class_="mx-3",
             v_model=self.method,
             label='Method',
             items=[],
             value=self.method,
+            attach=True,
         )
 
         def _change_method(widget, event=None, data=None):
@@ -289,7 +249,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         self.additional_config_values = dict()
 
         # ui
-        self.dialog_contents = None
+        self.card_contents = None
         self.additional_config_ui = None
         self.before_contents = None
         self.after_contents = None
@@ -305,10 +265,14 @@ class TabularSingleProcessingDialog(v.Dialog):
 
             before_coulumn = self.get_sample_data(column_name=self.column_name, n=-1)
             processed_column = self.processing_data(before_coulumn)
-            self.app_context.tabular_dataset.current_data[self.column_name + "_" + self.suffix[self.method]] = processed_column
+            new_colunm_name = self.column_name + "_" + self.suffix[self.method]
+            self.app_context.tabular_dataset.current_data[new_colunm_name] = processed_column
             tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-            tabular_data_single_processing.update_display()
-            self.value = 0
+            tabular_data_single_processing.update()
+            alert = get_or_create_class('alert', self.app_context)
+            alert.children = [f"{new_colunm_name}이 생성되었습니다!"]
+            alert.type = "success"
+            alert.v_model = True
             
             # 박영근 추가: save workbook
             self.app_context.current_workbook.save_workbook()
@@ -316,35 +280,37 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         save_btn.on_event('click', _on_click_save)
 
-        # dialog contents
-        self.dialog_contents = v.Card(children=[
-            v.CardTitle(
-                class_='headline grey lighten-2',
-                primary_title=True,
-                children=[
-                    "Card Title",
-                    v.Spacer(),
-                    self.close_btn,
-                ],
-            ),
-            v.CardText(class_="py-0", children=[self.method_selector]),
-            v.CardActions(children=[
-                v.Spacer(),
-                save_btn                
-            ])
-        ])
-
-        super().__init__(
-            class_="d-flex",
-            scrollable=True,
-            children=[self.dialog_contents],
-            min_width=700,
-            max_width=1200,
-            value=0,
+        # card contents
+        self.card_title = v.CardTitle(
+            primary_title=True,
+            children="",
+            style_="background-color:rgb(248, 250, 252); border-bottom:1px solid #e0e0e0; height:60px; \
+                    font-size:1rem; font-weight:bold; color: rgb(30, 41, 59);"
+        )
+        self.card_body = v.CardText(
+            children=[v.Row(
+                style_ = "max-height:100%; margin:0; padding:0; background-color:#ffffff; \
+                        display:flex, flex-direction:column;",
+                children = [self.method_selector],
+            )]
+            # children=[self.method_selector],
+            # style_="padding:0px; height:100%; background-color:rgb(255, 255, 255);"
+        )
+        self.card_footer = v.CardActions(
+            children=[save_btn],
+            style_="background-color:rgb(248, 250, 252); justify-content:flex-end; padding-right:20px; border-top:1px solid #e0e0e0;"
         )
 
-    def initialize(self, column_name, process):
-        self.process = process
+        super().__init__(
+            # class_="pa-3",
+            children = [self.card_title, self.card_body, self.card_footer],
+            style_= "display:flex; flex-direction:column; \
+                box-shadow: none !important; border:1px solid #e0e0e0; \
+                background-color: rgb(255, 255, 255);"
+        )
+
+    def initialize(self, column_name, process_type):
+        self.process_type = process_type
         self.column_name = column_name
         config= self.app_context.processing_params['single_process']['config']
         column = self.app_context.tabular_dataset.current_data[column_name]
@@ -365,10 +331,8 @@ class TabularSingleProcessingDialog(v.Dialog):
                 "most_frequent": column.mode()[0],
                 "constant": "",
             }
-
-        method_value = config['dtype'][self.column_dtype][process]['default'] if process in config['dtype'][self.column_dtype].keys() else []        
-        method_items = config['dtype'][self.column_dtype][process]['values'] if process in config['dtype'][self.column_dtype].keys() else ''
-
+        method_value = config['dtype'][self.column_dtype][process_type]['default'] if process_type in config['dtype'][self.column_dtype].keys() else []        
+        method_items = config['dtype'][self.column_dtype][process_type]['values'] if process_type in config['dtype'][self.column_dtype].keys() else ''
         self.method_selector.items = method_items
         self.method_selector.value = method_value
         self.method_selector.v_model = method_value
@@ -376,23 +340,17 @@ class TabularSingleProcessingDialog(v.Dialog):
 
         self.show()
 
-    def close(self):
-        self.value=0
-
     def show(self):
-        self.additional_config_ui = self._make_additonal_config_ui(self.method, self.column_name)
+        self.additional_config_ui = self._make_additional_config_ui(self.method, self.column_name)
         self.before_contents = self._make_before_contents(self.column_name)
         self.after_contents = self._make_processed_contents(self.column_name)
 
         # Card Title
-        self.dialog_contents.children[0].children = [
-            f"{self.column_name.upper()} - {self.process.upper()}",
-            v.Spacer(),
-            self.close_btn,
+        self.card_title.children = [
+            f"{self.column_name.upper()} - {self.process_type.upper()}",
         ]
 
-        # Card Text
-        self.dialog_contents.children[1].children = [
+        self.card_body.children = [
             # method selector
             v.Row(children=[self.method_selector]),
             # additional config
@@ -410,14 +368,12 @@ class TabularSingleProcessingDialog(v.Dialog):
                 v.Col(class_="py-0", children=[self.after_contents]),                                
             ])
         ]
-        self.value = 1
+        self.children = [self.card_title, self.card_body, self.card_footer]
 
-
-    def _make_additonal_config_ui(self, method, column_name) -> dict:
+    def _make_additional_config_ui(self, method, column_name) -> dict:
         config= self.app_context.processing_params['single_process']['config']
         additional_configs = config['additional_config'][method]['option'] if method in config['additional_config'].keys() else []
         additonal_config_ui = {}    # 추가 설정 UI
-
         for option in additional_configs:
             self.additional_config_values[option["name"]] = ""
             if option['type'] == "slider":
@@ -446,8 +402,9 @@ class TabularSingleProcessingDialog(v.Dialog):
                 def _on_change_slider(widget, event=None, data=None):
                     self.additional_config_values[widget.value] = widget.v_model
                     self.after_contents = self._make_processed_contents(column_name)
-                    # result area
-                    self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+
+                    # after contents area
+                    self.card_body.children[2].children[2].children = [self.after_contents]
                             
                 slider.on_event("change", _on_change_slider)
                 counter.on_event("change", _on_change_slider)
@@ -459,11 +416,12 @@ class TabularSingleProcessingDialog(v.Dialog):
                 widget = v.Select(
                     label=option['name'],
                     items=option['values'],
-                    v_model=self.additional_config_values[option["name"]]
+                    v_model=self.additional_config_values[option["name"]],
+                    attach=True,
                 )
                 def _change_select(widget, event=None, data=None):
                     self.additional_config_values[widget.label] = widget.v_model
-                    if self.process == "fill" and "value" in self.additional_config_values.keys():
+                    if self.process_type == "fill" and "value" in self.additional_config_values.keys():
                         self.additional_config_ui["value"].v_model = self.column_statistic[widget.v_model]
                         self.additional_config_values["value"] = self.column_statistic[widget.v_model]
                         if widget.v_model == "constant":
@@ -473,13 +431,13 @@ class TabularSingleProcessingDialog(v.Dialog):
 
                         self.after_contents = self._make_processed_contents(column_name)
                         # result area
-                        self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                        self.card_body.children[2].children[2].children = [self.after_contents]
                     else:
                         self.additional_config_values[widget.label] = widget.v_model
 
                         self.after_contents = self._make_processed_contents(column_name)
                         # result area
-                        self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                        self.card_body.children[2].children[2].children = [self.after_contents]
 
                 widget.on_event('change', _change_select)
                 additonal_config_ui[option['name']] = widget
@@ -495,13 +453,13 @@ class TabularSingleProcessingDialog(v.Dialog):
                 )
                 def _change_text(widget, event=None, data=None):
                     self.additional_config_values[widget.label] = widget.v_model
-                    if self.process == "fill":
+                    if self.process_type == "fill":
                         self.column_statistic[self.additional_config_values["imputer"]] = widget.v_model
-                    elif self.process == "extract" and self.method == "re_extract":
+                    elif self.process_type == "extract" and self.method == "re_extract":
                         self.additional_config_values["regex"] = widget.v_model
                         
                     self.after_contents = self._make_processed_contents(column_name)
-                    self.dialog_contents.children[1].children[2].children[2].children = [self.after_contents]
+                    self.card_body.children[2].children[2].children = [self.after_contents]
                 
                 widget.on_event('change', _change_text)
                 additonal_config_ui[option['name']] = widget
@@ -513,7 +471,7 @@ class TabularSingleProcessingDialog(v.Dialog):
         '''
         sample_data = self.app_context.tabular_dataset.current_data[column_name]
         if n != -1:
-            if self.process == "fill":
+            if self.process_type == "fill":
                 sample_data = sample_data[sample_data.isna()]
 
             if len(sample_data) > n:
@@ -527,15 +485,15 @@ class TabularSingleProcessingDialog(v.Dialog):
             children=["Before Contents"],
         )
 
-        if self.process in ['scale', 'transform'] and self.method != 'ordinal_encoder':
+        if self.process_type in ['scale', 'transform'] and self.method != 'ordinal_encoder':
             sample_data = self.get_sample_data(column_name, n=-1)
         else :
             sample_data = self.get_sample_data(column_name, n=15)
 
-        if self.process == "fill" and len(sample_data) == 0:
+        if self.process_type == "fill" and len(sample_data) == 0:
             children = ["Null 값이 없습니다!"]
 
-        elif self.process == "scale" or (self.process == "transform" and self.method != "ordinal_encoder"):
+        elif self.process_type == "scale" or (self.process_type == "transform" and self.method != "ordinal_encoder"):
             chart = self._make_histogram(sample_data, suffix="before")
             children = [chart]
         else:
@@ -558,7 +516,7 @@ class TabularSingleProcessingDialog(v.Dialog):
 
     def processing_data(self, column):
 
-        if self.process == "fill":
+        if self.process_type == "fill":
             imputer_value = self.column_statistic[self.additional_config_values["imputer"]]
             try:
                 if self.column_dtype.startswith("float"):
@@ -570,7 +528,7 @@ class TabularSingleProcessingDialog(v.Dialog):
             except:
                 column = None
 
-        elif self.process == "extract" and self.method == "re_extract":
+        elif self.process_type == "extract" and self.method == "re_extract":
             regex = self.additional_config_values["regex"]
             self.additional_config_ui["regex"].disabled = False
             try:
@@ -578,14 +536,14 @@ class TabularSingleProcessingDialog(v.Dialog):
             except:
                 column = None
 
-        elif self.process == "scale":
+        elif self.process_type == "scale":
             if self.method == 'standard_scaler':
                 scaler = StandardScaler()
             elif self.method == 'minmax_scaler':
                 scaler = MinMaxScaler()
             column = pd.Series(scaler.fit_transform(column.values.reshape(-1, 1)).reshape(-1), name=column.name, index=column.index)
 
-        elif self.process == "transform":
+        elif self.process_type == "transform":
             if self.method == "ordinal_encoder":
                 encoder = OrdinalEncoder()
                 column = pd.Series(encoder.fit_transform(column.values.reshape(-1, 1)).reshape(-1), name=column.name, index=column.index)            
@@ -601,7 +559,7 @@ class TabularSingleProcessingDialog(v.Dialog):
                     column = pd.Series(kbins.fit_transform(column.values.reshape(-1, 1)).reshape(-1), name=column.name, index=column.index)            
                 except:
                     column = None
-        elif self.process == "nlp":
+        elif self.process_type == "nlp":
             nlp_package = {
                 "komoran": Komoran(),
                 "hannanum": Hannanum(),
@@ -616,25 +574,25 @@ class TabularSingleProcessingDialog(v.Dialog):
             children=["After Contents"],
         )
 
-        if self.process in ['scale', 'transform']:
+        if self.process_type in ['scale', 'transform']:
             sample_data = self.get_sample_data(column_name, n=-1)
         else:
             sample_data = self.get_sample_data(column_name, n=15)
 
         sample_processed_data = self.processing_data(sample_data)
         children = []
-        if self.process == "fill" and sample_processed_data is None:
+        if self.process_type == "fill" and sample_processed_data is None:
             children = ["데이터 타입에 맞게 입력해주세요!"]
-        elif self.process == "fill" and len(sample_processed_data) == 0:
+        elif self.process_type == "fill" and len(sample_processed_data) == 0:
             children = ["Null 값이 없습니다!"]
-        elif self.process == "extract" and sample_processed_data is None:
+        elif self.process_type == "extract" and sample_processed_data is None:
             children = ["정규표현식이 올바르지 않습니다!"]
-        elif self.process == "transform" and self.method == "kbins_discretizer" and sample_processed_data is None:
+        elif self.process_type == "transform" and self.method == "kbins_discretizer" and sample_processed_data is None:
             children = ["먼저, Null 값을 제거해주세요!"]
-        elif self.process == "scale":
+        elif self.process_type == "scale":
             chart = self._make_histogram(sample_processed_data, suffix="processed")
             children = [chart]
-        elif self.process == "transform":
+        elif self.process_type == "transform":
             if self.method == "ordinal_encoder":
                 sample_processed_data = sample_processed_data[:15] if len(sample_processed_data) > 15 else sample_processed_data
                 children = [v.Html(class_="my-2", tag="h4", children=[v.Text(children=str(value))]) for value in sample_processed_data.values]
@@ -693,8 +651,6 @@ class TabularMultipleProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-
-        self.dataset = self.app_context.tabular_dataset.current_data
 
         self.processing_menu = BaseCard(
             app_context=self.app_context,
