@@ -66,7 +66,6 @@ class TabularaAnalyticsBasicinfo(v.Container):
             title = '행 범위',
             range = [1, len(self.data), 1, default],
             size = {'width':'210px', 'height':'90px'},
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
 
         # 조회하기 버튼
@@ -214,8 +213,9 @@ class TabularAnalyticsWordCloud(v.Container):
             title = '변수 선택',
             data = df_col_names,
             size = {'width':'210px', 'height':'200px'},
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
+            style ='background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
+
         # column selection - select all
         select_all_values = [{'index':i} for i in range(len(self.data.columns))]
         self.column_selector.children[1].children[0].selected = select_all_values
@@ -229,7 +229,7 @@ class TabularAnalyticsWordCloud(v.Container):
             title = '행 범위',
             range = [1, len(self.data), 1, default],
             size = {'width':'210px', 'height':'90px'},
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
+            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;'
         )
 
         # 조회하기 버튼

@@ -36,5 +36,3 @@
 source /etc/bash.bashrc && voila /aihub/workspace/.AIDUez.ipynb --port 8888 --no-browser --enable_nbextensions False 
 ```
 <br>
-
-

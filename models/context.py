@@ -36,7 +36,10 @@ class AppContext:
     # --------------------------------------------------
     task_recent: object = None
     task_recent_view: object = None
-
+    task_favorite: object = None
+    task_favorite_view: object = None
+    task_all_view: object = None
+    task_all: object = None
 
     tabular_base: object = None
     tabular_dataset: object = None

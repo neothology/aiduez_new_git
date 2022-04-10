@@ -38,7 +38,7 @@ class TabularModel:
         self.current_model_name = 'latest'
         self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
         self.dataset = self.app_context.tabular_dataset.current_data
-        self.output_directory =  self.app_context.current_workbook.current_models_dir # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models
+        self.output_directory =  self.app_context.current_workbook.current_models_dir # e.g. /aihub/workspace/_tmp/workbook/works/titanic_train/models
 
         # 모델 결과 Dialog 에 모델명 추가
         self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
@@ -67,9 +67,9 @@ class TabularModel:
         )]
 
         # save output_logs
-        # e.g. /aihub/workspace/tmp/workbook/works/titanic_train/models/titanic_train_latest
+        # e.g. /aihub/workspace/_tmp/workbook/works/titanic_train/models/titanic_train_latest
         self.current_train_result_dir = f'{self.output_directory}/{self.data_name}_{self.current_model_name}'
-        ludwig_log_file = '/aihub/workspace/tmp/ludwig.log'
+        ludwig_log_file = '/aihub/workspace/_tmp/ludwig.log'
         result_logs_file =  os.path.join(self.current_train_result_dir, 'result_logs.txt')
         shutil.move(ludwig_log_file, result_logs_file) 
 
@@ -89,7 +89,7 @@ class TabularModel:
         self.app_context.tabular_ai_training__train_result.children[0].close_button.disabled = False
 
         # update workbook profile
-        self.app_context.current_workbook.save_workbook(model = self.current_model_name)
+        self.app_context.current_workbook.save_workbook(model = f'{self.data_name}_{self.current_model_name}')
 
         # save workbook
         self.app_context.current_workbook.save_workbook()
@@ -97,15 +97,30 @@ class TabularModel:
         self.app_context.progress_linear.active = False
 
     def save_as(self, exp_name, model_name: str):
+
+        self.app_context.progress_linear.active = True
+
         # update: current_model_name, current_exp_and_model_name, current_train_result_dir
         self.current_model_name = model_name
         self.current_exp_and_model_name = f'{self.data_name}_{self.current_model_name}'
+
+        # 모델 결과 Dialog의 모델명 변경
+        self.app_context.tabular_ai_training__train_result.children[0].title_sub.children = [f'모델명: {self.current_exp_and_model_name}']
+
         from_dir = self.current_train_result_dir
         to_dir = f'{self.output_directory}/{self.current_exp_and_model_name}'
         if from_dir == to_dir:
             raise Exception('from_dir and to_dir are same')
         shutil.copytree(from_dir, to_dir)
         self.current_train_result_dir = to_dir
+
+        # update workbook profile
+        self.app_context.current_workbook.save_workbook(model = f'{self.data_name}_{self.current_model_name}')
+
+        # save workbook
+        self.app_context.current_workbook.save_workbook()
+
+        self.app_context.progress_linear.active = False
 
     def load_model(self, model_name: str):
         pass
@@ -267,12 +282,12 @@ class TabularTrainResult(BaseDialog):
         self.button_chart_view.hide()
 
         def _on_click_button_chart_view(item, event=None, data=None):
-            self.children[0].children[2].children = [self.output_plots]
+            self.children[0].children[1].children = [self.output_plots]
             self.button_chart_view.disabled = True
             self.button_text_view.disabled = False
 
         def _on_click_button_text_view(item, event=None, data=None):
-            self.children[0].children[2].children = [self.output_logs]
+            self.children[0].children[1].children = [self.output_logs]
             self.button_text_view.disabled = True
             self.button_chart_view.disabled = False
 

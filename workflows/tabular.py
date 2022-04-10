@@ -1,71 +1,92 @@
 import ipyvuetify as v
 import os
 from utils import get_or_create_class, delete_files_in_dir
-class TabularBase(v.Container):
+class TabularBase:
 
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+        self.base_key = 'tabular'
+        self.tab_props = self.app_context.workflows_list[self.base_key]
 
-        # delete tmp directory contents if exists, else make tmp directory
-        tmp_dir = self.app_context.env_values['tmp_dir']
-        if os.path.exists(tmp_dir):
-            delete_files_in_dir(tmp_dir)
-        else:
-            os.makedirs(tmp_dir)
-
-        # init workbook
-        self.workbook = get_or_create_class('tabular_workbook', self.app_context, 'current_workbook')
-        self.workbook.create_new() # tabular, text, image, video, audio, etc.
+    def show(self, tab_name:str, update=False):
 
         # initialize components to view
-        work_area_contents = get_or_create_class('sub_area', self.app_context, context_key = 'tabular_contents')
+        work_area_contents = get_or_create_class('sub_area', self.app_context, context_key = f'{self.base_key}_contents')
 
         self.tab_menu = get_or_create_class(
             'tab_menu', 
             self.app_context,  
-            context_key = 'tabular_tab_menu',
-            tab_props = self.app_context.workflows_list['tabular'],
-            target_area = work_area_contents
+            context_key = f'{self.base_key}_tab_menu',
+            target_area = work_area_contents,
+            tab_props = self.tab_props,
+            tab_name = tab_name,
+            update = update
             )
 
-        # initialize each workflow 
-        # tabular_workflow_names = [tab.value for tab in self.tab_menu.tab_menu.children]
-        # init_intervals = [10,25,40,10,5]
-        # init_progress = 15
-        # for i, workflow_name in enumerate(tabular_workflow_names):
-        #     _ = get_or_create_class(workflow_name, self.app_context)
-        #     init_progress += init_intervals[i]
-        #     self.app_context.progress_overlay.update(init_progress)
+        # get target area
+        target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area 
 
-        # put components into layout
-        super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0px; display:flex; flex-direction:column;",
-            children = [
-                self.tab_menu, 
-                work_area_contents,
+        # put components into target area
+        target_area.children = [
+            v.Container(
+                class_ = self.context_key,
+                style_ = "min-width:100%; min-height:100%; padding:0px; display:flex; flex-direction:column;",
+                children = [
+                    self.tab_menu, 
+                    work_area_contents,
                 ],
-        )
+            )
+        ]
 
-class TabularDataImport_old(v.Container):
-    def __init__(self, app_context, context_key, **kwargs):
-        self.app_context = app_context
-        self.context_key = context_key
+        self.app_context.current_workflow = self.base_key
 
-        self.import_tab = get_or_create_class(
-            'tabular_data_import_tab',
-            app_context = self.app_context,
-            context_key = 'tabular_data_import_tab'
-        )
-        super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column",
-            children = [
-                self.import_tab,
-                
-            ],
-        )
+        # task view change
+        self.app_context.side_nav.temporary = True
+        self.app_context.side_nav.permanent = False
+        self.app_context.side_nav.v_model = False
+        self.app_context.top_area.change_style('default')
+
+    def create_new(self):
+
+        # init workbook
+        self.workbook = get_or_create_class('tabular_workbook', self.app_context, 'current_workbook', update=True)
+        self.workbook.create_new() # tabular, text, image, video, audio, etc.
+        default_tab_name = self.tab_props['default']
+
+        # 기존 내용 삭제: import
+        if self.app_context.tabular_data_import__workbook_data_list:
+            self.app_context.tabular_data_import__workbook_data_list.update_data([])
+        if self.app_context.tabular_data_context:
+            self.app_context.tabular_data_context.reset()
+
+        self.show(default_tab_name, update=True)
+
+    def load_workbook_from_tmp(self, workbook_name):
+
+        # init workbook
+        self.workbook = get_or_create_class('tabular_workbook', self.app_context, 'current_workbook')
+        self.workbook.load_workbook_from_tmp(workbook_name) 
+        self.tab_name = self.app_context.current_workbook.profile['workflow_stage'] if self.app_context.current_workbook.profile['workflow_stage'] else self.tab_props['default']       
+
+        # set current work 
+        if self.app_context.current_workbook.profile['current_work']:
+            self.app_context.current_workbook.change_work(self.app_context.current_workbook.profile['current_work'])
+
+        # menu control
+        for item in self.app_context.side_nav_menu.menu_to_target:
+            item.disabled = False
+
+        # show work
+        self.show(self.tab_name, update=True)    
+
+    def return_to_current_workflow_stage(self):
+        current_workflow_stage = self.app_context.current_workflow_stage
+        self.show(current_workflow_stage)
+
+        # menu control
+        for item in self.app_context.side_nav_menu.menu_to_target:
+            item.disabled = False
 
 class TabularDataImport(v.Container):
     def __init__(self, app_context, context_key, **kwargs):

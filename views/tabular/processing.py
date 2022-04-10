@@ -91,7 +91,7 @@ class TabularSingleProcessing(v.Container):
             title="변수 선택",
             body=column_selector,
             size = {'width':'210px'},
-            style= 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;'
+            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
 
         # preprocess selector
@@ -107,7 +107,7 @@ class TabularSingleProcessing(v.Container):
             title="가공 선택",
             body=preprocess_selector,
             size = {'width': '210px'},
-            style= 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;'
+            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
         
 
