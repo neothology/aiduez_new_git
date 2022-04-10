@@ -194,7 +194,6 @@ class TabularWorkbook:
                 self.app_context.tabular_analytics_wcloud__data_range_selector = None
                 self.app_context_tabular_analytics_wcloud = None
 
-
         # preprocessing 변경
         if self.app_context.tabular_data_processing:
             self.app_context.tabular_data_processing__sub_contents.children = []

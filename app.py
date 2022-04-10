@@ -24,6 +24,7 @@ class Aian:
         # merge components into layouts
         self.side_nav.children = [self.side_nav_menu]
         self.background.children = [self.alert, self.p_overlay, self.b_overlay, self.top_area, self.page_progress, self.side_nav, self.work_area]
+        # self.background.children = [self.alert, self.top_area, self.page_progress, self.side_nav, self.work_area]
 
     def start(self):
         return self.background
