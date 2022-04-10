@@ -1,153 +1,22 @@
-{%- extends 'base.html.j2' -%}
-{% from 'mathjax.html.j2' import mathjax %}
-{% from 'jupyter_widgets.html.j2' import jupyter_widgets %}
+.container {
+    width: 100% !important;
+} 
 
-{%- block header -%}
-<!DOCTYPE html>
-<html>
-<head>
-{%- block html_head -%}
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% set nb_title = nb.metadata.get('title', '') or resources['metadata']['name'] %}
-<title>{{nb_title}}</title>
-
-{%- block html_head_js -%}
-{%- block html_head_js_requirejs -%}
-<script src="{{ resources.require_js_url }}"></script>
-{%- endblock html_head_js_requirejs -%}
-{%- endblock html_head_js -%}
-
-{% block jupyter_widgets %}
-  {%- if "widgets" in nb.metadata -%}
-    {{ jupyter_widgets(resources.jupyter_widgets_base_url, resources.html_manager_semver_range, resources.widget_renderer_url) }}
-  {%- endif -%}
-{% endblock jupyter_widgets %}
-
-{% block extra_css %}
-{% endblock extra_css %}
-
-{% for css in resources.inlining.css -%}
-  <style type="text/css">
-    {{ css }}
-  </style>
-{% endfor %}
-
-{% block notebook_css %}
-{{ resources.include_css("static/index.css") }}
-{% if resources.theme == 'dark' %}
-    {{ resources.include_css("static/theme-dark.css") }}
-{% else %}
-    {{ resources.include_css("static/theme-light.css") }}
-{% endif %}
-<style type="text/css">
-a.anchor-link {
-   display: none;
-}
-.highlight  {
-    margin: 0.4em;
+div.output_subarea {
+    padding: 0px !important;
+    margin-top: 10px !important;
 }
 
-/* Input area styling */
-.jp-InputArea {
-    overflow: hidden;
+.background {
+    border:1px solid #cccccc;
 }
 
-.jp-InputArea-editor {
-    overflow: hidden;
-}
-
-@media print {
-  body {
-    margin: 0;
-  }
-}
-
-body {
-  margin: 0;
-}
-
-.jp-Notebook {
-  padding: 0;
-}
-
-.jp-Cell {
-  padding: 0;
-}
-
-.jp-Cell:not(.jp-mod-noOutputs) .jp-Cell-outputWrapper {
-  margin: 0;
-}
-
-.jupyter-widgets {
-  margin: 0 !important;
+.v-navigation-drawer__border {
+    background-color: none !important;
 }
 
 
-
-
-
-
-
-
-.v-container.background {
-  height: auto !important;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  border:0;
-}
-
-.vuetify-styles .v-application--wrap {
-  flex-direction: row !important;
-}
-
-.v-container.work_area {
-  height: auto !important;
-  position: fixed;
-  bottom: 0;
-}
-
-.v-navigation-drawer.side_nav {
-  height: 100% !important;
-}
-
-.top_area .v-toolbar__content {
-  height: 48px !important;
-  padding: 0 !important;
-}
-
-.v-container.tabular_data_analytics .col {
-    max-height: 100% !important;
-}
-
-.tabular_analytics_basicinfo__output_part .v-navigation-drawer {
-    height: 100% !important;
-}
-
-.tabular_analytics_basicinfo__output_part .col {
-    max-height: 100% !important;
-    overflow-y: unset !important;
-}
-
-.vuetify-styles .v-toolbar {
-    position: fixed;
-}
-
-.vuetify-styles .v-alert {
-    position: fixed !important;
-}
-
-.col.tabular_tab_menu {
-    position: fixed;
-}
-
-
-
-
-
-
-
+/* -------------------------------------------------------  */
 @font-face {
     font-family: 'Nanum';
     font-style: normal;
@@ -213,6 +82,10 @@ body {
     background-color: #ffffff00 !important;
 }
 
+.theme--light.v-list-item--active.sub-menu-item:before {
+    background-color: #ff000000 !important;
+}
+
 .vuetify-styles .sub-menu-item.now_active:before {
     background-color: #585858 !important;
     opacity: 0.08 !important;
@@ -242,7 +115,7 @@ body {
     border: 0;
 }
 
-#input-293 {
+.extra-dense input {
     text-align: right;
 }
 
@@ -308,10 +181,6 @@ body {
     overflow-y: hidden !important;
 }
 
-.vuetify-styles .v-dialog {
-    overflow-y: hidden !important;
-}
-
 .vuetify-styles .v-radio .v-label {
     font-size: 14px !important;
     width:90px
@@ -337,6 +206,14 @@ body {
     opacity: 0 !important
 }
 
+.v-autocomplete__content {
+    background-color: #ffffff;
+}
+
+.v-menu__content {
+    background-color: #ffffff;
+}
+
 .vuetify-styles .task_icon_card:hover {
     background-color: #e1e1e1 !important;
 }
@@ -348,40 +225,3 @@ body {
 .task_icon_card:not(.now_in_use) {
     cursor: pointer;
 }
-
-
-
-
-</style>
-
-{% endblock notebook_css %}
-
-{%- block html_head_js_mathjax -%}
-{{ mathjax(resources.mathjax_url) }}
-{%- endblock html_head_js_mathjax -%}
-
-{%- block html_head_css -%}
-{%- endblock html_head_css -%}
-
-{%- endblock html_head -%}
-</head>
-{%- endblock header -%}
-
-{%- block body_header -%}
-{% if resources.theme == 'dark' %}
-<body class="jp-Notebook" data-jp-theme-light="false" data-jp-theme-name="JupyterLab Dark">
-{% else %}
-<body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-{% endif %}
-{%- endblock body_header -%}
-
-{% block body_footer %}
-</body>
-{% endblock body_footer %}
-
-{% block footer %}
-{% block footer_js %}
-{% endblock footer_js %}
-{{ super() }}
-</html>
-{% endblock footer %}
