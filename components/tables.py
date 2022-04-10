@@ -174,8 +174,6 @@ class SelectTableCardNH(SimpleCard):
     
     def update_data(self, data):
         self.children[1].children = [self._make_table(data, self.size)]
-        print('here2')
-        print(self.children[1].children)
 
 class SelectTableNH(v.VuetifyTemplate):    
     headers = traitlets.List([]).tag(sync=True, allow_null=True)

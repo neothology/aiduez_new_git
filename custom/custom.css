@@ -205,3 +205,23 @@ div.output_subarea {
 .vuetify-styles .side_nav .v-list-item--link:before {
     opacity: 0 !important
 }
+
+.v-autocomplete__content {
+    background-color: #ffffff;
+}
+
+.v-menu__content {
+    background-color: #ffffff;
+}
+
+.vuetify-styles .task_icon_card:hover {
+    background-color: #e1e1e1 !important;
+}
+
+.task_icon_card.now_in_use {
+    background-color: #e1e1e1 !important;
+}
+
+.task_icon_card:not(.now_in_use) {
+    cursor: pointer;
+}

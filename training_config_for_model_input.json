@@ -1,0 +1,54 @@
+{
+    "input_features": [
+        {
+            "name": "Id",
+            "type": "numerical",
+            "encoder": "passthrough"
+        },
+        {
+            "name": "SepalLengthCm",
+            "type": "numerical",
+            "encoder": "passthrough"
+        },
+        {
+            "name": "SepalWidthCm",
+            "type": "numerical",
+            "encoder": "passthrough"
+        },
+        {
+            "name": "PetalLengthCm",
+            "type": "numerical",
+            "encoder": "passthrough"
+        },
+        {
+            "name": "PetalWidthCm",
+            "type": "numerical",
+            "encoder": "passthrough"
+        },
+        {
+            "name": "Species",
+            "type": "category",
+            "encoder": "dense",
+            "embedding_size": 50,
+            "dropout": 0
+        }
+    ],
+    "combiner": {
+        "type": "concat"
+    },
+    "output_features": [],
+    "preprocessing": {
+        "numerical": {
+            "normalization": "zscore"
+        }
+    },
+    "training": {
+        "epochs": 100,
+        "batch_size": 128,
+        "early_stop": 5,
+        "optimizer": {
+            "type": "adam"
+        },
+        "learning_rate": 0.001
+    }
+}

@@ -18,9 +18,9 @@ class TabularImportBaseView(v.Container):
         self.app_context = app_context
         self.context_key = context_key
         self.style = {
-            'left':"margin:0; padding-left:50px; padding-top:20px; height:500px;" + size.get('left', ""),
-            'right':"margin:0; padding:0; height:500px;" + size.get('right', ""),
-            'top':"margin:0; padding:0; max-height:300px;" + size.get('top', ""),
+            'left':"margin:0; padding-left:50px; padding-top:20px; height:250px;" + size.get('left', ""),
+            'right':"margin:0; padding:0; height:250px;" + size.get('right', ""),
+            'top':"margin:0; padding:0;" + size.get('top', ""),
             'middle':"margin:0; padding:0; max-height:45px; margin-left:50px; margin-right:390px; border-bottom:1px solid #e0e0e0;\
                 align-items:flex-end;" + size.get('middle', ""),
             'bottom':"margin:0; padding:0; height:100%;" + size.get('bottom', ""),
@@ -88,7 +88,6 @@ class TabularImportPCView(TabularImportBaseView):
             data = self.app_context.tabular_dataset.data_name_list,
             size = {'width':'400px', 'height':'185px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         self.select_encoding_options = get_or_create_class(
@@ -188,6 +187,9 @@ class TabularImportPCView(TabularImportBaseView):
             self.workbook_data_list.update_data(self.app_context.tabular_dataset.data_name_list)
 
         self.file_upload_button.on_event('click', _upload_file)
+    
+    def update_data(self, data_name_list):
+        self.workbook_data_list.update_data(data_name_list)
 
 class TabularImportAIDUView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
@@ -199,7 +201,7 @@ class TabularImportAIDUView(TabularImportBaseView):
             self.context_key
         )
 
-class TabularImportEDAPView(v.Container):
+class TabularImportEDAPView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key

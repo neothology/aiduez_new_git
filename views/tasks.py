@@ -1,6 +1,7 @@
 import ipyvuetify as v
 from components.buttons import StatedBtn
 from components.cards import IconCard
+from components.dialog import SimpleDialog
 
 
 class TaskBaseView(v.Container):
@@ -42,13 +43,54 @@ class TaskBaseView(v.Container):
             style_ = "display:flex; justify-content:flex-end; padding-right:40px;",
         )
 
+        # dialog
+        self.confrim_btn = v.Btn(
+                children = ["확인"],
+                small = True,
+            )
+
+        self.cancel_btn = v.Btn(
+                children = ["취소"],
+                small = True,
+            )
+
+        self.more_menu_dialog_contents = {
+            'rename':{
+                'title':'Workbook 이름 변경', 
+                'body': v.TextField(
+                    v_model = "",
+                    style_ ="padding:10px 20px 0 20px;",
+                )
+            },
+            'delete':{
+                'title':'Workbook 삭제',
+                'body': v.Col(
+                    children = [],
+                    style = ""
+                ),
+            },
+        }
+        self.more_menu_dialog = SimpleDialog(
+            title = "",
+            body = "",
+            buttons = [ self.confrim_btn, self.cancel_btn ],
+                size = {'width':'500px', 'height':'200px'},
+                # style = {
+                #     'card':"",
+                #     "header":"",
+                #     "body":"align-items:center; font-size:16px; color:#2f2f2f; padding:20px; \
+                #         line-height:32px;",
+                #     "footer":"padding-top:0; border-top:0; background-color:#ffffff;"
+                # }
+        )
+
         self.top_area = v.Row(
             style_ = 'margin:0; padding:0;',
             class_ = "",
-            children = [self.title, self.view_option_area]
+            children = [self.title, self.view_option_area, self.more_menu_dialog],
         )
 
-        # middle_area: workbook cards
+        # middle_area: workbook cards, dialog
         # workbook cards
         self.workbook_cards = [
             IconCard(
@@ -59,10 +101,10 @@ class TaskBaseView(v.Container):
                 workbook_color = card_data['workbook_color'],
                 favorite = card_data['favorite'],
                 size = {'width': '280px', 'height': '170px'},
+                idx = idx,
 
-            ) for card_data in self.workbook_card_data
+            ) for idx, card_data in enumerate(self.workbook_card_data)
         ]   
-
 
         self.middle_area = v.Row(
             style_ = 'margin:0; padding:0; padding-left:40px; padding-right:25px; padding-top:20px;',
@@ -86,13 +128,82 @@ class TaskBaseView(v.Container):
             ],
         )
 
-        # callbacks:
-        ##  click on workbook card
+        # callbacks: 모든 callback은 1차로 tasks.py 에서 처리
+        self.controller = getattr(self.app_context, self.relavant_controller)
+
+        # callbacks: (1) Workbook 열기
+        self.last_clicked_card = None
+        self.just_clicked_card = None
         def _on_click_workbook_card(item, event, data):
-            self.selected = item
+            
+            self.idx = int(item.class_)
+            self.just_clicked_card = self.workbook_cards[self.idx]
+            self.just_clicked_card.class_list.add('now_in_use')
+
+            if self.last_clicked_card:
+                self.last_clicked_card.class_list.remove('now_in_use')
+
+            # keep last clicked card
+            self.last_clicked_card = self.just_clicked_card
+                
+            # call load_workbook function in controller 
+            if self.app_context.current_workbook:
+                if self.just_clicked_card.title_text != self.app_context.current_workbook.current_workbook_name:
+                    self.controller.load_workbook(self.just_clicked_card.workbook_type, self.just_clicked_card.title_text) # e.g. 'tabular', 'Untitled.ezx'
+                else:
+                    self.controller.return_to_current_workflow_stage()
+            else:
+                self.controller.load_workbook(self.just_clicked_card.workbook_type, self.just_clicked_card.title_text)
+
+        for card in self.workbook_cards:
+            card.children[0].children[0].on_event('click', _on_click_workbook_card)
+            card.children[1].on_event('click', _on_click_workbook_card)
+
+        # callbacks: (2) 이름 변경
+        self.selected_workbook_name = ''
+        def _on_select_rename(item, event, data):
+            self.selected_workbook_name = item.class_.split('|')[-1].split('.')[0]
+            self.more_menu_dialog_contents['rename']['body'].v_model = self.selected_workbook_name.split('.')[0]
+            self.more_menu_dialog.update(self.more_menu_dialog_contents['rename'])
+            self.more_menu_dialog.show()
+
+            def _on_click_cancel_button(item, event, data):
+                self.more_menu_dialog.value = 0
+
+            def _on_click_confirm_button(item, event, data):
+                self.controller.rename_workbook(
+                    self.selected_workbook_name, 
+                    self.more_menu_dialog.children[0].children[1].children[0].v_model, 
+                    )            
+
+            self.cancel_btn.on_event('click', _on_click_cancel_button)  
+            self.confrim_btn.on_event('click', _on_click_confirm_button)
+
+        # callbacks: (3) 삭제
+        self.selected_workbook_full_name = ''
+        def _on_select_delete(item, event, data):
+            self.controller.check_active(self.selected_workbook_full_name)
+
+            self.selected_workbook_full_name = item.class_.split('|')[-1]
+            self.more_menu_dialog_contents['delete']['body'].children = [
+                f"{self.selected_workbook_full_name} 파일을 삭제 하시겠습니까? 삭제된 파일은 복구할 수 없습니다."
+                ]
+            self.more_menu_dialog.update(self.more_menu_dialog_contents['delete'])
+            self.more_menu_dialog.show()
+
+            def _on_click_cancel_button(item, event, data):
+                self.more_menu_dialog.value = 0
+
+            def _on_click_confirm_button(item, event, data):
+                self.controller.delete_workbook(self.selected_workbook_full_name)
+                self.more_menu_dialog.value = 0
+            
+            self.cancel_btn.on_event('click', _on_click_cancel_button)  
+            self.confrim_btn.on_event('click', _on_click_confirm_button)
 
         for workbook_card in self.workbook_cards:
-            workbook_card.on_event('click', _on_click_workbook_card)
+            workbook_card.more_items.children[0].on_event('click', _on_select_rename)
+            workbook_card.more_items.children[1].on_event('click', _on_select_delete)
 
     def show(self, target_area:object):
         self.target_area = target_area
@@ -106,6 +217,7 @@ class TaskRecentView(TaskBaseView):
         self.app_context = app_context
         self.context_key = context_key
         self.workbook_card_data = kwargs.get('workbook_card_data')
+        self.relavant_controller = 'task_recent'
 
         super().__init__(
             self.app_context,
@@ -119,6 +231,7 @@ class TaskFavoriteView(TaskBaseView):
         self.app_context = app_context
         self.context_key = context_key
         self.workbook_card_data = kwargs.get('workbook_card_data')
+        self.relavant_controller = 'task_favorite'
 
         super().__init__(
             self.app_context,
@@ -132,6 +245,7 @@ class TaskAllView(TaskBaseView):
         self.app_context = app_context
         self.context_key = context_key
         self.workbook_card_data = kwargs.get('workbook_card_data')
+        self.relavant_controller = 'task_all'
 
         super().__init__(
             self.app_context,

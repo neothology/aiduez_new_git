@@ -38,6 +38,7 @@ class BaseDialog(v.Dialog):
             children = [children],
             width = body_size.get('width'),
         )
+        
 class SimpleDialog(v.Dialog):
     def __init__(
         self,
@@ -66,3 +67,8 @@ class SimpleDialog(v.Dialog):
     def show(self):
         self.value = 1
         self.value = 2
+
+    def update(self, contents:dict):
+        self.children[0].children[0].children[0].children = [contents.get('title', '')]
+        self.children[0].children[1].children = [contents.get('body', '')]
+

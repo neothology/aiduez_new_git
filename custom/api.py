@@ -1543,7 +1543,7 @@ class LudwigModel:
         """
         logging.getLogger('ludwig').setLevel(logging_level)
         # start customize ----------------------------------------------------------------------------------------------------
-        filehandler = logging.FileHandler('/aihub/workspace/tmp/ludwig.log')
+        filehandler = logging.FileHandler('/aihub/workspace/_tmp/ludwig.log')
         logging.getLogger('ludwig').addHandler(filehandler)
         # end customize ------------------------------------------------------------------------------------------------------
 

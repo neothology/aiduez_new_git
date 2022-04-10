@@ -171,7 +171,6 @@ class SimpleSliderCard(SimpleCard):
         super().__init__(
             class_ = kwargs.get('class_'),
             title= title,
-            style_ = "margin:0;", 
             body = body,
             controls = [counter],
             no_footer=True,
@@ -215,7 +214,6 @@ class SimpleRadioCard(SimpleCard):
             super().__init__(
                 class_ = kwargs.get('class_'),
                 title= title,
-                style_ = "margin:0;", 
                 body = body,
                 no_footer=True,
                 size = size,

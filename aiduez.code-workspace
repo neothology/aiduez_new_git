@@ -26,6 +26,9 @@
 		},
 		{
 			"path": "../../../usr/local/lib/python3.8/dist-packages/ipyvue"
+		},
+		{
+			"path": "../../../usr/local/lib/python3.8/dist-packages/ludwig"
 		}
 	],
 	"settings": {}

@@ -8,9 +8,9 @@ class_paths:
   top_area: components.layouts.TopArea
   work_area: components.layouts.WorkArea
   side_nav: components.layouts.SideNav
-  list_menu: components.menus.ListMenu
-  list_menu_sub: components.menus.ListMenuSub
-  tab_menu:  components.menus.TabMenu
+  list_menu: views.menus.ListMenu
+  list_menu_sub: views.tabular.menus.ListMenuSub
+  tab_menu:  views.tabular.menus.TabMenu
   sub_area: components.layouts.SubArea
   sub_menu_area: components.layouts.SubMenuArea
   
@@ -695,40 +695,29 @@ training_params:
               dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
 
 workbook_icons:
-  - home
-  - settings
+  - mdi-bullseye
   - language
-  - favorite
-  - date_range
-  - savings
-  - leaderboard
-  - pan_tool
-  - flutter_dash
-  - rocket_launch
-  - outlet
-  - token
-  - location_city
-  - mood
-  - surfing
-  - send
-  - auto_awesome
+  - apps
+  - stream
+  - select_all
+  - waves
+  - tune
+  - blur_on
+  - grid_on
   - filter_vintage
-  - flare
-  - brightness_7
+  - business
+  - grid_view
+  - memory
+  - graphic_eq
+  - access_time
+  - margin
+  - star_outline
+  - panorama_photosphere
+  - camera
+  - pages
 
 workbook_colors:
-  - 'C0C0C0'
-  # - '808080'
-  # - '000000'
-  - 'FF0000'
-  # - '800000'
-  - 'FFFF00'
-  # - '808000'
-  - '00FF00'
-  # - '008000'
-  - '00FFFF'
-  # - '008080'
-  - '0000FF'
-  # - '000080'
-  - 'FF00FF'
-  # - '800080'
+  - F1DDBF
+  - 525E75
+  - 78938A
+  - 92BA92

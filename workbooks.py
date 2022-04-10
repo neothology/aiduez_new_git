@@ -2,7 +2,7 @@ import os
 import re
 import zipfile
 import ipyvuetify as v
-from utils import get_or_create_class, delete_files_in_dir
+from utils import get_or_create_class, delete_files_in_dir, check_string_validation_a
 import json
 import time
 import shutil
@@ -16,25 +16,28 @@ class TabularWorkbook:
         self.tmp_dir = app_context.env_values['tmp_dir']
         self.tmp_workbook_dir = f'{self.tmp_dir}/workbook'
         self.tmp_works_dir = f'{self.tmp_workbook_dir}/works'
-        self.workbook_name = ''
-        self.workbook_path = ''
         self.work_name_list = []
         self.work_dir_list = []
+        self.current_workbook_name = ''
+        self.current_workbook_path = ''
         self.current_work_name: str = ''
         self.current_work_dir: str = ''
         self.current_work_state_dir: str = ''
         self.current_models_dir: str = ''
-
+        self.dataset = None
         self.profile = None
        
         
     def create_new(self):
 
-        # make 'workbook' directory in 'tmp' directory
-        if os.path.exists(self.tmp_workbook_dir): # /aihub/workspace/tmp/workbook
-            delete_files_in_dir(self.tmp_workbook_dir)
+        # delete tmp directory contents if exists, else make tmp directory
+        if os.path.exists(self.tmp_dir):
+            delete_files_in_dir(self.tmp_dir)
         else:
-            os.mkdir(self.tmp_workbook_dir)
+            os.makedirs(self.tmp_dir)
+
+        # make 'workbook' directory in 'tmp' directory
+        os.mkdir(self.tmp_workbook_dir)
 
         # make 'Untitled.ezx' zipfile in 'workspace' directory
         def _generate_workbook_name(path):
@@ -54,20 +57,19 @@ class TabularWorkbook:
             else:
                 return 'Untitled.ezx'
         
-        self.workbook_name = _generate_workbook_name(self.workspace_dir) 
-        self.workbook_path = f'{self.workspace_dir}/{self.workbook_name}'
-        zipfile.ZipFile(self.workbook_path, 'w').close() # e.g. /aihub/workspace/Untitled.ezx
+        self.current_workbook_name = _generate_workbook_name(self.workspace_dir) 
+        self.current_workbook_path = f'{self.workspace_dir}/{self.current_workbook_name}'
+        zipfile.ZipFile(self.current_workbook_path, 'w').close() # e.g. /aihub/workspace/Untitled.ezx
 
         # initialize dataset object
-        self.dataset = get_or_create_class('tabular_dataset', self.app_context)
+        self.dataset = get_or_create_class('tabular_dataset', self.app_context, update=True)
 
         # create new workbook profile and save it
         import random
         icon_random = random.randint(0, 19)
-        color_random = random.randint(0, 6)
+        color_random = random.randint(0, 3)
         self.profile = {
             'workbook_type': 'tabular',
-            'name': self.workbook_name,
             'works': [],
             'models': [],
             'workbook_icon': self.app_context.workbook_icons[icon_random],
@@ -75,8 +77,9 @@ class TabularWorkbook:
             'favorite': False,
             'description': '',
             'workflow_stage': self.app_context.current_workflow_stage,
+            'current_work': '',
+            'current_model': '',
             'created_at': str(time.time()),
-            'opened_at': '',
             'modified_at': str(time.time()),
             'deleted_at': '',
         }
@@ -90,14 +93,8 @@ class TabularWorkbook:
 
         def _check_work_name(work_name:str):
 
-            # (1) 첫글자는 영문 또는 한글만 (2) 특수문자는 '_' 만 가능, 
-            chk_all = re.compile('[^a-zA-Z0-9ㄱ-ㅎ가-힣_]')
-            chk_first = re.compile('[a-zA-Zㄱ-ㅎ가-힣]')
-            
-            if chk_first.match(work_name) is None:
-                raise Exception('데이터 이름은 영문 또는 한글로 시작해야 합니다.')
-            elif chk_all.search(work_name) is not None:
-                raise Exception("데이터 이름은 영문, 숫자, 한글, 그리고 '_'만 가능합니다.")
+            # check if work name is valid
+            _ = check_string_validation_a(work_name)
 
             # check if data name already exists
             if work_name in self.work_name_list:
@@ -105,22 +102,7 @@ class TabularWorkbook:
 
             return work_name
 
-
-
-        # def _check_data_column(data):
-
-        #     # Column명은 영문이랑 '_'만 허용
-        #     chk_col_all = re.compile('[^a-zA-Z0-9_]')
-        #     column_list = data.columns.tolist()
-
-        #     for i in range(0, len(column_list)):
-        #         if chk_col_all.search(column_list[i]) is not None:
-        #             raise Exception("데이터 컬러명은 영문, 숫자, 그리고 '_'만 가능합니다. ")
-            
-        #     return data
-
         self.app_context.progress_linear.active = True
-
 
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
@@ -138,7 +120,7 @@ class TabularWorkbook:
         # invoke dataset object and add data to it
         self.dataset.add_data(self.current_work_name, data)
 
-        self.work_name_list.append(work_name)
+        # self.work_name_list.append(work_name)
         self.work_dir_list.append(self.current_work_dir)
 
         # update 
@@ -149,7 +131,11 @@ class TabularWorkbook:
 
         self.app_context.progress_linear.active = False
 
-    def save_current_work(self):
+    def save_workbook(self, **kwargs):
+
+        self.app_context.progress_linear.active = True
+
+        # save current work
         # save current work -(1) 데이터 입수
         # save current work -(2) 데이터 분석
         # self.app_context.current_workflow_stage_sub
@@ -159,12 +145,34 @@ class TabularWorkbook:
             self.app_context.tabular_ai_training__training_options.save_config(self.current_work_state_dir)
         # save current work -(5) AI모델 평가
 
-    def load_existing_work(self, work_name):
+        if kwargs.get('work'):
+            if kwargs['work'] not in self.profile['works']:
+                self.profile['works'].append(kwargs['work'])
+            self.profile['current_work'] = kwargs['work']
+
+        if kwargs.get('model'):
+            if kwargs['model'] not in self.profile['models']:
+                self.profile['models'].append(kwargs['model'])
+            self.profile['current_model'] = kwargs['model']
+
+        self.profile['workflow_stage'] = self.app_context.current_workflow_stage
+        self.profile['modified_at'] = str(time.time())
+
+        with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'w') as f:
+            json.dump(self.profile, f)
+
+        shutil.make_archive(f'{self.tmp_dir}/tmp_workbook', 'zip', self.tmp_workbook_dir)
+        shutil.move(f'{self.tmp_dir}/tmp_workbook.zip', self.current_workbook_path)
+
+        self.app_context.progress_linear.active = False
+
+    def _load_existing_work(self, work_name):
 
         # work 변경
         self.current_work_name = work_name
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'
         self.current_work_state_dir = f'{self.current_work_dir}/work_state'
+        self.current_models_dir = f'{self.current_work_dir}/models'
 
         # data 변경
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
@@ -203,7 +211,7 @@ class TabularWorkbook:
         if self.app_context.tabular_ai_training:
             tabular_ai_training = get_or_create_class('tabular_ai_training', self.app_context)
             
-            tabular_ai_training.train_button.disabled = True
+            tabular_ai_training.train_button.children[2].disabled = True
 
             train_result = get_or_create_class(
                 'tabular_train_result',
@@ -250,44 +258,43 @@ class TabularWorkbook:
             ]
         
     def change_work(self, work_name):
-        self.app_context.progress_overlay.start()
-
-        # decide which stages to update
-        stages = ['tabular_data_analytics', 'tabular_data_processing', 'tabular_ai_training']
+        # self.app_context.progress_overlay.start()
         
-        self.save_current_work()
-        self.load_existing_work(work_name)
+        self.save_workbook()
+        self._load_existing_work(work_name)
+        self.save_workbook(work = work_name)
+
+
         self.app_context.progress_overlay.finish()
 
-    def save_workbook(self, **kwargs):
+    def load_workbook_from_tmp(self, workbook_name):
 
-        self.app_context.progress_linear.active = True
+        # load workbook profile
+        with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'r') as f:
+            self.profile = json.loads(f.read())
 
-        if kwargs.get('work'):
-            self.profile['works'].append(kwargs['work'])
+        self.work_name_list = self.profile['works']
+        self.work_dir_list = [f'{self.tmp_works_dir}/{work_name}' for work_name in self.work_name_list]
 
-        if kwargs.get('model'):
-            self.profile['models'].append(kwargs['model'])
+        self.app_context.current_workflow_stage = self.profile['workflow_stage']
 
-        self.profile['workflow_stage'] = self.app_context.current_workflow_stage
-        self.profile['modified_at'] = str(time.time())
+        # set workbook name
+        self.current_workbook_name = workbook_name # e.g. 'Untitled.ezx'
+        self.current_workbook_path = f'{self.workspace_dir}/{self.current_workbook_name}'
 
-        with open(f'{self.tmp_workbook_dir}/workbook_profile.json', 'w') as f:
-            json.dump(self.profile, f)
+        # initialize dataset object
+        self.dataset = get_or_create_class('tabular_dataset', self.app_context)
+        self.dataset.data_name_list = self.work_name_list
+        self.dataset.data_path_list = [f'{self.tmp_works_dir}/{work_name}/data/{work_name}.json' for work_name in self.work_name_list]
 
-        shutil.make_archive(f'{self.tmp_dir}/tmp_workbook', 'zip', self.tmp_workbook_dir)
-        shutil.move(f'{self.tmp_dir}/tmp_workbook.zip', self.workbook_path)
+        # load saved work
+        if self.profile['current_work']:
+            self._load_existing_work(self.profile['current_work'])
 
-        self.app_context.progress_linear.active = False
+        # update import view
+        if self.app_context.tabular_data_import__workbook_data_list:
+            self.app_context.tabular_data_import__workbook_data_list.update_data(self.app_context.tabular_dataset.data_name_list)
 
-    def save_current_work_as(self, work_name):
-        pass
-
-    def save_workbook_as():
-        pass
-
-    def rename_workbook():
-        pass
-
-
-
+        # reset data context
+        if self.app_context.tabular_data_context:
+            self.app_context.tabular_data_context.reset()

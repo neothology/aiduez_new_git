@@ -153,7 +153,6 @@ class TabularSingleProcessingMenu(BaseCard):
             ) for column_name in self.dataset.columns
         ]
 
-
         # (3) pandas_data_types -------------------------------------------------
         pandas_data_types = [
             v.Col(
