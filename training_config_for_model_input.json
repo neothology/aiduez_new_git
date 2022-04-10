@@ -1,32 +1,12 @@
 {
     "input_features": [
         {
-            "name": "Id",
+            "name": "Score",
             "type": "numerical",
             "encoder": "passthrough"
         },
         {
-            "name": "SepalLengthCm",
-            "type": "numerical",
-            "encoder": "passthrough"
-        },
-        {
-            "name": "SepalWidthCm",
-            "type": "numerical",
-            "encoder": "passthrough"
-        },
-        {
-            "name": "PetalLengthCm",
-            "type": "numerical",
-            "encoder": "passthrough"
-        },
-        {
-            "name": "PetalWidthCm",
-            "type": "numerical",
-            "encoder": "passthrough"
-        },
-        {
-            "name": "Species",
+            "name": "Review",
             "type": "category",
             "encoder": "dense",
             "embedding_size": 50,

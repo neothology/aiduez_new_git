@@ -75,7 +75,6 @@ class TaskBase:
         self.view_instance.show(self.target_area)
 
     def load_workbook(self, workbook_type, workbook_name):
-        # self.app_context.progress_overlay.start()
 
         import os
         from utils import delete_files_in_dir
@@ -85,18 +84,13 @@ class TaskBase:
         else:
             os.makedirs(self.tmp_dir)
 
-        # self.app_context.progress_overlay.update(30)
         workbook_path = f'{self.workspace_dir}/{workbook_name}'
         with ZipFile(workbook_path) as workbook:
             workbook.extractall(self.tmp_workbook_dir)
         
-        # self.app_context.progress_overlay.update(60)
         workflow_base = get_or_create_class(f'{workbook_type}_base', self.app_context) # e.g. 'tabular_base'
         workflow_base.load_workbook_from_tmp(workbook_name)
-        
-        # self.app_context.progress_overlay.update(100)
-        # self.app_context.progress_overlay.finish()
-    
+            
     def return_to_current_workflow_stage(self):
         workbook_type = self.app_context.current_workbook.flow_type
         workflow_base = get_or_create_class(f'{workbook_type}_base', self.app_context) # e.g. 'tabular_base'

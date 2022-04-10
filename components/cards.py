@@ -307,7 +307,7 @@ class SimpleCard(v.Card):
             "card": size_style + " \
                 padding:0; display:flex; flex-direction:column; \
                 box-shadow: none !important; border:1px solid #e0e0e0; \
-                background-color: rgb(255, 255, 255); " + kwargs.get('style') if kwargs.get('style') else "", 
+                background-color: rgb(255, 255, 255); " + kwargs.get('style', ""),
             "header": "max-height:33px; min-height:33px; margin:0; width:100%; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
                 padding:0; padding-left:16px; \
