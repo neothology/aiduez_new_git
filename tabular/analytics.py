@@ -14,6 +14,25 @@ class TabularAnalyticsBase:
     def show_contents(self):
         self.view_instance.show()
 
+class TabularaAnalyticsBasicinfo(TabularAnalyticsBase):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.target_view_name = 'tabular_analytics_basicinfo_view'
+        super().__init__(self.app_context, self.context_key, self.target_view_name, **kwargs)
+
+        # make setting data:
+        self.x_cols = pd.DataFrame(self.data.columns, columns=['col_names'])
+        self.data_range_default = len(self.data) // 2 if len(self.data) // 2 <= 1000 else 1000
+        
+        self.view_instance = get_or_create_class(
+            self.target_view_name, 
+            self.app_context, 
+            target_area = self.target_area,
+            x_cols = self.x_cols,
+            data_range = [1, len(self.data), 1, self.data_range_default],
+        )
+
 class TabularAnalyticsScatter(TabularAnalyticsBase):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context

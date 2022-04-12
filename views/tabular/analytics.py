@@ -40,44 +40,74 @@ class TabualrAnalyticsOptionArea(v.NavigationDrawer):
     def update_contents(self, children):
         self.children[0].children = children
 
-class TabularaAnalyticsBasicinfo(v.Container):
+
+class TabularAnalyticsBaseView(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+        self.target_area = kwargs.get('target_area')
 
-        self.data = self.app_context.tabular_dataset.current_data
+        self.setting_part = get_or_create_class(
+            'tabular_data_analytics_options',
+            self.app_context,
+        )
+
+        self.output_part = v.Row(
+            class_ = self.context_key,
+            style_ = self.output_part_style,
+            children = [self.setting_part],
+        )
+
+        super().__init__(
+            class_ = self.context_key,
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
+            children = [
+                self.output_part
+            ],
+        )
+        
+    def show(self):
+        self.setting_part.update_contents(self.setting_part_components)
+        self.target_area.children = [self]
+
+class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.target_area = kwargs.get('target_area')
+        self.x_cols = kwargs.get('x_cols')
+        self.data_range = kwargs.get('data_range')
         self.selected_data = None
+        self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
+                    display:flex, flex-direction:column; justify-content:center;"
 
-        self.result_togle = "display:none;"
-
-        # column selection
-        df_col_names = pd.DataFrame(self.data.columns, columns=['col_names'])
+        # setting area: (1) column selection
         self.column_selector = get_or_create_class(
             'select_table_card',
             self.app_context,
-            context_key = f'{self.context_key}__column_selector', # tabular_analytics_basicinfo__column_selector
+            context_key = f'{self.context_key}__column_selector', # tabular_analytics_scatter_view__column_selector
             title = '변수 선택',
-            data = df_col_names,
-            size = {'width':'210px', 'height':'200px'},
-            style = 'background-color:#ffffff;',
+            data = self.x_cols,
+            size = {'width':'210px', 'height':'150px'},
+            single_select = False,
+            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
         )
 
         # column selection - select all
-        select_all_values = [{'index':i} for i in range(len(self.data.columns))]
+        select_all_values = [{'index':i} for i in range(len(self.x_cols))]
         self.column_selector.children[1].children[0].selected = select_all_values
 
-        # data range selector
-        default = 1000 if len(self.data) // 2  > 1000 else len(self.data) // 2
+        # setting area: (2) data range selection
         self.data_range_selector = get_or_create_class(
             'simple_slider_card',
             self.app_context,
             context_key = f'{self.context_key}__data_range_selector', 
             title = '행 범위',
-            range = [1, len(self.data), 1, default],
+            range = self.data_range,
             size = {'width':'210px', 'height':'90px'},
         )
 
-        # 조회하기 버튼
+        # setting area: (4) run button
         self.run_button = v.Col(
             children= [
                 v.Btn(
@@ -99,29 +129,13 @@ class TabularaAnalyticsBasicinfo(v.Container):
             self.run_button,
         ]
 
-        self.setting_part = get_or_create_class(
-            'tabular_data_analytics_options',
-            self.app_context,
-        )
-        
-        self.setting_part.update_contents(self.setting_part_components)
-
-        self.output_part = v.Row(
-            class_ = 'tabular_analytics_basicinfo__output_part',
-            style_ = "max-height:100%; margin:0; padding:0; background-color:#ffffff; \
-                      display:flex, flex-direction:column;",
-            children = [self.setting_part],
-        )
-
         super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
-            children = [
-                self.output_part
-                ],
-        )
+            app_context, 
+            context_key, 
+            target_area = self.target_area
+            )
 
-        def _show_base_info(item, event, data):
+        def _show_plot(item, event, data):
             self.app_context.progress_linear.start()
 
             # selected col_names
@@ -168,39 +182,7 @@ class TabularaAnalyticsBasicinfo(v.Container):
             ]
             self.app_context.progress_linear.active = False
 
-        self.run_button.on_event('click', _show_base_info)
-
-    def update_options(self):
-        self.setting_part.update_contents(self.setting_part_components)
-
-class TabularAnalyticsBaseView(v.Container):
-    def __init__(self, app_context, context_key, **kwargs):
-        self.app_context = app_context
-        self.context_key = context_key
-        self.target_area = kwargs.get('target_area')
-
-        self.setting_part = get_or_create_class(
-            'tabular_data_analytics_options',
-            self.app_context,
-        )
-
-        self.output_part = v.Row(
-            class_ = self.context_key,
-            style_ = self.output_part_style,
-            children = [self.setting_part],
-        )
-
-        super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
-            children = [
-                self.output_part
-            ],
-        )
-
-    def show(self):
-        self.setting_part.update_contents(self.setting_part_components)
-        self.target_area.children = [self]
+        self.run_button.on_event('click', _show_plot)
 
 class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
@@ -746,14 +728,6 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
             style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:flex-end; align-items:center; width:210px;",
         )
 
-        # # 영문/한문 Cloud 선택
-        # self.select_lan = v.Checkbox(
-        #     label = '영문 Cloud', 
-        #     value = False, 
-        #     children = [],
-        #     style_ = "margin:0; padding:0; display:flex;flex-direction:row;justify-content:flex-end"        
-        # )
-
         self.setting_part_components = [
             self.column_selector,
             v.Spacer(style_ = "min-height:10px"),
@@ -854,7 +828,7 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
         self.run_button.on_event('click', _show_plot)
 
 
-class TabularAnalyticsDimensionReduction(v.Container):
+class TabularAnalyticsDimensionReductionView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key

@@ -185,6 +185,7 @@ class TabularWorkbook:
                 item.class_list.remove('now_active')
             self.app_context.tabular_data_analytics__sub_contents.children[0].children = []
             self.app_context.tabular_analytics_basicinfo = None
+            self.app_context.tabular_analytics_basicinfo_view = None
             self.app_context.tabular_analytics_scatter = None
             self.app_context.tabular_analytics_scatter_view = None
             self.app_context.tabular_analytics_heatmap = None

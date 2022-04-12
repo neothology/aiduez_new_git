@@ -244,19 +244,8 @@ class ListMenuSub(v.List):
 
             # get target and set
             self.app_context.current_workflow_stage_sub = item.value
-
-            # temporary condition to apply MVC:
-            if item.value not in ['tabular_analytics_scatter', 'tabular_analytics_heatmap', 'tabular_analytics_boxplot', 'tabular_analytics_density', 'tabular_analytics_wcloud']:
-                target_area = getattr(self.app_context, stage + "__sub_contents")        
-                target_instance = get_or_create_class(item.value, self.app_context) # e.g. tabular_analytics_basicinfo의 경우 여기서 options가 생성
-
-                # temporary condition to apply MVC:
-                if self.app_context.current_workflow_stage == 'tabular_data_analytics':
-                    target_instance.update_options()
-                target_area.children = [target_instance]
-            else:
-                target_instance = get_or_create_class(item.value, self.app_context) 
-                target_instance.show_contents()
+            target_instance = get_or_create_class(item.value, self.app_context) 
+            target_instance.show_contents()
 
             if self.last_activated_item != item:
                 self.app_context.tabular_data_analytics_options.v_model = True
