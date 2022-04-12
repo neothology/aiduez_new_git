@@ -30,6 +30,7 @@ class AppContext:
     work_area: object = None
     base_overlay: object = None
     progress_overlay: object = None
+    progress_overlay2: object = None
     progress_linear: object = None
 
 ## workbook list ##
@@ -96,7 +97,9 @@ class AppContext:
     tabular_analytics_wcloud_view: object = None
 
     tabular_analytics_reduction: object = None
+    tabular_analytics_reduction_view: object = None
     tabular_analytics_clustering: object = None
+    tabular_analytics_clustering_view: object = None
     tabular_analytics_datasample: object = None
     tabular_analytics_datasample__column_selector: object = None
     tabular_analytics_datasample__data_range_selector: object = None

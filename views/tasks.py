@@ -136,7 +136,9 @@ class TaskBaseView(v.Container):
         self.just_clicked_card = None
         def _on_click_workbook_card(item, event, data):
             self.app_context.ignore_progress_linear = True
+            self.app_context.progress_overlay2.ignore = True
             self.app_context.progress_overlay.start()
+            
             
             self.idx = int(item.class_)
             self.just_clicked_card = self.workbook_cards[self.idx]
@@ -161,6 +163,7 @@ class TaskBaseView(v.Container):
             self.app_context.progress_overlay.update(100)
             self.app_context.progress_overlay.stop()
             self.app_context.ignore_progress_linear = False
+            self.app_context.progress_overlay2.ignore = False
 
         for card in self.workbook_cards:
             card.children[0].children[0].on_event('click', _on_click_workbook_card)

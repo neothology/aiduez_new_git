@@ -196,21 +196,8 @@ class TabularWorkbook:
             self.app_context.tabular_analytics_density_view = None
             self.app_context.tabular_analytics_wcloud = None
             self.app_context.tabular_analytics_wcloud_view = None
-
-
-        #     if self.app_context.tabular_data_analytics_options:
-        #         self.app_context.tabular_data_analytics__sub_contents.children = []
-        #         self.app_context.tabular_data_analytics_options = None
-        #         self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
-        #         self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
-        #     if self.app_context.tabular_analytics_basicinfo:
-        #         self.app_context.tabular_analytics_basicinfo__column_selector = None
-        #         self.app_context.tabular_analytics_basicinfo__data_range_selector = None
-        #         self.app_context.tabular_analytics_basicinfo = None
-        #     if self.app_context.tabular_analytics_wcloud:
-        #         self.app_context.tabular_analytics_wcloud__column_selector = None
-        #         self.app_context.tabular_analytics_wcloud__data_range_selector = None
-        #         self.app_context_tabular_analytics_wcloud = None
+            self.app_context.tabular_analytics_reduction = None
+            self.app_context.tabular_analytics_reduction_view = None
 
         # preprocessing 변경
         if self.app_context.tabular_data_processing:
@@ -222,8 +209,8 @@ class TabularWorkbook:
             if self.app_context.tabular_data_single_processing is not None:
                 self.app_context.tabular_data_single_processing.update()
 
-
-        self.app_context.progress_overlay.update(20)
+        self.app_context.progress_overlay.update(60)
+        self.app_context.progress_overlay2.update(20)
 
         # training 변경
         if self.app_context.tabular_ai_training:
@@ -240,7 +227,8 @@ class TabularWorkbook:
                 size = {'width':'90vw', 'height':'80vh'}, 
             )
             
-            self.app_context.progress_overlay.update(60)
+            self.app_context.progress_overlay.update(70)
+            self.app_context.progress_overlay2.update(60)
 
             training_options = get_or_create_class(
                 'tabular_training_options', 
@@ -250,7 +238,8 @@ class TabularWorkbook:
                 title = '학습 Parameter 설정',
             )
 
-            self.app_context.progress_overlay.update(90)
+            self.app_context.progress_overlay.update(80)
+            self.app_context.progress_overlay2.update(90)
 
             column_summary = get_or_create_class(
                 'column_summary',
@@ -261,7 +250,8 @@ class TabularWorkbook:
                 col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
             ) 
 
-            self.app_context.progress_overlay.update(100)
+            self.app_context.progress_overlay.update(90)
+            self.app_context.progress_overlay2.update(100)
 
             # hide show_result button
             self.app_context.tabular_ai_training__train_activator.show_result_btn.hide()
@@ -276,14 +266,16 @@ class TabularWorkbook:
             ]
         
     def change_work(self, work_name):
-        # self.app_context.progress_overlay.start()
+        if self.app_context.progress_overlay.value:
+            self.app_context.progress_overlay2.ignore = True
+        else:
+            self.app_context.progress_overlay2.start()
         
         self.save_workbook()
         self._load_existing_work(work_name)
         self.save_workbook(work = work_name)
 
-
-        self.app_context.progress_overlay.stop()
+        self.app_context.progress_overlay2.stop()
 
     def load_workbook_from_tmp(self, workbook_name):
 

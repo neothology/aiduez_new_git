@@ -90,7 +90,7 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
+            style = 'background-color:#ffffff;',
         )
 
         # column selection - select all
@@ -192,7 +192,6 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
         self.x_cols = kwargs.get('x_cols')
         self.hue_cols = kwargs.get('hue_cols')
         self.data_range = kwargs.get('data_range')
-        self.selected_data = None
         self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
                     display:flex, flex-direction:column; justify-content:center;"
 
@@ -205,7 +204,7 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
+            style = 'background-color:#ffffff;',
         )
 
         # column selection - select all
@@ -315,7 +314,6 @@ class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
         self.target_area = kwargs.get('target_area')
         self.x_cols = kwargs.get('x_cols')
         self.data_range = kwargs.get('data_range')
-        self.selected_data = None
         self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
                     display:flex, flex-direction:column; justify-content:center;"
 
@@ -417,7 +415,6 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
         self.y_cols = kwargs.get('y_cols')
         self.hue_cols = kwargs.get('hue_cols')
         self.data_range = kwargs.get('data_range')
-        self.selected_data = None
         self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
                     display:flex, flex-direction:column; justify-content:center;"
 
@@ -552,7 +549,6 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
         self.x_cols = kwargs.get('x_cols')
         self.hue_cols = kwargs.get('hue_cols')
         self.data_range = kwargs.get('data_range')
-        self.selected_data = None
         self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
                     display:flex, flex-direction:column; justify-content:center;"
 
@@ -670,7 +666,6 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
         self.x_cols = kwargs.get('x_cols')
         self.hue_cols = kwargs.get('hue_cols')
         self.data_range = kwargs.get('data_range')
-        self.selected_data = None
         self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
                     display:flex, flex-direction:column; justify-content:center;"
 
@@ -741,8 +736,7 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
             app_context, 
             context_key, 
             target_area = self.target_area
-            )
-
+        )
 
         def _show_plot(item, event, data):
             self.app_context.progress_linear.start()
@@ -827,14 +821,130 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
         self.run_button.on_event('click', _show_plot)
 
 
-class TabularAnalyticsDimensionReductionView(TabularAnalyticsBaseView):
+class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [self.context_key]
+        self.target_area = kwargs.get('target_area')
+        self.x_cols = kwargs.get('x_cols')
+        self.c_cols = kwargs.get('c_cols')
+        self.data_range = kwargs.get('data_range')
+        self.algorithm_cols = kwargs.get('algorithm_cols')
+        self.perplexity_range = kwargs.get('perplexity_range')
+        self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
+                    display:flex, flex-direction:column; justify-content:center;"
+
+        # setting area: (1) algorithm selector
+        self.algorithm_selector = get_or_create_class(
+            'simple_radio_card',
+            self.app_context,
+            context_key = f'{self.context_key}__algorithm_selector',
+            title = '알고리즘',
+            direction = 'row',
+            options = self.algorithm_cols,
+            size = {'width':'210px', 'height':'90px'},
+            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0; padding-left:30px; padding-bottom:15px;',
         )
+            
+        # setting area: (2) column selection
+        self.column_selector = get_or_create_class(
+            'select_table_card',
+            self.app_context,
+            context_key = f'{self.context_key}__column_selector',
+            title = '변수 선택',
+            data = self.x_cols,
+            size = {'width':'210px', 'height':'150px'},
+            single_select = False,
+            style = 'background-color:#ffffff;',
+        )
+        
+        # column selection - select all
+        select_all_values = [{'index':i} for i in range(len(self.x_cols))]
+        self.column_selector.children[1].children[0].selected = select_all_values
+
+        # setting area: (3) category selection
+        self.category_selector = get_or_create_class(
+            'select_table_card',
+            self.app_context,
+            context_key = f'{self.context_key}__category_selector', 
+            title = '범주 선택',
+            data = self.c_cols,
+            size = {'width':'210px', 'height':'100px'},
+            single_select = True,
+            style = 'background-color:#ffffff;',
+        )
+
+        # setting area: (4) data range selection
+        self.data_range_selector = get_or_create_class(
+            'simple_slider_card',
+            self.app_context,
+            context_key = f'{self.context_key}__data_range_selector', 
+            title = '행 범위',
+            range = self.data_range,
+            size = {'width':'210px', 'height':'90px'},
+        )
+
+        # setting area: (5) perplexity slider
+        self.perplexity_selector = get_or_create_class(
+            'simple_slider_card',
+            self.app_context,
+            context_key = f'{self.context_key}__perplexity_selector', 
+            title = 'Perplexity',
+            range = self.perplexity_range,
+            size = {'width':'210px', 'height':'90px'},
+        )
+        
+        self.perplexity_selector_area = v.Row(
+            children = [],
+            style_  = "margin:0; padding:0; display:flex; flex-direction:column; justify-content:center; align-items:center; \
+                     width:210px; margin-bottom:10px",
+        )
+
+        # setting area: (6) run button
+        self.run_button = v.Col(
+            children= [
+                v.Btn(
+                    style_ = "",
+                    children = ['조회하기'],
+                    rounded = True,
+                    depressed = True,
+                    dark = True,
+                ),
+            ],
+            style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:flex-end; align-items:center; width:210px;",
+        )
+
+        self.setting_part_components = [
+            self.algorithm_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.column_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.category_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.data_range_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.perplexity_selector_area,
+            self.run_button
+        ]
+
+        super().__init__(
+            app_context, 
+            context_key, 
+            target_area = self.target_area
+        )
+
+        def _show_conditional_option(item, event, data):
+            if item.v_model == 't_sne':
+                self.perplexity_selector_area.children = [self.perplexity_selector]
+            else:
+                self.perplexity_selector_area.children = []
+
+        def _show_plot(item, event, data):
+            self.app_context.progress_linear.start()
+            self.app_context.progress_linear.stop()
+
+        self.algorithm_selector.children[1].children[0].children[0].on_event('change', _show_conditional_option)
+        self.run_button.on_event('click', _show_plot)
 
 class TabularAnalyticsClustering(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
@@ -863,7 +973,7 @@ class TabularAnalyticsDataSample(v.Container):
             title = '변수 선택',
             data = df_col_names,
             size = {'width':'210px', 'height':'200px'},
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
+            style = 'background-color:#ffffff;',
         )
         # column selection - select all
         select_all_values = [{'index':i} for i in range(len(self.data.columns))]
@@ -878,7 +988,7 @@ class TabularAnalyticsDataSample(v.Container):
             title = '행 범위',
             range = [1, len(self.data), 1, default],
             size = {'width':'210px', 'height':'90px'},
-            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0;',
+            style = 'background-color:#ffffff;',
         )
 
         # 조회하기 버튼

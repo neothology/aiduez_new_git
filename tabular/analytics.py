@@ -190,3 +190,53 @@ class TabularAnalyticsWordCloud(TabularAnalyticsBase):
             x_cols = self.x_cols,
             data_range = [self.data_range_start, len(self.data), 1, self.data_range_default]
         )
+
+class TabularAnalyticsReduction(TabularAnalyticsBase):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.target_view_name = 'tabular_analytics_reduction_view'
+        super().__init__(self.app_context, self.context_key, self.target_view_name, **kwargs)
+
+        # make setting data:
+        self.x_cols = pd.DataFrame(self.data.select_dtypes(include = [np.number]).columns, columns = ['col_name'])
+        self.c_cols = pd.DataFrame(self.data.select_dtypes(exclude = [np.number]).columns, columns = ['col_name'])
+
+        # algorithm
+        self.algorithm_cols = {
+                'labels':['PCA', 't-SNE'],
+                'values':['pca', 't_sne'],
+            },
+
+        # data range
+        if len(self.data) <= 100:
+            self.data_range_start = self.data_range_default = len(self.data) 
+        elif len(self.data) <= 200:
+            self.data_range_start = self.data_range_default = 100
+
+        elif len(self.data) <= 2000:
+            self.data_range_start = 100
+            self.data_range_default = len(self.data) // 2
+        else:
+            self.data_range_start = 100
+            self.data_range_default = 1000
+
+        # algorithm
+        self.algorithm_cols = {
+                'labels':['PCA', 't-SNE'],
+                'values':['pca', 't_sne'],
+            }
+
+        # perplexity range
+        self.perplexity_range = [1, 100, 1, 50]
+
+        self.view_instance = get_or_create_class(
+            self.target_view_name, 
+            self.app_context, 
+            target_area = self.target_area,
+            x_cols = self.x_cols,
+            c_cols = self.c_cols,
+            data_range = [self.data_range_start, len(self.data), 1, self.data_range_default],
+            algorithm_cols = self.algorithm_cols,
+            perplexity_range = self.perplexity_range
+        )
