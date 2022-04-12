@@ -62,7 +62,8 @@ class_paths:
 
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
   tabular_data_analytics_options: views.tabular.analytics.TabualrAnalyticsOptionArea
-  tabular_analytics_basicinfo: views.tabular.analytics.TabularaAnalyticsBasicinfo
+  tabular_analytics_basicinfo: tabular.analytics.TabularaAnalyticsBasicinfo
+  tabular_analytics_basicinfo_view: views.tabular.analytics.TabularaAnalyticsBasicinfoView
   tabular_analytics_scatter: tabular.analytics.TabularAnalyticsScatter
   tabular_analytics_scatter_view: views.tabular.analytics.TabularAnalyticsScatterView
   tabular_analytics_heatmap: tabular.analytics.TabularAnalyticsHeatmap

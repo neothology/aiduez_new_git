@@ -65,7 +65,7 @@ class TabularAnalyticsBaseView(v.Container):
                 self.output_part
             ],
         )
-        
+
     def show(self):
         self.setting_part.update_contents(self.setting_part_components)
         self.target_area.children = [self]
@@ -543,7 +543,6 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
             self.app_context.progress_linear.stop()
 
         self.run_button.on_event('click', _show_plot)
-
 
 class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
