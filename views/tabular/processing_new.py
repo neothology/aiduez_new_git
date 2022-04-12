@@ -68,7 +68,7 @@ class TabularSingleProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
 
         self.column_name=""     # selected column name
         self.process_type=""    # selected process type
@@ -199,7 +199,7 @@ class TabularSingleProcessing(v.Container):
                 alert.v_model = True
             else:
                 alert.v_model = False
-                self.app_context.progress_linear.active = True
+                self.app_context.progress_linear.start()
                 self.column_name = column_selector.v_model
                 self.process_type = single_process_type[preprocess_selector.v_model]
                 self.processing_card.initialize(column_name=self.column_name, process_type=self.process_type)
@@ -227,7 +227,7 @@ class TabularSingleProcessing(v.Container):
         return processing_options
 
     def update(self):
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
         self.processing_options = self._make_single_process_options()
         self.children = [
             self.processing_options,
@@ -286,7 +286,7 @@ class TabularSingleProcessingCard(v.Card):
 
         def _on_click_save(widget, event=None, data=None):
             # 박영근 추가: progress linear
-            self.app_context.progress_linear.active = True
+            self.app_context.progress_linear.start()
 
             before_coulumn = self.get_sample_data(column_name=self.column_name, n=-1)
             processed_column = self.processing_data(before_coulumn)

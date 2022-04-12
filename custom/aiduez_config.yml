@@ -6,11 +6,12 @@ class_paths:
   # components - layout & menu
   background: components.layouts.BackGround
   top_area: components.layouts.TopArea
-  work_area: components.layouts.WorkArea
   side_nav: components.layouts.SideNav
   list_menu: views.menus.ListMenu
-  list_menu_sub: views.tabular.menus.ListMenuSub
+  work_area: components.layouts.WorkArea
   tab_menu:  views.tabular.menus.TabMenu
+  list_menu_sub: views.tabular.menus.ListMenuSub
+
   sub_area: components.layouts.SubArea
   sub_menu_area: components.layouts.SubMenuArea
   
@@ -62,11 +63,18 @@ class_paths:
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
   tabular_data_analytics_options: views.tabular.analytics.TabualrAnalyticsOptionArea
   tabular_analytics_basicinfo: views.tabular.analytics.TabularaAnalyticsBasicinfo
-  tabular_analytics_scatter: views.tabular.analytics.TabularAnalyticsScatter
-  tabular_analytics_heatmap: views.tabular.analytics.TabularAnalyticsHeatmap
-  tabular_analytics_boxplot: views.tabular.analytics.TabularAnalyticsBoxplot
-  tabular_analytics_density: views.tabular.analytics.TabularAnalyticsDensity
-  tabular_analytics_wcloud: views.tabular.analytics.TabularAnalyticsWordCloud
+  tabular_analytics_scatter: tabular.analytics.TabularAnalyticsScatter
+  tabular_analytics_scatter_view: views.tabular.analytics.TabularAnalyticsScatterView
+  tabular_analytics_heatmap: tabular.analytics.TabularAnalyticsHeatmap
+  tabular_analytics_heatmap_view: views.tabular.analytics.TabularAnalyticsHeatmapView
+  tabular_analytics_boxplot: tabular.analytics.TabularAnalyticsBoxplot
+  tabular_analytics_boxplot_view: views.tabular.analytics.TabularAnalyticsBoxplotView
+  tabular_analytics_density: tabular.analytics.TabularAnalyticsDensity
+  tabular_analytics_density_view: views.tabular.analytics.TabularAnalyticsDensityView
+  tabular_analytics_wcloud: tabular.analytics.TabularAnalyticsWordCloud
+  tabular_analytics_wcloud_view: views.tabular.analytics.TabularAnalyticsWordCloudView
+
+
   tabular_analytics_reduction: views.tabular.analytics.TabularAnalyticsDimensionReduction
   tabular_analytics_clustering: views.tabular.analytics.TabularAnalyticsClustering
   tabular_analytics_datasample: views.tabular.analytics.TabularAnalyticsDataSample

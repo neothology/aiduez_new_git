@@ -225,3 +225,7 @@ div.output_subarea {
 .task_icon_card:not(.now_in_use) {
     cursor: pointer;
 }
+
+.tabular_analytics_wcloud_view__language_selector .v-radio {
+    max-width:37% !important;
+}

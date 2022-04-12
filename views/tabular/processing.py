@@ -42,7 +42,7 @@ class TabularSingleProcessing(v.Container):
         self.app_context = app_context
         self.context_key = context_key
 
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
 
         self.processing_menu = TabularSingleProcessingMenu(
             app_context=self.app_context,
@@ -88,7 +88,7 @@ class TabularSingleProcessing(v.Container):
         return column_summary
 
     def update(self):
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
         self.processing_menu.update()
         # column summary
         self.column_summary = self._get_column_sumary(self.app_context.tabular_dataset.current_data, update=True)

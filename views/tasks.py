@@ -135,7 +135,7 @@ class TaskBaseView(v.Container):
         self.last_clicked_card = None
         self.just_clicked_card = None
         def _on_click_workbook_card(item, event, data):
-
+            self.app_context.ignore_progress_linear = True
             self.app_context.progress_overlay.start()
             
             self.idx = int(item.class_)
@@ -149,6 +149,7 @@ class TaskBaseView(v.Container):
             self.last_clicked_card = self.just_clicked_card
                 
             # call load_workbook function in controller 
+            
             self.app_context.progress_overlay.update(50)
             if self.app_context.current_workbook:
                 if self.just_clicked_card.title_text != self.app_context.current_workbook.current_workbook_name:
@@ -158,7 +159,8 @@ class TaskBaseView(v.Container):
             else:
                 self.controller.load_workbook(self.just_clicked_card.workbook_type, self.just_clicked_card.title_text)
             self.app_context.progress_overlay.update(100)
-            self.app_context.progress_overlay.finish()
+            self.app_context.progress_overlay.stop()
+            self.app_context.ignore_progress_linear = False
 
         for card in self.workbook_cards:
             card.children[0].children[0].on_event('click', _on_click_workbook_card)

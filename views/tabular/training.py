@@ -29,7 +29,7 @@ class TabularModel:
         self.current_exp_and_model_name = ''
 
     def train(self, output_logs, output_plots, **kwargs):
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
         config = self.app_context.tabular_ai_training__training_options.retrieve_config()
         self.output_logs = output_logs
         self.output_plots = output_plots
@@ -98,7 +98,7 @@ class TabularModel:
 
     def save_as(self, exp_name, model_name: str):
 
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
 
         # update: current_model_name, current_exp_and_model_name, current_train_result_dir
         self.current_model_name = model_name

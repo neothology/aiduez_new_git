@@ -69,14 +69,14 @@ class SelectTableCard(SimpleCard):
         title:str,
         data:pd.DataFrame(),
         size:dict = {},
-        *args,
+        single_select:bool = False,
         **kwargs
     ):
 
         self.select_table = SelectTable(
             data = data,
             size = size,
-            *args,
+            single_select = single_select,
             **kwargs,
         )
 
@@ -95,24 +95,43 @@ class SelectTable(v.VuetifyTemplate):
     selected = traitlets.List([]).tag(sync=True, allow_null=True)
     index_col = traitlets.Unicode('').tag(sync=True)
     style = traitlets.Unicode('').tag(sync=True)
-    template = traitlets.Unicode('''
-        <template>
-            <v-data-table
-                v-model="selected"
-                :headers="headers"
-                :items="items"
-                :item-key="index_col"
-                :style="style"
-                :items-per-page=-1
-                show-select
-                :single-select="single_select"
-                dense
-                hide-default-footer
-            >
-            </v-data-table>
-        </template>
-        ''').tag(sync=True)
-    
+    template_with_header = traitlets.Unicode('''
+            <template>
+                <v-data-table
+                    v-model="selected"
+                    :headers="headers"
+                    :items="items"
+                    :item-key="index_col"
+                    :style="style"
+                    :items-per-page=-1
+                    show-select
+                    :single-select="single_select"
+                    dense
+                    hide-default-footer
+                >
+                </v-data-table>
+            </template>
+            ''').tag(sync=True)
+
+    template_no_header = traitlets.Unicode('''
+            <template>
+                <v-data-table
+                    v-model="selected"
+                    :headers="headers"
+                    :items="items"
+                    :item-key="index_col"
+                    :style="style"
+                    :items-per-page=-1
+                    show-select
+                    :single-select="single_select"
+                    dense
+                    hide-default-header
+                    hide-default-footer
+                >
+                </v-data-table>
+            </template>
+            ''').tag(sync=True)
+            
     def __init__(
         self, 
         data=pd.DataFrame(),
@@ -122,6 +141,15 @@ class SelectTable(v.VuetifyTemplate):
         **kwargs
         ):
         
+        self.template = self.template_no_header if single_select else self.template_with_header
+        self.headers = data.columns.tolist()
+        self.items = data.to_dict('records')
+        self.single_select = single_select
+        self.selected = []
+        self.index_col = 'id'
+        self.style = ''
+        self.size = size
+        super().__init__(*args, **kwargs)
         super().__init__(*args, **kwargs)
         
         data = data.reset_index()
@@ -139,6 +167,8 @@ class SelectTable(v.VuetifyTemplate):
         self.headers = headers        
         self.items = json.loads(
             data.to_json(orient='records'))
+
+
 
 class SelectTableCardNH(SimpleCard): 
     def _make_table(self, data, size):
@@ -223,4 +253,3 @@ class SelectTableNH(v.VuetifyTemplate):
         self.headers = headers        
         self.items = json.loads(
             data.to_json(orient='records'))
-

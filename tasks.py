@@ -10,7 +10,6 @@ class TaskBase:
         self.target_view_name = target_view_name
         self.workbook_profiles = []
         self.workbook_path_list = []
-        self.workbook_name_list = []
         self.workspace_dir = self.app_context.env_values['workspace_dir']
         self.tmp_workbook_dir =f"{self.app_context.env_values['tmp_dir']}/workbook"
 
@@ -58,7 +57,6 @@ class TaskBase:
                         import os
                         workbook_profile['name'] = os.path.basename(workbook_path)
                         self.workbook_profiles.append(workbook_profile)
-                        self.workbook_name_list.append(os.path.basename(workbook_path))
 
         self.sorted_workbook_profiles = self.sort_workbook_profiles(self.workbook_profiles)
         self.workbook_card_data = [self._make_workbook_card_data(profile) for profile in self.sorted_workbook_profiles] # list of dict

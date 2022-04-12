@@ -6,6 +6,7 @@ import os
 import json
 import numpy as np
 import time
+import pandas as pd
 
 def logging_time(original_fn):
     def wrapper_fn(*args, **kwargs):
@@ -90,3 +91,4 @@ def check_string_validation_a(string):
         raise Exception("데이터 이름은 영문, 숫자, 한글, 그리고 '_'만 가능합니다.")
 
     return string
+

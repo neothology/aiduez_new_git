@@ -210,8 +210,8 @@ class TabularDataAnalytics(v.Container):
                     },
                     {
                         'icon': 'mdi-earth',
-                        'title': '한글워드클라우드',
-                        'sub_title': 'Korean Words Cloud',
+                        'title': '워드클라우드',
+                        'sub_title': 'Words Cloud',
                         'target': 'tabular_analytics_wcloud',
                     },
                 ]
@@ -294,6 +294,7 @@ class TabularDataAnalytics(v.Container):
                 )
             ]
         )
+
 
 class TabularDataProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
@@ -398,7 +399,7 @@ class TabularAITraining(v.Container):
 
     def load_contents(self):
 
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
 
         # data_context
         self.data_context = get_or_create_class(

@@ -39,6 +39,6 @@ class ProgressOverlay(v.Overlay):
     def update(self, value):
         self.children[0].value = value
        
-    def finish(self):
+    def stop(self):
         self.value = False
         self.children[0].value = 0

@@ -191,6 +191,7 @@ class SimpleRadioCard(SimpleCard):
             self.direction = True if direction == 'row' else False
 
             radio_options = v.RadioGroup(
+                class_ = context_key,
                 v_model = options['values'][0],
                 row = self.direction,
                 style_ = "padding:0; height:25px;",
@@ -208,7 +209,7 @@ class SimpleRadioCard(SimpleCard):
 
             body = v.Row(
                 children = [radio_options],
-                style_ = "margin:0; padding-bottom:10px; align-items:center; padding-left:15px" + kwargs.get('style', ""), 
+                style_ = "margin:0; padding-bottom:10px; align-items:center; padding-left:15px;" + kwargs.get('style', ""), 
             )
 
             super().__init__(

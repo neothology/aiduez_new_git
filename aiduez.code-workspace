@@ -29,6 +29,9 @@
 		},
 		{
 			"path": "../../../usr/local/lib/python3.8/dist-packages/ludwig"
+		},
+		{
+			"path": "../../../usr/local/lib/python3.8/dist-packages/pandas_profiling"
 		}
 	],
 	"settings": {}

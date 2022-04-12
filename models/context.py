@@ -17,6 +17,9 @@ class AppContext:
     current_workflow_stage_sub: str = None
     current_workbook: object = None
 
+## for control
+    ignore_progress_linear: bool = False
+
 ## base layout object ##
     background: object = None
     alert: object = None
@@ -74,19 +77,24 @@ class AppContext:
     tabular_data_analytics: object = None
     tabular_data_analytics__sub_menu: object = None
     tabular_data_analytics__sub_contents: object = None
-    tabular_data_analytics__options: object = None
+    tabular_data_analytics_options: object = None
+
     tabular_analytics_basicinfo: object = None
-    tabular_analytics_basicinfo__column_selector: object = None
-    tabular_analytics_basicinfo__data_range_selector: object = None
     tabular_analytics_basicinfo__data_info: object = None
     tabular_analytics_basicinfo__column_summary_simple: object = None
+
     tabular_analytics_scatter: object = None
+    tabular_analytics_scatter_view: object = None
     tabular_analytics_heatmap: object = None
+    tabular_analytics_heatmap_view: object = None
     tabular_analytics_boxplot: object = None
+    tabular_analytics_boxplot_view: object = None
     tabular_analytics_density: object = None
+    tabular_analytics_density_view: object = None
+
     tabular_analytics_wcloud: object = None
-    tabular_analytics_wcloud__column_selector: object = None
-    tabular_analytics_wcloud__data_range_selector: object = None
+    tabular_analytics_wcloud_view: object = None
+
     tabular_analytics_reduction: object = None
     tabular_analytics_clustering: object = None
     tabular_analytics_datasample: object = None

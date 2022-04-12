@@ -102,7 +102,7 @@ class TabularWorkbook:
 
             return work_name
 
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
 
         # make work directory
         self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
@@ -133,7 +133,7 @@ class TabularWorkbook:
 
     def save_workbook(self, **kwargs):
 
-        self.app_context.progress_linear.active = True
+        self.app_context.progress_linear.start()
 
         # save current work
         # save current work -(1) 데이터 입수
@@ -180,19 +180,36 @@ class TabularWorkbook:
         # analytics 변경
 
         if self.app_context.tabular_data_analytics:
-            if self.app_context.tabular_data_analytics__options:
-                self.app_context.tabular_data_analytics__sub_contents.children = []
-                self.app_context.tabular_data_analytics__options = None
-                self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
-                self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
-            if self.app_context.tabular_analytics_basicinfo:
-                self.app_context.tabular_analytics_basicinfo__column_selector = None
-                self.app_context.tabular_analytics_basicinfo__data_range_selector = None
-                self.app_context.tabular_analytics_basicinfo = None
-            if self.app_context.tabular_analytics_wcloud:
-                self.app_context.tabular_analytics_wcloud__column_selector = None
-                self.app_context.tabular_analytics_wcloud__data_range_selector = None
-                self.app_context_tabular_analytics_wcloud = None
+            self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
+            for item in self.app_context.tabular_data_analytics__sub_menu.menu_to_target:
+                item.class_list.remove('now_active')
+            self.app_context.tabular_data_analytics__sub_contents.children[0].children = []
+            self.app_context.tabular_analytics_basicinfo = None
+            self.app_context.tabular_analytics_scatter = None
+            self.app_context.tabular_analytics_scatter_view = None
+            self.app_context.tabular_analytics_heatmap = None
+            self.app_context.tabular_analytics_heatmap_view = None
+            self.app_context.tabular_analytics_boxplot = None
+            self.app_context.tabular_analytics_boxplot_view = None
+            self.app_context.tabular_analytics_density = None
+            self.app_context.tabular_analytics_density_view = None
+            self.app_context.tabular_analytics_wcloud = None
+            self.app_context.tabular_analytics_wcloud_view = None
+
+
+        #     if self.app_context.tabular_data_analytics_options:
+        #         self.app_context.tabular_data_analytics__sub_contents.children = []
+        #         self.app_context.tabular_data_analytics_options = None
+        #         self.app_context.tabular_data_analytics__sub_menu.last_activated_item.class_list.remove("now_active")
+        #         self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
+        #     if self.app_context.tabular_analytics_basicinfo:
+        #         self.app_context.tabular_analytics_basicinfo__column_selector = None
+        #         self.app_context.tabular_analytics_basicinfo__data_range_selector = None
+        #         self.app_context.tabular_analytics_basicinfo = None
+        #     if self.app_context.tabular_analytics_wcloud:
+        #         self.app_context.tabular_analytics_wcloud__column_selector = None
+        #         self.app_context.tabular_analytics_wcloud__data_range_selector = None
+        #         self.app_context_tabular_analytics_wcloud = None
 
         # preprocessing 변경
         if self.app_context.tabular_data_processing:
@@ -265,7 +282,7 @@ class TabularWorkbook:
         self.save_workbook(work = work_name)
 
 
-        self.app_context.progress_overlay.finish()
+        self.app_context.progress_overlay.stop()
 
     def load_workbook_from_tmp(self, workbook_name):
 
