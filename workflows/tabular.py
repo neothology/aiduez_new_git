@@ -303,15 +303,10 @@ class TabularDataProcessing(v.Container):
 
         self.menu_tree = [
             {   
-                'icon': 'mdi-clipboard-text-outline',
-                'title': '단일 칼럼 변환',
-                'target': 'tabular_data_single_processing',
-            },
-            {
-                'icon': 'mdi-clipboard-text-multiple-outline',
-                'title': '복합 칼럼 변환',
-                'target': 'tabular_data_multiple_processing',
-            },
+                'icon': menu["icon"],
+                'title': menu["title"],
+                'target': menu["target"],
+            } for menu in self.app_context.workflows_list['tabular']['stages'][2]["menu_list"] # 데이터 가공's menu_list
         ]
 
         # top area(data_context, button)

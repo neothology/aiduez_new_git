@@ -110,12 +110,12 @@ class AppContext:
     tabular_data_processing__save_activator: object = None
     tabular_data_processing__sub_menu: object = None
     tabular_data_processing__sub_contents: object = None
-    tabular_data_processing__options: object = None
+    # tabular_data_processing__options: object = None
     tabular_data_processing__column_summary: object = None
-    tabular_data_single_processing: object = None
-    tabular_data_single_processing_dialog: object = None
+    tabular_data_single_processing_view: object = None
+    tabular_data_single_processing_dialog_view: object = None
     # tabular_data_single_processing__card: object = None
-    tabular_data_multiple_processing: object = None
+    tabular_data_multiple_processing_view: object = None
 
     # tabilar ai training objects
     tabular_ai_training: object = None

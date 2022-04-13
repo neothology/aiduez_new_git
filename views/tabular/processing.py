@@ -37,7 +37,7 @@ class TabularProcessingSaveActivator(v.Col):
             style_ = self.style["row"]
         )
 
-class TabularSingleProcessing(v.Container):
+class TabularSingleProcessingView(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
@@ -51,9 +51,9 @@ class TabularSingleProcessing(v.Container):
         )
 
         self.processing_dialog = get_or_create_class(
-            'tabular_data_single_processing_dialog',
+            'tabular_data_single_processing_dialog_view',
             app_context=self.app_context,
-            context_key= 'tabular_data_single_processing_dialog'
+            context_key= 'tabular_data_single_processing_dialog_view'
         )
         # column summary
         self.column_summary = self._get_column_sumary(dataset=self.app_context.tabular_dataset.current_data)
@@ -211,8 +211,8 @@ class TabularSingleProcessingMenu(BaseCard):
             column_name = self.dataset.columns[index]
             self.dataset = self.dataset.drop(column_name, axis=1)
             self.app_context.tabular_dataset.current_data = self.dataset
-            tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-            tabular_data_single_processing.update()
+            tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
+            tabular_data_single_processing_view.update()
             alert = get_or_create_class('alert', self.app_context)
             alert.show_and_auto_close(
                 message=f"'{column_name}'이(가) 삭제되었습니다!", 
@@ -244,7 +244,7 @@ class TabularSingleProcessingMenu(BaseCard):
         def _activate_process_dialog(widget=None, event=None, data=None):
             column_name = widget.v_model["column_name"]
             process = widget.v_model["process"]
-            dialog = self.app_context.tabular_data_single_processing_dialog
+            dialog = self.app_context.tabular_data_single_processing_dialog_view
             
             def _close_dialog(widget, event=None, data=None):
                 widget.value = 0
@@ -277,7 +277,7 @@ class TabularSingleProcessingMenu(BaseCard):
 
         return dialog_buttons
 
-class TabularSingleProcessingDialog(v.Dialog):
+class TabularSingleProcessingDialogView(v.Dialog):
     def __init__(self, app_context, context_key) -> None:
         self.app_context = app_context
 
@@ -339,8 +339,8 @@ class TabularSingleProcessingDialog(v.Dialog):
             processed_column = self.processing_data(before_coulumn)
             new_colunm_name = self.column_name + "_" + self.suffix[self.method]
             self.app_context.tabular_dataset.current_data[new_colunm_name] = processed_column
-            tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-            tabular_data_single_processing.update()
+            tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
+            tabular_data_single_processing_view.update()
             self.value = 0
             alert = get_or_create_class('alert', self.app_context)
             alert.show_and_auto_close(
