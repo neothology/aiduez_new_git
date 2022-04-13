@@ -352,29 +352,32 @@ class TabularSingleProcessingDialogView(v.Dialog):
         save_btn.on_event('click', _on_click_save)
 
         # dialog contents
-        self.dialog_contents = v.Card(children=[
-            v.CardTitle(
-                class_='headline grey lighten-2',
-                primary_title=True,
-                children=[
-                    "Card Title",
+        self.dialog_contents = v.Card(
+            children=[
+                v.CardTitle(
+                    class_='headline grey lighten-2',
+                    primary_title=True,
+                    children=[
+                        "Card Title",
+                        v.Spacer(),
+                        self.close_btn,
+                    ],
+                ),
+                v.CardText(class_="py-0", children=[self.method_selector]),
+                v.CardActions(children=[
                     v.Spacer(),
-                    self.close_btn,
-                ],
-            ),
-            v.CardText(class_="py-0", children=[self.method_selector]),
-            v.CardActions(children=[
-                v.Spacer(),
-                save_btn                
-            ])
-        ])
+                    save_btn                
+                ])
+            ],
+            max_height=700,
+        )
 
         super().__init__(
-            class_="d-flex",
             scrollable=True,
             children=[self.dialog_contents],
             min_width=700,
             max_width=1200,
+            max_height=900,
             value=0,
         )
 
@@ -687,7 +690,6 @@ class TabularSingleProcessingDialogView(v.Dialog):
         processed_result.children = children
         
         contents = v.Card(
-            class_="overlow-auto",            
             children=[
                 v.CardTitle(
                     class_="headline justify-center",
@@ -709,7 +711,8 @@ class TabularSingleProcessingDialogView(v.Dialog):
             tag = 'iframe',
             attributes = {
                 'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
-                'style': "border:none; width:100%; height:350px;",
+                'style': "border:none; width:100%; height:300px;",
+                'scrolling': 'no',
             },
         )
         return chart 
