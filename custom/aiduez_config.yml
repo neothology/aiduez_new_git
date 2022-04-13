@@ -76,9 +76,12 @@ class_paths:
   tabular_analytics_wcloud: tabular.analytics.TabularAnalyticsWordCloud
   tabular_analytics_wcloud_view: views.tabular.analytics.TabularAnalyticsWordCloudView
 
+  tabular_analytics_reduction: tabular.analytics.TabularAnalyticsReduction
+  tabular_analytics_reduction_view: views.tabular.analytics.TabularAnalyticsReductionView
 
-  tabular_analytics_reduction: views.tabular.analytics.TabularAnalyticsDimensionReduction
-  tabular_analytics_clustering: views.tabular.analytics.TabularAnalyticsClustering
+  tabular_analytics_clustering: tabular.analytics.TabularAnalyticsClustering
+  tabular_analytics_clustering_view: views.tabular.analytics.TabularAnalyticsClusteringView
+
   tabular_analytics_datasample: views.tabular.analytics.TabularAnalyticsDataSample
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
@@ -488,6 +491,7 @@ processing_params:
               type: select
               values: ['komoran', 'hannanum']
               default: komoran
+ 
  # 학습 parameter 정의
 training_params:
   ludwig:
@@ -663,7 +667,7 @@ training_params:
             values: [category, binary]
             default: category
           bool:
-            values: [binary]
+            values: [binary, category]
             default: binary
         model_type:
           numerical: 

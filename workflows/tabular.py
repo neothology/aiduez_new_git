@@ -160,6 +160,7 @@ class TabularDataImport(v.Container):
             children = [
                 self.top_area,
                 v.Col(
+                    class_ = 'tabular_sub_menu',
                     style_ = "display:flex; max-height:1599px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
@@ -277,7 +278,7 @@ class TabularDataAnalytics(v.Container):
             self.app_context,
             context_key = 'tabular_data_analytics__sub_contents',
             style = "width:100%; \
-                    padding:0; margin:0; background-color:#ffffff00; position:relative; ",
+                    padding:0; margin:0; background-color:#ffffff00; position:relative; min-height:100%;",
         )
 
         super().__init__(
@@ -286,6 +287,7 @@ class TabularDataAnalytics(v.Container):
             children = [
                 self.top_area,
                 v.Col(
+                    class_ = 'tabular_sub_menu',
                     style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
@@ -366,6 +368,7 @@ class TabularDataProcessing(v.Container):
             children = [
                 self.top_area,
                 v.Col(
+                    class_ = 'tabular_sub_menu',
                     style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,

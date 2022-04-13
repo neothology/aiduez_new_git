@@ -117,7 +117,11 @@ body {
   padding: 0 !important;
 }
 
-.v-container.tabular_data_analytics .col {
+.v-container .tabular_sub_menu.col {
+    max-height: 100% !important;
+}
+
+.v-container .output_part_sub.col {
     max-height: 100% !important;
 }
 
@@ -142,9 +146,13 @@ body {
     position: fixed;
 }
 
+.v-container.tabular_data_analytics__sub_contents .v-navigation-drawer {
+    height: 100% !important;
+}
 
-
-
+.v-container.tabular_data_processing_sub_menu {
+    height: 100% !important;
+}
 
 
 
@@ -361,6 +369,26 @@ body {
     max-width:37% !important;
 }
 
+.tabular_analytics_wcloud_view__language_selector .theme--light.v-label {
+    color: rgba(0,0,0, 0.83) !important;
+}
+
+.tabular_analytics_reduction_view__algorithm_selector .v-radio {
+    max-width:39% !important;
+}
+
+.tabular_analytics_reduction_view__algorithm_selector .theme--light.v-label {
+    color: rgba(0,0,0, 0.83) !important;
+}
+
+.vuetify-styles .tabula-data-selector .theme--light.v-list-item:hover:before {
+    background-color: #e4effa !important;
+    opacity: 0.6 !important;
+}
+
+.vuetify-styles .tabula-data-selector .theme--light.v-list-item:before {
+    transition: none !important;
+}
 
 </style>
 

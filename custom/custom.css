@@ -229,3 +229,29 @@ div.output_subarea {
 .tabular_analytics_wcloud_view__language_selector .v-radio {
     max-width:37% !important;
 }
+
+.tabular_analytics_wcloud_view__language_selector .theme--light.v-label {
+    color: rgba(0,0,0, 0.83) !important;
+}
+
+.tabular_analytics_reduction_view__algorithm_selector .v-radio {
+    max-width:39% !important;
+}
+
+.tabular_analytics_clustering_view__algorithm_selector .v-radio {
+    max-width:45% !important;
+    margin-right:10px !important;
+}
+
+.tabular_analytics_reduction_view__algorithm_selector .theme--light.v-label {
+    color: rgba(0,0,0, 0.83) !important;
+}
+
+.vuetify-styles .tabula-data-selector .theme--light.v-list-item:hover:before {
+    background-color: #e4effa !important;
+    opacity: 0.6 !important;
+}
+
+.vuetify-styles .tabula-data-selector .theme--light.v-list-item:before {
+    transition: none !important;
+}

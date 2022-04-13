@@ -78,7 +78,7 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
         self.x_cols = kwargs.get('x_cols')
         self.data_range = kwargs.get('data_range')
         self.selected_data = None
-        self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
+        self.output_part_style = "max-height:100%; margin:0; padding:0px; background-color:#ffffff; \
                     display:flex, flex-direction:column; justify-content:center;"
 
         # setting area: (1) column selection
@@ -175,6 +175,7 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
             self.output_part.children = [
                 self.setting_part, 
                 v.Col(
+                    class_ = "output_part_sub",
                     children = [self.data_info] + self.columns_info,
                     style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
                               padding-top:15px; padding-left:15px",
@@ -295,7 +296,6 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
             fig.update_layout(width=1200, height=1200)
 
             self.setting_part.v_model = False
-            self.output_part.children = [go.FigureWidget(fig)]
 
             self.output_part.children = [
                 self.setting_part, 
@@ -380,8 +380,6 @@ class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
 
             # selected col_names
             selected_cols = self.column_selector.children[1].children[0].selected
-            if len(selected_cols) > 10:
-                raise Exception('최대 10개 컬럼에 대한 산포도 시각화가 가능합니다.')
             selected_cols_to_idx = [col['index'] for col in selected_cols]
             selected_col_names = self.x_cols.iloc[selected_cols_to_idx]['col_name'].to_list()
 
@@ -638,7 +636,6 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
 
             # draw plot & show
             color = None if selected_hue_name is None or selected_hue_name == '-' else selected_hue_name
-            # data = self.data.head(selected_num_rows)
             data = self.data.filter([selected_col_name]) if color is None else self.data.filter([selected_col_name, color]).head(selected_num_rows)
 
             try:
@@ -810,6 +807,7 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
             self.output_part.children = [
                 self.setting_part, 
                 v.Col(
+                    class_ = "output_part_sub",
                     children = [img],
                     style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
                             padding-top:15px; padding-left:15px",
@@ -897,7 +895,7 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
         self.perplexity_selector_area = v.Row(
             children = [],
             style_  = "margin:0; padding:0; display:flex; flex-direction:column; justify-content:center; align-items:center; \
-                     width:210px; margin-bottom:10px",
+                     width:210px;",
         )
 
         # setting area: (6) run button
@@ -935,25 +933,261 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
 
         def _show_conditional_option(item, event, data):
             if item.v_model == 't_sne':
-                self.perplexity_selector_area.children = [self.perplexity_selector]
+                self.perplexity_selector_area.children = [self.perplexity_selector, v.Spacer(style_ = "min-height:10px")]
             else:
                 self.perplexity_selector_area.children = []
 
         def _show_plot(item, event, data):
             self.app_context.progress_linear.start()
+
+            # selected cols
+            selected_cols = self.column_selector.children[1].children[0].selected
+            selected_cols_to_idx = [col['index'] for col in selected_cols]
+            selected_col_names = self.x_cols.iloc[selected_cols_to_idx]['col_name'].to_list()
+            if len(selected_col_names) < 3:
+                raise Exception('최소 3개 이상의 변수를 선택해 주세요.')
+
+            # selected category
+            selected_category = self.category_selector.children[1].children[0].selected
+            selected_category_name = selected_category[0]['col_name'] if selected_category else None
+
+            # selected data range
+            selected_num_rows = int(self.data_range_selector.children[1].children[0].children[0].v_model)
+
+            selected_algorithm = self.algorithm_selector.children[1].children[0].children[0].v_model
+
+            # selected perplexity
+            selected_perplexity = self.perplexity_selector.children[1].children[0].children[0].v_model
+
+            # draw plot & show
+            from sklearn.manifold import TSNE
+            from sklearn.decomposition import PCA
+            import plotly.express as px
+            from plotly.offline import iplot
+            import plotly.graph_objects as go
+
+            self.data = self.app_context.tabular_dataset.current_data
+
+            selected_col_names_for_projection = selected_col_names + ([selected_category_name] if selected_category_name else [])
+            data = self.data.filter(selected_col_names_for_projection).dropna().head(selected_num_rows)
+
+            options = {'n_components':2, 'random_state':0}
+            if selected_algorithm == 'pca':
+                chart_title = "PCA 차원축소(Dimensionality Reduction)"
+                model = PCA(**options)
+            else:
+                chart_title = "t-SNE 차원축소(Dimensionality Reduction)"
+                options['perplexity'] = selected_perplexity
+                model = TSNE(**options)
+
+            projections = model.fit_transform(data.filter(selected_col_names))
+
+            if selected_category_name:
+                color = data[selected_category_name].astype('category')
+                labels = {'color':color.name}
+            else:
+                color = labels = None
+
+            fig = px.scatter(projections, x=0, y=1, color=color, labels=labels, title=chart_title)
+            fig.update_layout(width=1200, height=700)
+
+            self.setting_part.v_model = False
+            self.output_part.children = [
+                self.setting_part,   
+                go.FigureWidget(fig)
+            ]
+
             self.app_context.progress_linear.stop()
 
         self.algorithm_selector.children[1].children[0].children[0].on_event('change', _show_conditional_option)
         self.run_button.on_event('click', _show_plot)
 
-class TabularAnalyticsClustering(v.Container):
+
+class TabularAnalyticsClusteringView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-        super().__init__(
-            style_ = "min-width:100%; min-height:100%; display:flex; flex-direction:column;",
-            children = [self.context_key]
+        self.target_area = kwargs.get('target_area')
+        self.x_cols = kwargs.get('x_cols')
+        self.data_range = kwargs.get('data_range')
+        self.algorithm_cols = kwargs.get('algorithm_cols')
+        self.clustering_range = kwargs.get('clustering_range')
+        self.output_part_style = "max-height:100%; margin:0; padding:0px; padding-top:20px; background-color:#ffffff; \
+                    display:flex, flex-direction:column; justify-content:center;"
+
+        # setting area: (1) algorithm selector
+        self.algorithm_selector = get_or_create_class(
+            'simple_radio_card',
+            self.app_context,
+            context_key = f'{self.context_key}__algorithm_selector',
+            title = '알고리즘',
+            direction = 'row',
+            options = self.algorithm_cols,
+            size = {'width':'210px', 'height':'90px'},
+            style = 'background-color:#ffffff; border-bottom:1px solid #e0e0e0; padding-left:7px; padding-bottom:15px;',
         )
+            
+        # setting area: (2) column selection
+        self.column_selector = get_or_create_class(
+            'select_table_card',
+            self.app_context,
+            context_key = f'{self.context_key}__column_selector',
+            title = '변수 선택',
+            data = self.x_cols,
+            size = {'width':'210px', 'height':'150px'},
+            single_select = False,
+            style = 'background-color:#ffffff;',
+        )
+        
+        # column selection - select all
+        select_all_values = [{'index':i} for i in range(len(self.x_cols))]
+        self.column_selector.children[1].children[0].selected = select_all_values
+
+        # setting area: (3) clustering range selection
+        self.clustering_range_selector = get_or_create_class(
+            'simple_slider_card',
+            self.app_context,
+            context_key = f'{self.context_key}__clustering_range_selector', 
+            title = '군집 개수',
+            range = self.clustering_range,
+            size = {'width':'210px', 'height':'90px'},
+        )
+
+        # setting area: (4) elbow resurt check
+        self.elbow_resurt_check = v.Row(
+            style_ = "flex-direction:column;",
+            children = [
+                v.Checkbox(
+                    v_model = False,
+                    hide_details = True,
+                    label = 'Elbow 분석결과 표시',
+                    style_ = 'margin:0; padding-left:5px;',
+                ),
+                v.Col(
+                    style_ = "width:210px; height:30px; padding: 5px; padding-left:30px; color:rgba(0, 0, 0, 0.6);",
+                    children = ['(클러스터 개수별 오차제곱합)']
+                )
+
+            ]
+        )
+
+        # setting area: (5) data range selection
+        self.data_range_selector = get_or_create_class(
+            'simple_slider_card',
+            self.app_context,
+            context_key = f'{self.context_key}__data_range_selector', 
+            title = '행 범위',
+            range = self.data_range,
+            size = {'width':'210px', 'height':'90px'},
+        )
+
+        # setting area: (6) run button
+        self.run_button = v.Col(
+            children= [
+                v.Btn(
+                    style_ = "",
+                    children = ['조회하기'],
+                    rounded = True,
+                    depressed = True,
+                    dark = True,
+                ),
+            ],
+            style_ = "margin:0; padding:0; display:flex; flex-direction:row; justify-content:flex-end; align-items:center; width:210px;",
+        )
+
+        self.setting_part_components = [
+            self.algorithm_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.column_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.clustering_range_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.data_range_selector,
+            v.Spacer(style_ = "min-height:10px"),
+            self.elbow_resurt_check,
+            v.Spacer(style_ = "min-height:10px"),
+            self.run_button
+        ]
+
+        super().__init__(
+            app_context, 
+            context_key, 
+            target_area = self.target_area
+        )
+
+        def _show_plot(item, event, data):
+            self.app_context.progress_linear.start()
+
+            # selected cols
+            selected_cols = self.column_selector.children[1].children[0].selected
+            selected_cols_to_idx = [col['index'] for col in selected_cols]
+            selected_col_names = self.x_cols.iloc[selected_cols_to_idx]['col_name'].to_list()
+            if len(selected_col_names) < 3:
+                raise Exception('최소 3개 이상의 변수를 선택해 주세요.')
+
+            # clustering range
+            selected_clustering_range = int(self.clustering_range_selector.children[1].children[0].children[0].v_model)
+
+            # selected data range
+            selected_num_rows = int(self.data_range_selector.children[1].children[0].children[0].v_model)
+
+            selected_algorithm = self.algorithm_selector.children[1].children[0].children[0].v_model
+
+            # elbow resurt check
+            elbow_result_check = self.elbow_resurt_check.children[0].v_model
+
+            # draw plot & show
+            from sklearn.preprocessing import MinMaxScaler
+            from sklearn.cluster import KMeans
+            from sklearn.cluster import AgglomerativeClustering
+            from sklearn.decomposition import PCA
+            from sklearn.impute import SimpleImputer
+            import plotly.express as px
+            import plotly.graph_objects as go
+            import numpy as np
+
+            self.data = self.app_context.tabular_dataset.current_data
+
+            scaler = MinMaxScaler(feature_range=(0, 1))
+            imp = SimpleImputer(missing_values=np.nan, strategy='mean')
+
+            target_data = self.data.head(min(self.data.shape[0], selected_num_rows))
+            imputed = imp.fit_transform(target_data.filter(selected_col_names))
+            scaled = scaler.fit_transform(imputed)
+
+            if selected_algorithm == 'km':
+                model = KMeans(n_clusters=selected_clustering_range, algorithm='auto')
+                chart_title = f"k-Means 군집(Clustering) 시각화"
+            elif selected_algorithm == 'hier':
+                model = AgglomerativeClustering(n_clusters=selected_clustering_range, linkage='ward')
+                chart_title = f"병합군집(Agglomerative Clustering) 시각화"
+
+            predict = pd.DataFrame(model.fit_predict(scaled))
+            predict.columns=['cluster']
+
+            color = predict['cluster'].astype('category')
+            labels = {'color':color.name}
+            options = {'n_components':2, 'random_state':0}
+
+            projector = PCA(**options)
+            projections = projector.fit_transform(scaled)
+
+            hover_cols = target_data.drop(columns=['color']).columns.values if 'color' in target_data.columns.values else target_data.columns.values
+            target_data['PC1'] = projections[:, 0]
+            target_data['PC2'] = projections[:, 1]
+
+            fig = px.scatter(projections, x=0, y=1, color=color, labels=labels, title=chart_title)
+            fig.update_layout(width=1200, height=700)
+
+            self.setting_part.v_model = False
+            self.output_part.children = [
+                self.setting_part,   
+                go.FigureWidget(fig)
+            ]
+
+            self.app_context.progress_linear.stop()
+
+        self.run_button.on_event('click', _show_plot)
 
 class TabularAnalyticsDataSample(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
