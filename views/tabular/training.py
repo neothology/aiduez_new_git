@@ -29,7 +29,8 @@ class TabularModel:
         self.current_exp_and_model_name = ''
 
     def train(self, output_logs, output_plots, **kwargs):
-        self.app_context.progress_linear.start()
+        self.app_context.tabular_ai_training__progress_linear.start()
+
         config = self.app_context.tabular_ai_training__training_options.retrieve_config()
         self.output_logs = output_logs
         self.output_plots = output_plots
@@ -94,7 +95,7 @@ class TabularModel:
         # save workbook
         self.app_context.current_workbook.save_workbook()
 
-        self.app_context.progress_linear.active = False
+        self.app_context.tabular_ai_training__progress_linear.stop()
 
     def save_as(self, exp_name, model_name: str):
 
@@ -189,14 +190,12 @@ class TabularTrainActivator(v.Col):
         self.train_activator = v.Btn(
             style_ = self.style['button_train'],
             children = ['학습하기'],
-            rounded = True,
             disabled = True,
         )
 
         self.show_result_btn = v.Btn(
             style_ = self.style['button_result'],
             children = ['결과 보기'],
-            rounded = True,
         )
         self.show_result_btn.hide()
 

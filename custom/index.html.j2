@@ -90,6 +90,8 @@ body {
 
 
 
+
+
 .v-container.background {
   height: auto !important;
   position: fixed;
@@ -153,6 +155,12 @@ body {
 .v-container.tabular_data_processing_sub_menu {
     height: 100% !important;
 }
+
+
+
+
+
+
 
 
 
@@ -221,6 +229,10 @@ body {
     background-color: #ffffff00 !important;
 }
 
+.theme--light.v-list-item--active.sub-menu-item:before {
+    background-color: #ff000000 !important;
+}
+
 .vuetify-styles .sub-menu-item.now_active:before {
     background-color: #585858 !important;
     opacity: 0.08 !important;
@@ -250,7 +262,7 @@ body {
     border: 0;
 }
 
-#input-293 {
+.extra-dense input {
     text-align: right;
 }
 
@@ -316,17 +328,21 @@ body {
     overflow-y: hidden !important;
 }
 
-.vuetify-styles .v-dialog {
-    overflow-y: hidden !important;
-}
-
 .vuetify-styles .v-radio .v-label {
     font-size: 14px !important;
     width:90px
 }
 
-.tabular_data_import__workbook_data_list .v-data-table.theme--light td {
+.tabular_data_import__workbook_data_list_view .v-data-table.theme--light td {
     border-bottom: 0px !important;
+}
+
+.tabular_data_import__aidu_data_list_view .v-data-table.theme--light td {
+    border-bottom: 0px !important;
+}
+
+.tabular_import_aidu_view__work_area_contents_sub_area__top .v-radio {
+    margin:0 !important;
 }
 
 .vuetify-styles .v-input {
@@ -337,8 +353,8 @@ body {
     font-size: 14px !important;
 }
 
-.tabular_import_pc__work_area_contents_sub_area__middle .v-file-input {
-    width: 820px !important;
+.tabular_import_pc_view__work_area_contents_sub_area__middle .v-file-input {
+    width: 805px !important;
 }
 
 .vuetify-styles .side_nav .v-list-item--link:before {
@@ -377,6 +393,11 @@ body {
     max-width:39% !important;
 }
 
+.tabular_analytics_clustering_view__algorithm_selector .v-radio {
+    max-width:45% !important;
+    margin-right:10px !important;
+}
+
 .tabular_analytics_reduction_view__algorithm_selector .theme--light.v-label {
     color: rgba(0,0,0, 0.83) !important;
 }
@@ -391,6 +412,9 @@ body {
 }
 
 </style>
+
+
+
 
 {% endblock notebook_css %}
 

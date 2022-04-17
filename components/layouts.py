@@ -68,7 +68,6 @@ class TopArea(v.AppBar):
         self.nav_icon.on_event('click', on_click_toggle)
 
     def change_style(self, style_type):
-        # elems = [self, nav_icon, nav_icon_icon ]
         self.style_ = set_theme_style(self.app_context, self.context_key, elem = 'base', style_type=style_type)
         self.nav_icon.style_ = set_theme_style(self.app_context, self.context_key, elem = 'nav_icon', style_type=style_type)
         self.nav_icon_icon.style_ = set_theme_style(self.app_context, self.context_key, elem = 'nav_icon_icon', style_type=style_type)
@@ -82,6 +81,9 @@ class WorkArea(v.Container):
             class_ = self.context_key,
             style_ = set_theme_style(self.app_context, self.context_key),
         )
+
+    def change_style(self, style_type):
+        self.style_ = set_theme_style(self.app_context, self.context_key, elem = 'base', style_type=style_type)
 
 class SubArea(v.Container):
     def __init__(self, app_context, context_key, **kwargs):

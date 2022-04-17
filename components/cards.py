@@ -1,6 +1,7 @@
 import ipyvuetify as v
 from matplotlib.pyplot import title
 from components.dialog import SimpleDialog
+from utils import get_or_create_class
 
 class BaseCard(v.Card):
 
@@ -161,7 +162,9 @@ class BaseCard(v.Card):
                 body = self.model_save_body,
                 buttons = [ self.save_confrim_btn, self.save_cancel_btn ],
                 size = {'width':'500px', 'height':'200px'},
-                style = "height:150px;",
+                style = {
+                    'card': "height:150px;",
+                }
             )
             self.save_button = v.Btn(
                 v_on = 'tooltip.on',
@@ -208,9 +211,16 @@ class BaseCard(v.Card):
 
         self.card_header_bottom = header_bottom if header_bottom else ""
 
+        self.card_progress_linear = get_or_create_class(
+            'progress_linear', 
+            self.app_context, 
+            'tabular_ai_training__progress_linear',
+            style = 'z-index:780;',
+            )
+
         self.card_header = v.CardTitle(
             style_ = self.style['card_header'],
-            children = [self.card_header_top, self.card_header_bottom],
+            children = [self.card_header_top, self.card_header_bottom, self.card_progress_linear],
         )
 
         # card footer ------------------------------------------------------------
@@ -224,8 +234,6 @@ class BaseCard(v.Card):
                 children = [body_item]
             )for n, body_item in enumerate(body_items)]
 
-        
-        self.app_context.progress_linear.active = False
 
         self.children = [self.card_header, *self.card_body, self.card_footer]
         
@@ -297,26 +305,28 @@ class SimpleCard(v.Card):
         self.controls = v.Col(children = controls,  style_='padding:0; display:flex; justify-content:flex-end; padding-right:15px;')
         self.buttons = buttons
         size_style = f"min-width:{size.get('width', '')};" + f"max-width:{size.get('width', '')};" + f"height:{size.get('height', '')};" if size else ""
+        add_style_card = add_style_header = add_style_body = add_style_footer = ""
 
-        # add_style_card = kwargs.get('style')['card'] if kwargs.get('style') else "" 
-        # add_style_header = kwargs.get('style')['header'] if kwargs.get('style') else ""
-        # add_style_body = kwargs.get('style')['body'] if kwargs.get('style') else ""
-        # add_style_footer = kwargs.get('style')['footer'] if kwargs.get('style') else ""
+        if kwargs.get('style'):
+            add_style_card = kwargs.get('style').get('card', '')
+            add_style_header = kwargs.get('style').get('header', '')
+            add_style_body = kwargs.get('style').get('body', '')
+            add_style_footer = kwargs.get('style').get('footer', '')
 
         self.style = {
             "card": size_style + " \
                 padding:0; display:flex; flex-direction:column; \
                 box-shadow: none !important; border:1px solid #e0e0e0; \
-                background-color: rgb(255, 255, 255); " + kwargs.get('style', ""),
+                background-color: rgb(255, 255, 255); " + add_style_card,
             "header": "max-height:33px; min-height:33px; margin:0; width:100%; \
                 font-size: 0.875rem; color:rgb(100, 116, 139); \
                 padding:0; padding-left:16px; \
                 background-color:rgb(248, 250, 252); \
-                border-bottom:1px solid #e0e0e0;" ,
+                border-bottom:1px solid #e0e0e0;"  + add_style_header,
             "body": "padding:0px; height:100%; margin:0px; background-color:rgb(255, 255, 255); \
-                     display:flex;",
+                     display:flex;" + add_style_body,
             "footer": "background-color:rgb(248, 250, 252); \
-                justify-content:flex-end; padding-right:20px; border-top:1px solid #e0e0e0;" 
+                justify-content:flex-end; padding-right:20px; border-top:1px solid #e0e0e0;" + add_style_footer, 
         }
 
         self.header = v.CardTitle(

@@ -1,37 +1,44 @@
 {
 	"folders": [
 		{
+			"name": "aiduez",
 			"path": "."
 		},
 		{
+			"name": ".aiduez",
 			"path": "../../../root/.aiduez"
 		},
 		{
+			"name": "custom",
 			"path": "../../../root/.jupyter/custom"
 		},
 		{
+			"name": "voila",
 			"path": "../../../usr/local/lib/python3.8/dist-packages/voila"
 		},
 		{
+			"name": "lab",
 			"path": "../../../usr/local/share/jupyter/nbconvert/templates/lab"
 		},
 		{
-			"path": "../../../aihub/workspace"
+			"name": "aihub",
+			"path": "../../../aihub"
 		},
 		{
+			"name": "ipyvuetify",
 			"path": "../../../usr/local/lib/python3.8/dist-packages/ipyvuetify"
 		},
 		{
+			"name": "ipywidgets",
 			"path": "../../../usr/local/lib/python3.8/dist-packages/ipywidgets"
 		},
 		{
+			"name": "ipyvue",
 			"path": "../../../usr/local/lib/python3.8/dist-packages/ipyvue"
 		},
 		{
+			"name": "ludwig",
 			"path": "../../../usr/local/lib/python3.8/dist-packages/ludwig"
-		},
-		{
-			"path": "../../../usr/local/lib/python3.8/dist-packages/pandas_profiling"
 		}
 	],
 	"settings": {}

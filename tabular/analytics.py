@@ -11,7 +11,7 @@ class TabularAnalyticsBase:
         self.target_area = get_or_create_class('sub_area', self.app_context, 'tabular_data_analytics__sub_contents') 
         self.data = self.app_context.tabular_dataset.current_data
 
-    def show_contents(self):
+    def show(self):
         self.view_instance.show()
 
 class TabularaAnalyticsBasicinfo(TabularAnalyticsBase):
@@ -251,7 +251,7 @@ class TabularAnalyticsClustering(TabularAnalyticsBase):
         # make setting data:
         self.x_cols = pd.DataFrame(self.data.select_dtypes(include = [np.number]).columns, columns = ['col_name'])
 
-        # Clustering range
+        # clustering range
         self.clustering_range = [2, 10, 1, 2]
 
         # data range
@@ -275,4 +275,23 @@ class TabularAnalyticsClustering(TabularAnalyticsBase):
             data_range = [self.data_range_start, len(self.data), 1, self.data_range_default],
             algorithm_cols = self.algorithm_cols,
             clustering_range = self.clustering_range
+        )
+
+class TabularAnalyticsDataSample(TabularAnalyticsBase):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.target_view_name = 'tabular_analytics_datasample_view'
+        super().__init__(self.app_context, self.context_key, self.target_view_name, **kwargs)
+
+        # make setting data:
+        self.x_cols = pd.DataFrame(self.data.columns, columns=['col_names'])
+        self.data_range_default = len(self.data) // 2 if len(self.data) // 2 <= 1000 else 1000
+        
+        self.view_instance = get_or_create_class(
+            self.target_view_name, 
+            self.app_context, 
+            target_area = self.target_area,
+            x_cols = self.x_cols,
+            data_range = [1, len(self.data), 1, self.data_range_default],
         )

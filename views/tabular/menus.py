@@ -91,12 +91,18 @@ class TabMenu(v.Col):
             # get target and set
             self.app_context.current_workflow_stage = tab.value
             target_instance = get_or_create_class(tab.value, self.app_context, update = self.update)
-        
             self.target_area.children = [target_instance]
 
             # temporary code for 'training': 
             if tab.value == 'tabular_ai_training':
                 target_instance.load_contents()
+
+            # task view change
+            self.app_context.side_nav.temporary = True
+            self.app_context.side_nav.permanent = False
+            self.app_context.side_nav.v_model = False
+            self.app_context.top_area.change_style('default')
+            self.app_context.work_area.change_style('default')
 
         for tab in self.tab_menu.children:
             tab.on_event('click', _proceed_to_target)
@@ -235,20 +241,19 @@ class ListMenuSub(v.List):
 
         self.last_activated_item = None
         def _proceed_to_target(item, event=None, data=None):               
-
             stage = self.context_key.split("__")[0] # e.g. tabular_data_analytics
 
             # get target and set
             self.app_context.current_workflow_stage_sub = item.value
 
             # temporary condition to apply MVC:
-            if self.app_context.current_workflow_stage != 'tabular_data_analytics':
+            if self.app_context.current_workflow_stage not in ['tabular_data_analytics', 'tabular_data_import']:
                 target_area = getattr(self.app_context, stage + "__sub_contents")        
                 target_instance = get_or_create_class(item.value, self.app_context) 
                 target_area.children = [target_instance]
             else:
                 target_instance = get_or_create_class(item.value, self.app_context) 
-                target_instance.show_contents()
+                target_instance.show()
 
             if self.app_context.tabular_data_analytics_options:
                 if self.last_activated_item is None:

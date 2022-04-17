@@ -74,14 +74,15 @@ class TaskBaseView(v.Container):
             title = "",
             body = "",
             buttons = [ self.confrim_btn, self.cancel_btn ],
-                size = {'width':'500px', 'height':'200px'},
+                size = {'width':'500px', 'height':'150px'},
                 # style = {
-                #     'card':"",
-                #     "header":"",
                 #     "body":"align-items:center; font-size:16px; color:#2f2f2f; padding:20px; \
-                #         line-height:32px;",
+                #         line-height:32px; height:80px;",
                 #     "footer":"padding-top:0; border-top:0; background-color:#ffffff;"
                 # }
+                style = {
+                    'card': "height:150px;",
+                }
         )
 
         self.top_area = v.Row(
@@ -135,10 +136,7 @@ class TaskBaseView(v.Container):
         self.last_clicked_card = None
         self.just_clicked_card = None
         def _on_click_workbook_card(item, event, data):
-            self.app_context.ignore_progress_linear = True
-            self.app_context.progress_overlay2.ignore = True
-            self.app_context.progress_overlay.start()
-            
+            self.app_context.base_overlay.start()
             
             self.idx = int(item.class_)
             self.just_clicked_card = self.workbook_cards[self.idx]
@@ -151,8 +149,6 @@ class TaskBaseView(v.Container):
             self.last_clicked_card = self.just_clicked_card
                 
             # call load_workbook function in controller 
-            
-            self.app_context.progress_overlay.update(50)
             if self.app_context.current_workbook:
                 if self.just_clicked_card.title_text != self.app_context.current_workbook.current_workbook_name:
                     self.controller.load_workbook(self.just_clicked_card.workbook_type, self.just_clicked_card.title_text) # e.g. 'tabular', 'Untitled.ezx'
@@ -160,10 +156,7 @@ class TaskBaseView(v.Container):
                     self.controller.return_to_current_workflow_stage()
             else:
                 self.controller.load_workbook(self.just_clicked_card.workbook_type, self.just_clicked_card.title_text)
-            self.app_context.progress_overlay.update(100)
-            self.app_context.progress_overlay.stop()
-            self.app_context.ignore_progress_linear = False
-            self.app_context.progress_overlay2.ignore = False
+            self.app_context.base_overlay.stop()
 
         for card in self.workbook_cards:
             card.children[0].children[0].on_event('click', _on_click_workbook_card)

@@ -13,17 +13,19 @@ class TabularImportBaseView(v.Container):
         middle_area:list = [],
         bottom_area:list = [],
         size:dict = {},
+        style:dict = {},
         **kwargs
     ):
         self.app_context = app_context
         self.context_key = context_key
+
         self.style = {
-            'left':"margin:0; padding-left:50px; padding-top:20px; height:250px;" + size.get('left', ""),
-            'right':"margin:0; padding:0; height:250px;" + size.get('right', ""),
-            'top':"margin:0; padding:0;" + size.get('top', ""),
+            'left':"margin:0; padding-left:50px; padding-top:20px; height:250px;" + size.get('left', "") + style.get('left', ""),
+            'right':"margin:0; padding:0; padding-top:20px; height:250px;" + size.get('right', "") + style.get('right', ""),
+            'top':"margin:0; padding:0;" + size.get('top', "") + style.get('top', ""),
             'middle':"margin:0; padding:0; max-height:45px; margin-left:50px; margin-right:390px; border-bottom:1px solid #e0e0e0;\
-                align-items:flex-end;" + size.get('middle', ""),
-            'bottom':"margin:0; padding:0; height:100%;" + size.get('bottom', ""),
+                align-items:flex-end;" + size.get('middle', "") + style.get('middle', ""),
+            'bottom':"margin:0; padding:0; height:100%;" + size.get('bottom', "") + style.get('bottom', ""),
             'all':"min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
         }
 
@@ -75,17 +77,22 @@ class TabularImportBaseView(v.Container):
             ],
         )
 
+    def show(self):
+        self.target_area.children = [self]
+
 class TabularImportPCView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+        self.target_area = kwargs.get('target_area')
+        self.workbook_data_list = kwargs.get('workbook_data_list')
 
-        self.workbook_data_list = get_or_create_class(
+        self.workbook_data_list_view = get_or_create_class(
             'select_table_card_no_header',
             self.app_context,
-            context_key = 'tabular_data_import__workbook_data_list',
+            context_key = 'tabular_data_import__workbook_data_list_view',
             title = 'Workbook 데이터 목록',
-            data = self.app_context.tabular_dataset.data_name_list,
+            data = self.workbook_data_list,
             size = {'width':'400px', 'height':'185px'},
             single_select = True,
         )
@@ -125,7 +132,7 @@ class TabularImportPCView(TabularImportBaseView):
                 self.select_delimiter_options,
             ],
             class_ = "",
-            style_ = "padding:0; padding-top:20px;",
+            style_ = "padding:0;",
         )
 
         from ipyvuetify.extra import FileInput
@@ -135,7 +142,6 @@ class TabularImportPCView(TabularImportBaseView):
         self.file_upload_button = v.Btn(
                     style_ = "background-color:#636efa; color:white;",
                     children = ['가져오기'],
-                    rounded = True,
                     depressed = True,
                     disabled = True,
                 )
@@ -149,7 +155,7 @@ class TabularImportPCView(TabularImportBaseView):
         super().__init__(
             self.app_context,
             self.context_key,
-            left_area = [self.workbook_data_list],
+            left_area = [self.workbook_data_list_view],
             right_area = [select_import_options_area],
             middle_area = [self.upload_file_textfield, file_upload_button_row],
             size = {
@@ -175,31 +181,122 @@ class TabularImportPCView(TabularImportBaseView):
             self.file_upload_button.disabled = True
             encoding_option = self.select_encoding_options.selected_option
             delimiter_option = self.select_delimiter_options.selected_option
-            fo = get_or_create_class(
-                'tabular_import_file_object_handler',
-                self.app_context,
-                context_key = 'tabular_import_pc__file_object_handeler',
-            )
-            fo.load_data(self.upload_file_textfield, encoding_option, delimiter_option)
+            controller = self.app_context.tabular_import_pc
+            controller.load_data(self.upload_file_textfield, encoding_option, delimiter_option)
             
             self.upload_file_textfield.clear()
             self.upload_file_textfield.disabled = False
-            self.workbook_data_list.update_data(self.app_context.tabular_dataset.data_name_list)
-
+            
         self.file_upload_button.on_event('click', _upload_file)
     
-    def update_data(self, data_name_list):
-        self.workbook_data_list.update_data(data_name_list)
+    def update(self, data_name_list):
+        self.workbook_data_list_view.update(data_name_list)
 
 class TabularImportAIDUView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+        self.target_area = kwargs.get('target_area')
+        self.workbook_data_list = kwargs.get('workbook_data_list')
+        self.aidu_data_list = kwargs.get('aidu_data_list')
+
+        self.workbook_data_list_view = get_or_create_class(
+            'select_table_card_no_header',
+            self.app_context,
+            context_key = 'tabular_data_import__workbook_data_list_view',
+            title = 'Workbook 데이터 목록',
+            data = self.workbook_data_list,
+            size = {'width':'400px', 'height':'185px'},
+            single_select = True,
+        )
+
+        self.aidu_data_list_view = get_or_create_class(
+            'select_table_card_no_header',
+            self.app_context,
+            context_key = 'tabular_data_import__aidu_data_list_view',
+            title = 'AIDU 데이터 목록',
+            data = self.aidu_data_list,
+            size = {'width':'400px', 'height':'185px'},
+            select = True,
+            single_select = True,
+        )
+
+        self.select_encoding_options = get_or_create_class(
+            'simple_radio_card',
+            self.app_context,
+            context_key = f'{self.context_key}__select_encoding_options',
+            title = '인코딩 선택',
+            direction = 'row',
+            options = {
+                'labels':['UTF-8', 'CP949(한글)', 'EUC-KR(한글)'],
+                'values':['utf-8', 'cp949', 'euc-kr'],
+            },
+            size = {'width':'400px', 'height':'100px'},
+            style_ = "font-size:14px;",
+        )
+
+        self.select_delimiter_options = get_or_create_class(
+            'simple_radio_card',
+            self.app_context,
+            context_key = f'{self.context_key}__select_delimiter_options',
+            title = '구분자 선택',
+            direction = 'row',
+            options = {
+                'labels':['comma:","', 'tab:""', 'pipe:"|"'],
+                'values':[',', '\t', '|'],
+            },
+            size = {'width':'400px', 'height':'100px'},
+            style_ = "font-size:14px;",
+        )
+
+        self.file_upload_button = v.Btn(
+                    style_ = "background-color:#636efa; color:white;",
+                    children = ['가져오기'],
+                    depressed = True,
+                )
 
         super().__init__(
             self.app_context,
-            self.context_key
+            self.context_key,
+            left_area = [
+                self.workbook_data_list_view, 
+                v.Spacer(style_ = "min-height:20px"),
+                self.select_encoding_options],
+            right_area = [
+                self.aidu_data_list_view, 
+                v.Spacer(style_ = "min-height:20px"),
+                self.select_delimiter_options],
+            middle_area = [self.file_upload_button],
+            size = {
+                'left':"max-width:40%; max-height:380px; min-height:380px;",
+                'right':"max-width:60%; max-height:380px; min-height:380px;",
+                'top':"max-height:250px; max-height:380px; min-height:380px;",
+                'middle':"max-height:100px;",
+            },
+            style = {
+                'left':"",
+                'right':"",
+                'top':"",
+                'middle':"border:0; margin-right:405px; align-items:flex-start; justify-content:flex-end;",
+            }
         )
+
+        def _upload_file(item, event, data):
+            if self.aidu_data_list_view.children[1].children[0].selected == []:
+                raise Exception('선택된 AIDU 데이터가 없습니다.')
+
+
+            self.file_upload_button.disabled = True
+            encoding_option = self.select_encoding_options.selected_option
+            delimiter_option = self.select_delimiter_options.selected_option
+            controller = self.app_context.tabular_import_aidu
+            controller.load_data(
+                self.aidu_data_list_view.children[1].children[0].selected[0]['index'],
+                encoding_option,
+                delimiter_option,
+            )          
+            self.file_upload_button.disabled = False
+        self.file_upload_button.on_event('click', _upload_file)
 
 class TabularImportEDAPView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):

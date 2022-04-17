@@ -19,8 +19,8 @@ class Alert(v.Alert):
             type = self.type,
             dismissible = True,
             value = True,
-            v_model = True,     # this value can open or close alert
-            style_ = "position:absolute; top:0; margin:0; width:1570px; z-index:9999;",
+            v_model = False,     # this value can open or close alert
+            style_ = "position:absolute; top:0; margin:0; width:100%; z-index:9999;",
             transition="scroll-x-reverse-transition",
         )
 

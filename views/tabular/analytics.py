@@ -40,7 +40,6 @@ class TabualrAnalyticsOptionArea(v.NavigationDrawer):
     def update_contents(self, children):
         self.children[0].children = children
 
-
 class TabularAnalyticsBaseView(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
@@ -90,7 +89,6 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff;',
         )
 
         # column selection - select all
@@ -113,7 +111,6 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -135,7 +132,7 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
             target_area = self.target_area
             )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
 
             # selected col_names
@@ -178,12 +175,12 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
                     class_ = "output_part_sub",
                     children = [self.data_info] + self.columns_info,
                     style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
-                              padding-top:15px; padding-left:15px",
+                              padding-top:15px; padding-left:15px; position:absolute;",
                 ),
             ]
             self.app_context.progress_linear.active = False
 
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
@@ -205,7 +202,6 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff;',
         )
 
         # column selection - select all
@@ -221,7 +217,6 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
             data = self.hue_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         # setting area: (3) data range selection
@@ -240,7 +235,6 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -264,7 +258,7 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
             target_area = self.target_area
             )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
             import plotly.express as px
             import plotly.graph_objects as go
@@ -293,18 +287,21 @@ class TabularAnalyticsScatterView(TabularAnalyticsBaseView):
 
             # draw plot & show
             fig = go.Figure(px.scatter_matrix(data, dimensions=selected_col_names, color=selected_hue_name, title='Scatter plot'))
-            fig.update_layout(width=1200, height=1200)
+            fig.update_layout(width=1000, height=700)
 
             self.setting_part.v_model = False
 
             self.output_part.children = [
                 self.setting_part, 
-                go.FigureWidget(fig)
+                v.Col(
+                    children = [go.FigureWidget(fig)],
+                    style_ = "",
+                )
             ]
 
             self.app_context.progress_linear.active = False
 
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
 
@@ -326,7 +323,6 @@ class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff;',
         )
 
         # column selection - select 5 cols
@@ -349,7 +345,6 @@ class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -371,7 +366,7 @@ class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
             target_area = self.target_area
             )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
             import plotly.express as px
             import plotly.graph_objects as go
@@ -391,17 +386,20 @@ class TabularAnalyticsHeatmapView(TabularAnalyticsBaseView):
 
             fig = go.Figure(go.Heatmap(z=corr, x=labels, y=labels,
                                     colorscale='RdBu', reversescale=True, zmid=0))
-            fig.update_layout(title='Heatmap', yaxis=dict(autorange='reversed'), width=1200, height=1200)
+            fig.update_layout(title='Heatmap', yaxis=dict(autorange='reversed'), width=1000, height=700)
 
             self.setting_part.v_model = False
             self.output_part.children = [
                 self.setting_part, 
-                go.FigureWidget(fig)
+                v.Col(
+                    children = [go.FigureWidget(fig)],
+                    style_ = "",
+                )
             ]
 
             self.app_context.progress_linear.active = False
         
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 
 class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
@@ -439,7 +437,6 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
             data = self.y_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         self.column_y_selector.children[1].children[0].selected = [{'index':0, 'col_name':self.y_cols.iloc[0]['col_name']}] # init selected col
@@ -453,7 +450,6 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
             data = self.hue_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         # setting area: (3) data range selection
@@ -472,7 +468,6 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -498,7 +493,7 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
             target_area = self.target_area
             )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
             import plotly.express as px
             import plotly.graph_objects as go
@@ -527,17 +522,20 @@ class TabularAnalyticsBoxplotView(TabularAnalyticsBaseView):
                 .pipe(px.box, x=selected_x_name, y=selected_y_name, color=selected_hue_name, title='Boxplot')
             )
 
-            fig.update_layout(width=1200, height=600)
+            fig.update_layout(width=1000, height=600)
 
             self.setting_part.v_model = False
             self.output_part.children = [
                 self.setting_part, 
-                fig
+                v.Col(
+                    children = [fig],
+                    style_ = "",
+                )
             ]
 
             self.app_context.progress_linear.stop()
 
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
@@ -559,7 +557,6 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         self.column_selector.children[1].children[0].selected = [{'index':0, 'col_name':self.x_cols.iloc[0]['col_name']}]  # init selected col
@@ -573,7 +570,6 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
             data = self.hue_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         # setting area: (3) data range selection
@@ -592,7 +588,6 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -616,7 +611,7 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
             target_area = self.target_area
             )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
             import plotly.express as px
             import plotly.graph_objects as go
@@ -640,20 +635,23 @@ class TabularAnalyticsDensityView(TabularAnalyticsBaseView):
 
             try:
                 fig = px.histogram(data, x=selected_col_name, color=color, hover_data=data.columns)
-                fig.update_layout(title_text='Density Plot', width=1200, height=1200)
+                fig.update_layout(title_text='Density Plot', width=1000, height=700)
 
                 self.setting_part.v_model = False
 
                 self.output_part.children = [
                     self.setting_part, 
-                    go.FigureWidget(fig)
+                    v.Col(
+                        children = [go.FigureWidget(fig)],
+                        style_ = "",
+                    )
                 ]
             except:
                 raise Exception('Hue 그룹별 데이터가 특정 값에 편중되어 있습니다. 다른 Hue 값을 선택해 주세요.')
 
             self.app_context.progress_linear.active = False
 
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
@@ -675,7 +673,6 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         self.column_selector.children[1].children[0].selected = [{'index':0, 'col_name':self.x_cols.iloc[0]['col_name']}]  # init selected col
@@ -711,7 +708,6 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -735,7 +731,7 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
             target_area = self.target_area
         )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
 
             self.data = self.app_context.tabular_dataset.current_data
@@ -816,7 +812,7 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
 
             self.app_context.progress_linear.active = False
 
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 
 class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
@@ -853,7 +849,6 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff;',
         )
         
         # column selection - select all
@@ -869,7 +864,6 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
             data = self.c_cols,
             size = {'width':'210px', 'height':'100px'},
             single_select = True,
-            style = 'background-color:#ffffff;',
         )
 
         # setting area: (4) data range selection
@@ -904,7 +898,6 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -937,7 +930,7 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
             else:
                 self.perplexity_selector_area.children = []
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
 
             # selected cols
@@ -989,18 +982,21 @@ class TabularAnalyticsReductionView(TabularAnalyticsBaseView):
                 color = labels = None
 
             fig = px.scatter(projections, x=0, y=1, color=color, labels=labels, title=chart_title)
-            fig.update_layout(width=1200, height=700)
+            fig.update_layout(width=1000, height=700)
 
             self.setting_part.v_model = False
             self.output_part.children = [
                 self.setting_part,   
-                go.FigureWidget(fig)
+                v.Col(
+                    children = [go.FigureWidget(fig)],
+                    style_ = "",
+                )
             ]
 
             self.app_context.progress_linear.stop()
 
         self.algorithm_selector.children[1].children[0].children[0].on_event('change', _show_conditional_option)
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
 
 class TabularAnalyticsClusteringView(TabularAnalyticsBaseView):
@@ -1036,7 +1032,6 @@ class TabularAnalyticsClusteringView(TabularAnalyticsBaseView):
             data = self.x_cols,
             size = {'width':'210px', 'height':'150px'},
             single_select = False,
-            style = 'background-color:#ffffff;',
         )
         
         # column selection - select all
@@ -1087,7 +1082,6 @@ class TabularAnalyticsClusteringView(TabularAnalyticsBaseView):
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -1115,7 +1109,7 @@ class TabularAnalyticsClusteringView(TabularAnalyticsBaseView):
             target_area = self.target_area
         )
 
-        def _show_plot(item, event, data):
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
 
             # selected cols
@@ -1177,61 +1171,63 @@ class TabularAnalyticsClusteringView(TabularAnalyticsBaseView):
             target_data['PC2'] = projections[:, 1]
 
             fig = px.scatter(projections, x=0, y=1, color=color, labels=labels, title=chart_title)
-            fig.update_layout(width=1200, height=700)
+            fig.update_layout(width=1000, height=700)
 
             self.setting_part.v_model = False
             self.output_part.children = [
                 self.setting_part,   
-                go.FigureWidget(fig)
+                v.Col(
+                    children = [go.FigureWidget(fig)],
+                    style_ = "",
+                ),
             ]
 
             self.app_context.progress_linear.stop()
 
-        self.run_button.on_event('click', _show_plot)
+        self.run_button.on_event('click', _show_result)
 
-class TabularAnalyticsDataSample(v.Container):
+class TabularAnalyticsDataSampleView(TabularAnalyticsBaseView):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
+        self.target_area = kwargs.get('target_area')
+        self.x_cols = kwargs.get('x_cols')
+        self.data_range = kwargs.get('data_range')
+        self.selected_data = None
+        self.output_part_style = "max-height:100%; margin:0; padding:0px; background-color:#ffffff; \
+                    display:flex, flex-direction:column; justify-content:center;"
 
-        self.data = self.app_context.tabular_dataset.current_data
-
-        self.result_togle = "display:none;"
-
-        # column selection
-        df_col_names = pd.DataFrame(self.data.columns, columns=['col_names'])
+        # setting area: (1) column selection
         self.column_selector = get_or_create_class(
             'select_table_card',
             self.app_context,
-            context_key = f'{self.context_key}__column_selector', # tabular_analytics_basicinfo__column_selector
+            context_key = f'{self.context_key}__column_selector', 
             title = '변수 선택',
-            data = df_col_names,
-            size = {'width':'210px', 'height':'200px'},
-            style = 'background-color:#ffffff;',
+            data = self.x_cols,
+            size = {'width':'210px', 'height':'150px'},
+            single_select = False,
         )
+
         # column selection - select all
-        select_all_values = [{'index':i} for i in range(len(self.data.columns))]
+        select_all_values = [{'index':i} for i in range(len(self.x_cols))]
         self.column_selector.children[1].children[0].selected = select_all_values
 
-        # data range selector
-        default = 1000 if len(self.data) / 2  > 1000 else len(self.data) / 2
+        # setting area: (2) data range selection
         self.data_range_selector = get_or_create_class(
             'simple_slider_card',
             self.app_context,
             context_key = f'{self.context_key}__data_range_selector', 
             title = '행 범위',
-            range = [1, len(self.data), 1, default],
+            range = self.data_range,
             size = {'width':'210px', 'height':'90px'},
-            style = 'background-color:#ffffff;',
         )
 
-        # 조회하기 버튼
+        # setting area: (3) run button
         self.run_button = v.Col(
             children= [
                 v.Btn(
                     style_ = "",
                     children = ['조회하기'],
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),
@@ -1247,50 +1243,59 @@ class TabularAnalyticsDataSample(v.Container):
             self.run_button,
         ]
 
-        self.setting_part = get_or_create_class(
-            'tabular_data_analytics_options',
-            self.app_context,
-        )
-        
-        self.setting_part.update_contents(self.setting_part_components)
-
-        self.output_part = v.Row(
-            class_ = 'tabular_analytics_basicinfo__output_part',
-            style_ = "max-height:100%; margin:0; padding:0; background-color:#ffffff; \
-                      display:flex, flex-direction:column;",
-            children = [self.setting_part],
-        )
-
         super().__init__(
-            class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:row; background-color:#ffffff00;",
-            children = [
-                self.output_part
-                ],
-        )
+            app_context, 
+            context_key, 
+            target_area = self.target_area
+            )
 
-        def _show_data_sample(item, event, data):
+        self.data_head = self.data_tail = None
+        def _show_result(item, event, data):
             self.app_context.progress_linear.start()
 
-            # (1) Column 선택
-            selected_cols = self.app_context.tabular_analytics_datasample__column_selector.children[1].children[0].selected
+            # selected col_names
+            selected_cols = self.column_selector.children[1].children[0].selected
             if len(selected_cols) == 0:
                 raise Exception('변수를 1개 이상 선택해주세요.')
             selected_cols_to_idx = [col['index'] for col in selected_cols]
+            
+            # data range
+            selected_num_rows = int(self.data_range_selector.children[1].children[0].children[0].v_model)
 
-            # (2) 데이터 범위
-            selected_num_rows = int(self.app_context.tabular_analytics_datasample__data_range_selector.children[1].children[0].children[0].v_model)
+            # data
+            self.selected_data = self.app_context.tabular_dataset.current_data.iloc[:selected_num_rows, selected_cols_to_idx]
+           
+            # make output & show
+            self.data_head = get_or_create_class(
+                'datatable',
+                self.app_context,
+                context_key = f'{self.context_key}__sample_data_header', # tabular_analytics_basicinfo__data_info
+                data = self.selected_data.head(10),
+                title = 'First Rows',
+                update = True,
+            )
 
-            # (3) 데이터
-            self.df = self.app_context.tabular_dataset.current_data.iloc[:selected_num_rows, selected_cols_to_idx]
+            self.data_tail = get_or_create_class(
+                'datatable',
+                self.app_context,
+                context_key = f'{self.context_key}__sample_data_header', # tabular_analytics_basicinfo__data_info
+                data = self.selected_data.tail(10),
+                title = 'Last Rows',
+                update = True,
+            )
 
+            self.setting_part.v_model = False
             self.output_part.children = [
-                v.Col(title = '데이터 상위 10건', children = [self.df.head(10)]),
-                v.Col(title = '데이터 하위 10건', children = [self.df.tail(10)]),
-                
+                self.setting_part, 
+                v.Col(
+                    class_ = "output_part_sub",
+                    children = [self.data_head, v.Spacer(style_ = 'min-height:15px; max-height: 15px'), self.data_tail],
+                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
+                              padding-top:15px; padding-left:15px; padding-right:15px; position:absolute;",
+                ),
             ]
             self.app_context.progress_linear.active = False
 
-        self.run_button.on_event('click', _show_data_sample)
+        self.run_button.on_event('click', _show_result)
 
 

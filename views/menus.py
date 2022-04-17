@@ -142,12 +142,15 @@ class ListMenu(v.List):
 
                 # (2) change top area props according to target
                 self.app_context.top_area.change_style('light')
+                self.app_context.work_area.change_style('light')
+
             else:
 
                 self.app_context.side_nav.temporary = True
                 self.app_context.side_nav.permanent = False
                 self.app_context.side_nav.v_model = False
                 self.app_context.top_area.change_style('default')
+                self.app_context.work_area.change_style('default')
 
         # set default
         default_target_name: str = self.app_context.side_nav_menu_list['default'] # task_recent_view
