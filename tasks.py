@@ -73,7 +73,7 @@ class TaskBase:
         self.view_instance.show(self.target_area)
 
     def load_workbook(self, workbook_type, workbook_name):
-
+        
         import os
         from utils import delete_files_in_dir
         self.tmp_dir = self.app_context.env_values['tmp_dir']
@@ -114,7 +114,7 @@ class TaskBase:
                 self.app_context.current_workbook.current_workbook_name = f'{new_workbook_name}.ezx'
                 self.app_context.current_workbook.current_workbook_path = f'{self.workspace_dir}/{new_workbook_name}.ezx'
                 self.app_context.current_workbook.profile['modified_at'] = str(time.time())
-                self.app_context.save_workbook()
+                self.app_context.current_workbook.save_workbook()
 
         # task: reload workbook profiles
         self.load_workbook_profiles_and_show()  

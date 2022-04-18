@@ -25,27 +25,12 @@ class TabularBase:
             )
 
         # get target area
-        target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area 
-
-        # put components into target area
-        target_area.children = [
-            v.Container(
-                class_ = self.context_key,
-                style_ = "min-width:100%; min-height:100%; padding:0px; display:flex; flex-direction:column;",
-                children = [
-                    self.tab_menu, 
-                    work_area_contents,
-                ],
-            )
-        ]
-
         self.app_context.current_workflow = self.base_key
-
-        # task view change
-        self.app_context.side_nav.temporary = True
-        self.app_context.side_nav.permanent = False
-        self.app_context.side_nav.v_model = False
-        self.app_context.top_area.change_style('default')
+        self.app_context.current_workflow_stage = tab_name
+        target_area = get_or_create_class(self.app_context.side_nav_menu_list['target_area'], self.app_context) # work_area 
+        # target_instance = get_or_create_class(tab_name, self.app_context)
+        # work_area_contents.children = [target_instance]
+        target_area.children = [self.tab_menu, work_area_contents]
 
     def create_new(self):
 
@@ -54,11 +39,11 @@ class TabularBase:
         self.workbook.create_new() # tabular, text, image, video, audio, etc.
         default_tab_name = self.tab_props['default']
 
-        # 기존 내용 삭제: import
-        if self.app_context.tabular_data_import__workbook_data_list:
-            self.app_context.tabular_data_import__workbook_data_list.update_data([])
-        if self.app_context.tabular_data_context:
-            self.app_context.tabular_data_context.reset()
+        # 기존 내용 삭제: analytics, processing, training
+        self.app_context.current_workbook.clear_workflow_stage('tabular_data_import')
+        self.app_context.current_workbook.clear_workflow_stage('tabular_data_analytics')
+        self.app_context.current_workbook.clear_workflow_stage('tabular_data_processing')
+        self.app_context.current_workbook.clear_workflow_stage('tabular_ai_training')
 
         self.show(default_tab_name, update=True)
 
@@ -82,11 +67,19 @@ class TabularBase:
 
     def return_to_current_workflow_stage(self):
         current_workflow_stage = self.app_context.current_workflow_stage
-        self.show(current_workflow_stage)
 
         # menu control
         for item in self.app_context.side_nav_menu.menu_to_target:
             item.disabled = False
+
+        # task view change
+        self.app_context.side_nav.temporary = True
+        self.app_context.side_nav.permanent = False
+        self.app_context.side_nav.v_model = False
+        self.app_context.top_area.change_style('default')
+        self.app_context.work_area.change_style('default')
+
+        self.show(current_workflow_stage)
 
 class TabularDataImport(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
@@ -106,11 +99,11 @@ class TabularDataImport(v.Container):
                 'title': 'PC에서 가져오기',
                 'target': 'tabular_import_pc',
             },
-            {   
-                'icon': 'mdi-dns-outline',
-                'title': 'EDAP에서 가져오기',
-                'target': 'tabular_import_edap',
-            },
+            # {   
+            #     'icon': 'mdi-dns-outline',
+            #     'title': 'EDAP에서 가져오기',
+            #     'target': 'tabular_import_edap',
+            # },
         ]
 
         # top area(data_context, button)
@@ -130,7 +123,7 @@ class TabularDataImport(v.Container):
         self.work_area_contents_sub_menu = get_or_create_class(
             'sub_menu_area',
             self.app_context,
-            style = "min-width:200px; max-width:200px !important; background-color:#e5e5e5; z-index:100;",
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; z-index:100; border-right:1px solid #dbdbdb;",
         )
 
         self.sub_menu = get_or_create_class(
@@ -160,6 +153,7 @@ class TabularDataImport(v.Container):
             children = [
                 self.top_area,
                 v.Col(
+                    class_ = 'tabular_sub_menu',
                     style_ = "display:flex; max-height:1599px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
@@ -252,14 +246,14 @@ class TabularDataAnalytics(v.Container):
             children = [
                 self.data_context
             ],
-            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd;",
+            style_ = "margin:0; padding:0; max-height:60px; border-bottom:1px solid #cdcdcd; ",
         )
 
         # sub menu area
         self.work_area_contents_sub_menu = get_or_create_class(
             'sub_menu_area',
             self.app_context,
-            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5;z-index:100;",
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5;z-index:100; border-right:1px solid #dbdbdb;",
         )
                     
         self.sub_menu = get_or_create_class(
@@ -277,7 +271,7 @@ class TabularDataAnalytics(v.Container):
             self.app_context,
             context_key = 'tabular_data_analytics__sub_contents',
             style = "width:100%; \
-                    padding:0; margin:0; background-color:#ffffff00; position:relative; ",
+                    padding:0; margin:0; background-color:#ffffff00; position:relative; min-height:100%;",
         )
 
         super().__init__(
@@ -286,6 +280,7 @@ class TabularDataAnalytics(v.Container):
             children = [
                 self.top_area,
                 v.Col(
+                    class_ = 'tabular_sub_menu',
                     style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
@@ -333,7 +328,7 @@ class TabularDataProcessing(v.Container):
             'sub_menu_area',
             self.app_context,
             context_key = 'tabular_data_processing_sub_menu',
-            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; z-index:100;",
+            style = "min-width:230px; max-width:230px !important; background-color:#e5e5e5; z-index:100; border-right:1px solid #dbdbdb;",
         )
 
         # vertical tab
@@ -361,6 +356,7 @@ class TabularDataProcessing(v.Container):
             children = [
                 self.top_area,
                 v.Col(
+                    class_ = 'tabular_sub_menu',
                     style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,

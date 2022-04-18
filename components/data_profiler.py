@@ -291,7 +291,9 @@ class DataInfo(SimpleCard):
             ),
             no_footer=True,
             size = {"width":"410px", "height":"360px"},
-            style = "margin-bottom:15px;"
+            style = {
+                'card': 'margin-bottom:15px;',
+                }
         )
 class ColumnSummarySimple(SimpleCard):
     def __init__(self, app_context, context_key, title:str, col:pd.Series, **kwargs):
@@ -305,7 +307,9 @@ class ColumnSummarySimple(SimpleCard):
             body = self.column_summary_tables,
             no_footer = True,
             size = {"width":"1300px", "height":"auto"},
-            style = "margin-bottom:15px;",
+            style = {
+                'card': 'margin-bottom:15px',
+                }
         )
 
     def update_data(self, col:pd.Series):

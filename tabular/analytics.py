@@ -11,7 +11,7 @@ class TabularAnalyticsBase:
         self.target_area = get_or_create_class('sub_area', self.app_context, 'tabular_data_analytics__sub_contents') 
         self.data = self.app_context.tabular_dataset.current_data
 
-    def show_contents(self):
+    def show(self):
         self.view_instance.show()
 
 class TabularaAnalyticsBasicinfo(TabularAnalyticsBase):
@@ -206,7 +206,7 @@ class TabularAnalyticsReduction(TabularAnalyticsBase):
         self.algorithm_cols = {
                 'labels':['PCA', 't-SNE'],
                 'values':['pca', 't_sne'],
-            },
+            }
 
         # data range
         if len(self.data) <= 100:
@@ -221,12 +221,6 @@ class TabularAnalyticsReduction(TabularAnalyticsBase):
             self.data_range_start = 100
             self.data_range_default = 1000
 
-        # algorithm
-        self.algorithm_cols = {
-                'labels':['PCA', 't-SNE'],
-                'values':['pca', 't_sne'],
-            }
-
         # perplexity range
         self.perplexity_range = [1, 100, 1, 50]
 
@@ -239,4 +233,65 @@ class TabularAnalyticsReduction(TabularAnalyticsBase):
             data_range = [self.data_range_start, len(self.data), 1, self.data_range_default],
             algorithm_cols = self.algorithm_cols,
             perplexity_range = self.perplexity_range
+        )
+
+class TabularAnalyticsClustering(TabularAnalyticsBase):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.target_view_name = 'tabular_analytics_clustering_view'
+        super().__init__(self.app_context, self.context_key, self.target_view_name, **kwargs)
+
+        # algorithm
+        self.algorithm_cols = {
+                'labels':['K-Means', 'Hierarchy'],
+                'values':['km', 'hier'],
+            }
+
+        # make setting data:
+        self.x_cols = pd.DataFrame(self.data.select_dtypes(include = [np.number]).columns, columns = ['col_name'])
+
+        # clustering range
+        self.clustering_range = [2, 10, 1, 2]
+
+        # data range
+        if len(self.data) <= 100:
+            self.data_range_start = self.data_range_default = len(self.data) 
+        elif len(self.data) <= 200:
+            self.data_range_start = self.data_range_default = 100
+
+        elif len(self.data) <= 2000:
+            self.data_range_start = 100
+            self.data_range_default = len(self.data) // 2
+        else:
+            self.data_range_start = 100
+            self.data_range_default = 1000
+
+        self.view_instance = get_or_create_class(
+            self.target_view_name, 
+            self.app_context, 
+            target_area = self.target_area,
+            x_cols = self.x_cols,
+            data_range = [self.data_range_start, len(self.data), 1, self.data_range_default],
+            algorithm_cols = self.algorithm_cols,
+            clustering_range = self.clustering_range
+        )
+
+class TabularAnalyticsDataSample(TabularAnalyticsBase):
+    def __init__(self, app_context, context_key, **kwargs):
+        self.app_context = app_context
+        self.context_key = context_key
+        self.target_view_name = 'tabular_analytics_datasample_view'
+        super().__init__(self.app_context, self.context_key, self.target_view_name, **kwargs)
+
+        # make setting data:
+        self.x_cols = pd.DataFrame(self.data.columns, columns=['col_names'])
+        self.data_range_default = len(self.data) // 2 if len(self.data) // 2 <= 1000 else 1000
+        
+        self.view_instance = get_or_create_class(
+            self.target_view_name, 
+            self.app_context, 
+            target_area = self.target_area,
+            x_cols = self.x_cols,
+            data_range = [1, len(self.data), 1, self.data_range_default],
         )

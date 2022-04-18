@@ -29,8 +29,6 @@ class AppContext:
     top_area: object = None
     work_area: object = None
     base_overlay: object = None
-    progress_overlay: object = None
-    progress_overlay2: object = None
     progress_linear: object = None
 
 ## workbook list ##
@@ -59,20 +57,14 @@ class AppContext:
     tabular_data_import: object = None
     tabular_data_import__sub_menu: object = None
     tabular_data_import__sub_contents: object = None
+    tabular_data_import__workbook_data_list_view: object = None
+    tabular_data_import__workbook_aidu_list_view: object = None
     tabular_import_pc: object = None
-    tabular_import_pc__file_object_handeler: object = None
-    tabular_import_pc__select_encoding_options: object = None
-    tabular_import_pc__select_delimiter_options: object = None
-
-
-    tabular_data_import__workbook_data_list: object = None
-   
-    
-    tabular_data_import_tab: object = None
-    tabular_data_import_aidu: object = None
-    tabular_data_import_local: object = None
-    tabular_data_import_edap: object = None
-    tabular_data_import_pod: object = None
+    tabular_import_pc_view: object = None
+    tabular_import_aidu: object = None
+    tabular_import_aidu_view: object = None
+    tabular_import_edap: object = None
+    tabular_import_edap_view: object = None
 
     # tabular data analytics objects
     tabular_data_analytics: object = None
@@ -81,8 +73,7 @@ class AppContext:
     tabular_data_analytics_options: object = None
 
     tabular_analytics_basicinfo: object = None
-    tabular_analytics_basicinfo__data_info: object = None
-    tabular_analytics_basicinfo__column_summary_simple: object = None
+    tabular_analytics_basicinfo_view: object = None
 
     tabular_analytics_scatter: object = None
     tabular_analytics_scatter_view: object = None
@@ -101,8 +92,7 @@ class AppContext:
     tabular_analytics_clustering: object = None
     tabular_analytics_clustering_view: object = None
     tabular_analytics_datasample: object = None
-    tabular_analytics_datasample__column_selector: object = None
-    tabular_analytics_datasample__data_range_selector: object = None
+    tabular_analytics_datasample_view: object = None
 
     #tabular data processing objects
     tabular_data_processing: object = None
@@ -117,11 +107,11 @@ class AppContext:
 
     # tabilar ai training objects
     tabular_ai_training: object = None
-    tabular_ai_training__changed: bool = False
     tabular_ai_training__train_activator: object = None
     tabular_ai_training__training_options: object = None
     tabular_ai_training__column_summary: object = None
     tabular_ai_training__train_result: object = None
+    tabular_ai_training__progress_linear: object = None
 
     tabular_ai_evaluation: object = None
     # --------------------------------------------------
@@ -179,3 +169,39 @@ class AppContext:
         self.training_params: dict = app_config['training_params']
         self.workbook_icons: list = app_config['workbook_icons']
         self.workbook_colors: list = app_config['workbook_colors']
+
+    def clear_workflow(self):
+        self.workflow_base = None
+        self.workflow_tab_menu = None
+        self.workflow_contents = None
+        self.workflow_data_import = None
+        self.workflow_data_import__sub_menu = None
+        self.workflow_data_import__sub_contents = None
+        self.workflow_data_import__workbook_data_list = None
+        self.workflow_data_import__workbook_aidu_list = None
+        self.workflow_import_pc = None
+        self.workflow_import_pc_view = None
+        self.workflow_import_aidu = None
+        self.workflow_import_aidu_view = None
+        self.workflow_import_edap = None
+        self.workflow_import_edap_view = None
+        self.workflow_data_analytics = None
+        self.workflow_data_analytics__sub_menu = None
+        self.workflow_data_analytics__sub_contents = None
+        self.workflow_data_analytics_options = None
+        self.workflow_analytics_basicinfo = None
+        self.workflow_analytics_basicinfo__data_info = None
+        self.workflow_analytics_basicinfo__column_summary_simple = None
+        self.workflow_analytics_scatter = None
+        self.workflow_analytics_scatter_view = None
+        self.workflow_analytics_heatmap = None
+        self.workflow_analytics_heatmap_view = None
+        self.workflow_analytics_boxplot = None
+        self.workflow_analytics_boxplot_view = None
+        self.workflow_analytics_density = None
+        self.workflow_analytics_density_view = None
+        self.workflow_analytics_wcloud = None
+        self.workflow_analytics_wcloud_view = None
+        self.workflow_analytics_reduction = None
+        self.workflow_analytics_reduction_view = None
+        self.work

@@ -19,8 +19,6 @@ class_paths:
   column_summary: components.data_profiler.ColumnSummary
   column_summary_simple: components.data_profiler.ColumnSummarySimple
   base_overlay: components.overlays.BaseOverlay
-  progress_overlay: components.overlays.ProgressOverlay
-  progress_overlay2: components.overlays.ProgressOverlay2
   progress_linear: components.progress.ProgressLinear
   alert: components.alerts.Alert
   select_table_card: components.tables.SelectTableCard
@@ -29,9 +27,9 @@ class_paths:
   simple_radio_card: components.forms.SimpleRadioCard
   data_info: components.data_profiler.DataInfo
   select_autocomplete: components.forms.SelectAutoComplete
+  datatable: components.tables.DataTable
 
-  # workflow-task
-
+  # task
   task_recent: tasks.TaskRecent
   task_recent_view: views.tasks.TaskRecentView
   task_favorite: tasks.TaskFavorite
@@ -39,9 +37,7 @@ class_paths:
   task_all: tasks.TaskAll
   task_all_view: views.tasks.TaskAllView
 
-  task_card: views.tasks.TaskCardView
-
-  # workflow-tabular
+  # tabular
   tabular_base: workflows.tabular.TabularBase
   tabular_workbook: workbooks.TabularWorkbook
   tabular_dataset: components.dataset.TabularDataset
@@ -49,17 +45,12 @@ class_paths:
   tabular_model: views.tabular.training.TabularModel
 
   tabular_data_import: workflows.tabular.TabularDataImport
-  tabular_import_pc: views.tabular.imports.TabularImportPCView
-  tabular_import_file_object_handler: tabular.imports.FileObjectHandler
-  tabular_import_aidu: views.tabular.imports.TabularImportAIDUView
-  tabular_import_edap: views.tabular.imports.TabularImportEDAPView
-
-
-  tabular_data_import_tab: views.tabular.imports.TabularImportTab
-  tabular_data_import_aidu: views.tabular.imports.TabularAIDUImport
-  tabular_data_import_local: views.tabular.imports.TabularLocalImport
-  tabular_data_import_edap: views.tabular.imports.TabularEDAPImport
-  tabular_data_import_pod: views.tabular.imports.TabularPodImport
+  tabular_import_pc: tabular.imports.TabularImportPC
+  tabular_import_pc_view: views.tabular.imports.TabularImportPCView
+  tabular_import_aidu: tabular.imports.TabularImportAIDU
+  tabular_import_aidu_view: views.tabular.imports.TabularImportAIDUView
+  tabular_import_edap: tabular.imports.TabularImportEDAP
+  tabular_import_edap_view: views.tabular.imports.TabularImportEDAPView
 
   tabular_data_analytics: workflows.tabular.TabularDataAnalytics
   tabular_data_analytics_options: views.tabular.analytics.TabualrAnalyticsOptionArea
@@ -75,11 +66,12 @@ class_paths:
   tabular_analytics_density_view: views.tabular.analytics.TabularAnalyticsDensityView
   tabular_analytics_wcloud: tabular.analytics.TabularAnalyticsWordCloud
   tabular_analytics_wcloud_view: views.tabular.analytics.TabularAnalyticsWordCloudView
-
-
-  tabular_analytics_reduction: views.tabular.analytics.TabularAnalyticsDimensionReduction
-  tabular_analytics_clustering: views.tabular.analytics.TabularAnalyticsClustering
-  tabular_analytics_datasample: views.tabular.analytics.TabularAnalyticsDataSample
+  tabular_analytics_reduction: tabular.analytics.TabularAnalyticsReduction
+  tabular_analytics_reduction_view: views.tabular.analytics.TabularAnalyticsReductionView
+  tabular_analytics_clustering: tabular.analytics.TabularAnalyticsClustering
+  tabular_analytics_clustering_view: views.tabular.analytics.TabularAnalyticsClusteringView
+  tabular_analytics_datasample: tabular.analytics.TabularAnalyticsDataSample
+  tabular_analytics_datasample_view: views.tabular.analytics.TabularAnalyticsDataSampleView
 
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_save_activator: views.tabular.processing.TabularProcessingSaveActivator
@@ -191,9 +183,9 @@ workflows_list:
       - 
         title: AI모델 학습
         target: tabular_ai_training
-      - 
-        title: AI모델 평가
-        target: tabular_ai_evaluation
+      # - 
+      #   title: AI모델 평가
+      #   target: tabular_ai_evaluation
   text:
     default: text_data_import
     target_area: text_contents
@@ -279,17 +271,17 @@ theme:
       style: 
         base: 
           default: >
-            min-width:100%; max-width:none;
+            min-width:1920px; max-width:1920px !important;border-right:1px dashed #cccccc;
             height: 1800px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
-            display:flex; justify-content:center;
-            overflow:auto; left:0;
+            display:flex;
+            left:0;
           dark: >
-            min-width:100%; max-width:none;
+            min-width:1920px; max-width:1920px !important; border-right:1px dashed #cccccc;
             height: 1800px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
-            display:flex; justify-content:center;
-            overflow:auto; left:0;
+            display:flex;
+            left:0;
     side_nav:
       style: 
         base:
@@ -297,7 +289,8 @@ theme:
             min-width:250px; height:1800px; 
             padding:10px; z-index:1000; 
             display:flex; flex-direction:column; 
-            background-color:#0f172a
+            background-color:#0f172a;
+            position:absolute;
     top_area:
       style: 
         base:
@@ -307,6 +300,8 @@ theme:
             border-bottom:1px solid #e2e8f0; 
             background-color: rgb(30, 41, 59);
             z-index:776;
+            min-width:1920px; max-width:1920px;border-right:1px dashed #cccccc;
+            position:absolute;
           light: >
             height:199px; padding:10px; 
             min-width:100%;
@@ -314,6 +309,8 @@ theme:
             border-bottom:1px solid #e2e8f0; 
             background-color: #ffffff;
             z-index:776;
+            min-width:1920px; max-width:1920px;border-right:1px dashed #cccccc;
+            position:absolute;
         nav_icon:
           default: >
             min-width:50px; max-width:50px; margin:0; padding:0;
@@ -359,7 +356,15 @@ theme:
             height: 1599px; top:200px;
             background-color:#f1f5f9;
             margin:0; padding:0;
-            position:absolute;
+            position:absolute; left:10px; z-index:777;
+          light: >
+            min-width:1570px; max-width:1570px !important;
+            border-left:1px dashed #cccccc;
+            border-right:1px dashed #cccccc;
+            height: 1599px; top:200px;
+            background-color:#f1f5f9;
+            margin:0; padding:0;
+            position:absolute; left:256px; z-index:777;
 
 # 데이터가공 paramater 정의
 processing_params:
@@ -490,6 +495,7 @@ processing_params:
               type: select
               values: ['komoran', 'hannanum']
               default: komoran
+ 
  # 학습 parameter 정의
 training_params:
   ludwig:
@@ -665,15 +671,15 @@ training_params:
             values: [category, binary]
             default: category
           bool:
-            values: [binary]
+            values: [binary, category]
             default: binary
         model_type:
           numerical: 
             values: [regressor]
             default: regressor
           binary: 
-            values: [classifier]
-            default: classifier
+            values: [regressor]
+            default: regressor
           category:
             values: [classifier]
             default: classifier
@@ -688,14 +694,14 @@ training_params:
               dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
             classifier: {}
           binary:
-            regressor: {}
-            classifier:
+            regressor: 
               activation: 
                 values: [relu, sigmoid, softmax, tanh]
                 default: relu
               num_fc_layers: [0, 10, 1, 1] # min, max, step, default
               fc_size: [1, 1024, 1, 256] # min, max, step, default
               dropout: [0.00, 0.99, 0.01, 0] # min, max, step, default
+            classifier: {}
           category: 
             regressor: {}
             classifier:

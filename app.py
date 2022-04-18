@@ -10,12 +10,10 @@ class Aian:
 
         # initialize layout
         self.alert = get_or_create_class('alert', self.app_context)
-        self.p_overlay = get_or_create_class('progress_overlay', self.app_context)
-        self.b_overlay = get_or_create_class('base_overlay', self.app_context)
-        self.d_overlay = get_or_create_class('progress_overlay2', self.app_context, ignore = False)
+        self.base_overlay = get_or_create_class('base_overlay', self.app_context)
         self.background = get_or_create_class('background', self.app_context)
         self.top_area = get_or_create_class('top_area', self.app_context)
-        self.page_progress = get_or_create_class('progress_linear', self.app_context)
+        self.page_progress = get_or_create_class('progress_linear', self.app_context, style = 'position:absolute; top:200px; z-index:780; width: 1920px;')
         self.work_area = get_or_create_class('work_area', self.app_context)
         self.side_nav = get_or_create_class('side_nav', self.app_context)
 
@@ -24,7 +22,7 @@ class Aian:
 
         # merge components into layouts
         self.side_nav.children = [self.side_nav_menu]
-        self.background.children = [self.alert, self.p_overlay, self.b_overlay, self.d_overlay, self.top_area, self.page_progress, self.side_nav, self.work_area]
+        self.background.children = [self.alert, self.base_overlay, self.top_area, self.page_progress, self.side_nav, self.work_area]
         # self.background.children = [self.alert, self.top_area, self.page_progress, self.side_nav, self.work_area]
 
     def start(self):

@@ -49,7 +49,6 @@ class TabularProcessingSaveActivator(v.Col):
         self.data_save_button = v.Btn(
             style_ = self.style['data_save_button'],
             children = ['가공 데이터 저장'],
-            rounded = True,
         )
 
         def _save_data(widget, event=None, data=None):
@@ -143,7 +142,6 @@ class TabularSingleProcessing(v.Container):
                     style_ = "",
                     children = ['변수 삭제'],
                     v_model=self.column_name,
-                    rounded = True,
                     depressed = True,
                     color = "red lighten-1",
                 ),
@@ -158,7 +156,6 @@ class TabularSingleProcessing(v.Container):
                     style_ = "",
                     children = ['가공하기'],
                     v_model={'column_name': '', 'process': ''},
-                    rounded = True,
                     depressed = True,
                     dark = True,
                 ),

@@ -2,7 +2,7 @@ import os
 import re
 import zipfile
 import ipyvuetify as v
-from utils import get_or_create_class, delete_files_in_dir, check_string_validation_a
+from utils import get_or_create_class, delete_files_in_dir
 import json
 import time
 import shutil
@@ -76,7 +76,7 @@ class TabularWorkbook:
             'workbook_color': self.app_context.workbook_colors[color_random],
             'favorite': False,
             'description': '',
-            'workflow_stage': self.app_context.current_workflow_stage,
+            'workflow_stage': '',
             'current_work': '',
             'current_model': '',
             'created_at': str(time.time()),
@@ -91,21 +91,10 @@ class TabularWorkbook:
 
     def create_new_work(self, work_name, data):
 
-        def _check_work_name(work_name:str):
-
-            # check if work name is valid
-            _ = check_string_validation_a(work_name)
-
-            # check if data name already exists
-            if work_name in self.work_name_list:
-                raise Exception(f'{work_name}이/가 이미 존재합니다.')
-
-            return work_name
-
         self.app_context.progress_linear.start()
 
         # make work directory
-        self.current_work_name = _check_work_name(work_name) # e.g. 'titanic_train'
+        self.current_work_name = work_name # e.g. 'titanic_train'
         self.current_work_dir = f'{self.tmp_works_dir}/{work_name}'  # e.g. /aihub/workspace/tmp/workbook/works/titanic_train
         os.makedirs(self.current_work_dir)
 
@@ -129,7 +118,7 @@ class TabularWorkbook:
         # update workbook profile
         self.save_workbook(work = self.current_work_name)
 
-        self.app_context.progress_linear.active = False
+        self.app_context.progress_linear.stop()
 
     def save_workbook(self, **kwargs):
 
@@ -164,7 +153,66 @@ class TabularWorkbook:
         shutil.make_archive(f'{self.tmp_dir}/tmp_workbook', 'zip', self.tmp_workbook_dir)
         shutil.move(f'{self.tmp_dir}/tmp_workbook.zip', self.current_workbook_path)
 
-        self.app_context.progress_linear.active = False
+        self.app_context.progress_linear.stop()
+    
+    def clear_workflow_stage(self, stage:str):
+        if stage == 'tabular_data_analytics':
+            if self.app_context.tabular_data_analytics:
+                self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
+                for item in self.app_context.tabular_data_analytics__sub_menu.menu_to_target:
+                    item.class_list.remove('now_active')
+                if self.app_context.tabular_data_analytics__sub_contents:
+                    if self.app_context.tabular_data_analytics__sub_contents.children:
+                        self.app_context.tabular_data_analytics__sub_contents.children[0].children = []
+                self.app_context.tabular_analytics_basicinfo = None
+                self.app_context.tabular_analytics_basicinfo_view = None
+                self.app_context.tabular_analytics_scatter = None
+                self.app_context.tabular_analytics_scatter_view = None
+                self.app_context.tabular_analytics_heatmap = None
+                self.app_context.tabular_analytics_heatmap_view = None
+                self.app_context.tabular_analytics_boxplot = None
+                self.app_context.tabular_analytics_boxplot_view = None
+                self.app_context.tabular_analytics_density = None
+                self.app_context.tabular_analytics_density_view = None
+                self.app_context.tabular_analytics_wcloud = None
+                self.app_context.tabular_analytics_wcloud_view = None
+                self.app_context.tabular_analytics_reduction = None
+                self.app_context.tabular_analytics_reduction_view = None
+                self.app_context.tabular_analytics_clustering = None
+                self.app_context.tabular_analytics_clustering_view = None
+                self.app_context.tabular_analytics_datasample = None
+                self.app_context.tabular_analytics_datasample_view = None
+
+        elif stage == 'tabular_data_processing':
+            if self.app_context.tabular_data_processing:
+                self.app_context.tabular_data_processing__sub_contents.children = []
+                self.app_context.tabular_data_processing__options = None
+                if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
+                    self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
+                self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
+                if self.app_context.tabular_data_single_processing is not None:
+                    self.app_context.tabular_data_single_processing.update()
+
+        elif stage == 'tabular_ai_training':
+            if self.app_context.tabular_ai_training:
+                self.app_context.tabular_ai_training__train_activator = None
+                self.app_context.tabular_ai_training__training_options = None
+                self.app_context.tabular_ai_training__column_summary = None
+                self.app_context.tabular_ai_training__train_result = None
+
+        elif stage == 'tabular_data_import':
+            if self.app_context.tabular_data_import:
+                self.app_context.tabular_data_import = None
+                self.app_context.tabular_data_import__sub_menu = None
+                self.app_context.tabular_data_import__sub_contents = None
+                self.app_context.tabular_data_import__workbook_data_list_view = None
+                self.app_context.tabular_data_import__workbook_aidu_list_view = None
+                self.app_context.tabular_import_pc = None
+                self.app_context.tabular_import_pc_view = None
+                self.app_context.tabular_import_aidu = None
+                self.app_context.tabular_import_aidu_view = None
+                self.app_context.tabular_import_edap = None
+                self.app_context.tabular_import_edap_view = None
 
     def _load_existing_work(self, work_name):
 
@@ -178,39 +226,10 @@ class TabularWorkbook:
         self.app_context.tabular_dataset.change_data_to(work_name, self.current_work_dir)
 
         # analytics 변경
-
-        if self.app_context.tabular_data_analytics:
-            self.app_context.tabular_data_analytics__sub_menu.last_activated_item = None
-            for item in self.app_context.tabular_data_analytics__sub_menu.menu_to_target:
-                item.class_list.remove('now_active')
-            self.app_context.tabular_data_analytics__sub_contents.children[0].children = []
-            self.app_context.tabular_analytics_basicinfo = None
-            self.app_context.tabular_analytics_basicinfo_view = None
-            self.app_context.tabular_analytics_scatter = None
-            self.app_context.tabular_analytics_scatter_view = None
-            self.app_context.tabular_analytics_heatmap = None
-            self.app_context.tabular_analytics_heatmap_view = None
-            self.app_context.tabular_analytics_boxplot = None
-            self.app_context.tabular_analytics_boxplot_view = None
-            self.app_context.tabular_analytics_density = None
-            self.app_context.tabular_analytics_density_view = None
-            self.app_context.tabular_analytics_wcloud = None
-            self.app_context.tabular_analytics_wcloud_view = None
-            self.app_context.tabular_analytics_reduction = None
-            self.app_context.tabular_analytics_reduction_view = None
+        self.clear_workflow_stage('tabular_data_analytics')
 
         # preprocessing 변경
-        if self.app_context.tabular_data_processing:
-            self.app_context.tabular_data_processing__sub_contents.children = []
-            self.app_context.tabular_data_processing__options = None
-            if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
-                self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
-            self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
-            if self.app_context.tabular_data_single_processing_view is not None:
-                self.app_context.tabular_data_single_processing_view.update()
-
-        self.app_context.progress_overlay.update(60)
-        self.app_context.progress_overlay2.update(20)
+        self.clear_workflow_stage('tabular_data_processing')
 
         # training 변경
         if self.app_context.tabular_ai_training:
@@ -226,9 +245,6 @@ class TabularWorkbook:
                 title = '학습 로그',
                 size = {'width':'90vw', 'height':'80vh'}, 
             )
-            
-            self.app_context.progress_overlay.update(70)
-            self.app_context.progress_overlay2.update(60)
 
             training_options = get_or_create_class(
                 'tabular_training_options', 
@@ -238,9 +254,6 @@ class TabularWorkbook:
                 title = '학습 Parameter 설정',
             )
 
-            self.app_context.progress_overlay.update(80)
-            self.app_context.progress_overlay2.update(90)
-
             column_summary = get_or_create_class(
                 'column_summary',
                 self.app_context,
@@ -249,9 +262,6 @@ class TabularWorkbook:
                 title = '데이터 요약',
                 col = self.app_context.tabular_dataset.current_data.iloc[:, 0],
             ) 
-
-            self.app_context.progress_overlay.update(90)
-            self.app_context.progress_overlay2.update(100)
 
             # hide show_result button
             self.app_context.tabular_ai_training__train_activator.show_result_btn.hide()
@@ -266,16 +276,9 @@ class TabularWorkbook:
             ]
         
     def change_work(self, work_name):
-        if self.app_context.progress_overlay.value:
-            self.app_context.progress_overlay2.ignore = True
-        else:
-            self.app_context.progress_overlay2.start()
-        
         self.save_workbook()
         self._load_existing_work(work_name)
         self.save_workbook(work = work_name)
-
-        self.app_context.progress_overlay2.stop()
 
     def load_workbook_from_tmp(self, workbook_name):
 
@@ -302,8 +305,8 @@ class TabularWorkbook:
             self._load_existing_work(self.profile['current_work'])
 
         # update import view
-        if self.app_context.tabular_data_import__workbook_data_list:
-            self.app_context.tabular_data_import__workbook_data_list.update_data(self.app_context.tabular_dataset.data_name_list)
+        if self.app_context.tabular_data_import__workbook_data_list_view:
+            self.app_context.tabular_data_import__workbook_data_list_view.update(self.app_context.tabular_dataset.data_name_list)
 
         # reset data context
         if self.app_context.tabular_data_context:

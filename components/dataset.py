@@ -76,8 +76,10 @@ class TabularDataContext(v.Col):
         )
 
         def _on_data_selector_change(item, event=None, data=None):
+            self.app_context.base_overlay.start()  
             self.workbook = self.app_context.current_workbook
             self.workbook.change_work(item.v_model)
+            self.app_context.base_overlay.stop()  
 
         self.data_selector.children[0].on_event('change', _on_data_selector_change)  
 

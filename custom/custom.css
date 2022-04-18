@@ -186,8 +186,16 @@ div.output_subarea {
     width:90px
 }
 
-.tabular_data_import__workbook_data_list .v-data-table.theme--light td {
+.tabular_data_import__workbook_data_list_view .v-data-table.theme--light td {
     border-bottom: 0px !important;
+}
+
+.tabular_data_import__aidu_data_list_view .v-data-table.theme--light td {
+    border-bottom: 0px !important;
+}
+
+.tabular_import_aidu_view__work_area_contents_sub_area__top .v-radio {
+    margin:0 !important;
 }
 
 .vuetify-styles .v-input {
@@ -198,8 +206,8 @@ div.output_subarea {
     font-size: 14px !important;
 }
 
-.tabular_import_pc__work_area_contents_sub_area__middle .v-file-input {
-    width: 820px !important;
+.tabular_import_pc_view__work_area_contents_sub_area__middle .v-file-input {
+    width: 805px !important;
 }
 
 .vuetify-styles .side_nav .v-list-item--link:before {
@@ -229,3 +237,30 @@ div.output_subarea {
 .tabular_analytics_wcloud_view__language_selector .v-radio {
     max-width:37% !important;
 }
+
+.tabular_analytics_wcloud_view__language_selector .theme--light.v-label {
+    color: rgba(0,0,0, 0.83) !important;
+}
+
+.tabular_analytics_reduction_view__algorithm_selector .v-radio {
+    max-width:39% !important;
+}
+
+.tabular_analytics_clustering_view__algorithm_selector .v-radio {
+    max-width:45% !important;
+    margin-right:10px !important;
+}
+
+.tabular_analytics_reduction_view__algorithm_selector .theme--light.v-label {
+    color: rgba(0,0,0, 0.83) !important;
+}
+
+.vuetify-styles .tabula-data-selector .theme--light.v-list-item:hover:before {
+    background-color: #e4effa !important;
+    opacity: 0.6 !important;
+}
+
+.vuetify-styles .tabula-data-selector .theme--light.v-list-item:before {
+    transition: none !important;
+}
+

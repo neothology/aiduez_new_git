@@ -23,7 +23,6 @@ class TabularProcessingSaveActivator(v.Col):
         self.data_save_button = v.Btn(
             style_ = self.style['data_save_button'],
             children = ['가공 데이터 저장'],
-            rounded = True,
         )
 
         def _save_data(widget, event=None, data=None):
