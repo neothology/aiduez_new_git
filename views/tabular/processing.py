@@ -18,12 +18,14 @@ class TabularProcessingSaveActivator(v.Col):
         self.style = {
             'row': 'display:flex; flex-direction:row; padding:0; padding-top:12px; width:50%; justify-content:flex-end;',
             'data_save_button': 'width:150px; height:35px; background-color:#636efa; color:white;',
-            } 
+            }
 
         self.data_save_button = v.Btn(
             style_ = self.style['data_save_button'],
             children = ['가공 데이터 저장'],
         )
+
+        self.data_save_button.hide()
 
         def _save_data(widget, event=None, data=None):
             data_name = self.app_context.tabular_dataset.current_data_name + "_preprocessed"
@@ -35,6 +37,12 @@ class TabularProcessingSaveActivator(v.Col):
             children = [self.data_save_button],
             style_ = self.style["row"]
         )
+
+    def show_btn(self):
+        self.data_save_button.show()
+
+    def hide_btn(self):
+        self.data_save_button.hide()
 
 class TabularSingleProcessingView(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
@@ -212,6 +220,7 @@ class TabularSingleProcessingMenu(BaseCard):
             self.app_context.tabular_dataset.current_data = self.dataset
             tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
             tabular_data_single_processing_view.update()
+            self.app_context.tabular_data_processing__save_activator.show_btn() # activate save btn 
             alert = get_or_create_class('alert', self.app_context)
             alert.show_and_auto_close(
                 message=f"'{column_name}'이(가) 삭제되었습니다!", 
@@ -340,7 +349,8 @@ class TabularSingleProcessingDialogView(v.Dialog):
             self.app_context.tabular_dataset.current_data[new_colunm_name] = processed_column
             tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
             tabular_data_single_processing_view.update()
-            self.value = 0
+            self.value = 0  # close dialog
+            self.app_context.tabular_data_processing__save_activator.show_btn() # activate save btn 
             alert = get_or_create_class('alert', self.app_context)
             alert.show_and_auto_close(
                 message=f"'{new_colunm_name}'이(가) 생성되었습니다!", 
