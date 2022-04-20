@@ -18,12 +18,12 @@ div.output_subarea {
 
 /* -------------------------------------------------------  */
 @font-face {
-    font-family: 'NanumGothic';
-    font-style: normal;
-    font-weight: normal;
-    src: local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.woff") format('woff'),
+    font-family: 'NanumGothic';                                                               /* 나눔 고딕 우선 적용 */
+    font-style: normal;                                                                       /* 별도 폰트 스타일 미설정 */
+    font-weight: normal;                                                                      /* 별도 폰트 굵기 미설정. 폰트 굵기에 따라 요구되는 폰트 파일이 다름 */
+    src: local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.woff") format('woff'),        /* 가장 다양한 웹 브라우저에 대응하는 폰트 파일 양식 woff 사용 */
          local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff')
-         local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype')
+         local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype') /* 모든 폰트 로딩 실패 시 fall back 형식으로 사용할 수 있게 추가 */
         
    
 }
