@@ -18,17 +18,21 @@ div.output_subarea {
 
 /* -------------------------------------------------------  */
 @font-face {
-    font-family: 'Nanum';
+    font-family: 'NanumGothic';
     font-style: normal;
     font-weight: normal;
-    src: local('NanumGothic');
-    src: url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
-         url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff'),
-         url("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype');
+    src: local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.woff") format('woff'),
+         local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff')
+         local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype')
+        
+   
 }
 
+
+
+
 .vuetify-styles .v-application {
-    font-family: Roboto, sans-serif !important;
+    font-family: NanumGothic !important
 }
 
 .vuetify-styles .v-list-item--link:before {
