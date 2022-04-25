@@ -118,6 +118,10 @@ class TabularWorkbook:
         # update workbook profile
         self.save_workbook(work = self.current_work_name)
 
+        # update import view
+        if self.app_context.tabular_data_import__workbook_data_list_view:
+            self.app_context.tabular_data_import__workbook_data_list_view.update(self.app_context.tabular_dataset.data_name_list)
+
         self.app_context.progress_linear.stop()
 
     def save_workbook(self, **kwargs):

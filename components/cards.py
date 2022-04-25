@@ -489,7 +489,7 @@ class IconCard(v.Card):
             class_ = "task_icon_card",
             style_ = f"width:{size.get('width')}; height:{size.get('height')}; \
                 margin-right:20px; margin-bottom:20px; padding:0; display:flex; flex-direction:column; \
-                border-radius:8px; border-left:3px solid #{self.workbook_color};",
+                border-radius:8px;",# border-left:3px solid #{self.workbook_color};",
             children = [self.header, self.body],
         )
 
