@@ -2,6 +2,7 @@ from utils import get_or_create_class
 from glob import glob
 from zipfile import ZipFile
 import json
+import shutil
 
 class TaskBase:
     def __init__(self, app_context:object, context_key:str, target_view_name:str, **kwargs):
@@ -118,6 +119,29 @@ class TaskBase:
 
         # task: reload workbook profiles
         self.load_workbook_profiles_and_show()  
+
+    # 즐겨찾기 추가/제거
+    def favorite_workbook(self, workbook_full_name):
+        workbook_path = f"{self.workspace_dir}/{workbook_full_name}"
+
+        # extract workbook zip file
+        with ZipFile(workbook_path, 'r') as workbook:
+            workbook.extractall("tmp/")
+
+        # read workbook_profile
+        with open("tmp/workbook_profile.json", 'r') as js:
+            workbook_profile = json.load(js)
+        workbook_profile["favorite"] = not workbook_profile["favorite"]
+
+        # write new favored workbook_profile
+        with open("tmp/tmp_workbook_profile.json", 'w') as js:
+            json.dump(workbook_profile, js)
+    
+        shutil.move("tmp/tmp_workbook_profile.json", "tmp/workbook_profile.json")   # overwrite workbook_profile to favored  workbook_profile 
+        tmp_zip_dir = shutil.make_archive('tmp', 'zip', 'tmp/')     # compress tmp zip file
+        shutil.move(tmp_zip_dir, workbook_path)     # overwrite workbook to favored workbook
+        shutil.rmtree("tmp")    # remove extracted directory
+        self.load_workbook_profiles_and_show()
 
     def delete_workbook(self, workbook_full_name):
 

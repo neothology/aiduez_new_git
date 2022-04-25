@@ -18,12 +18,14 @@ class TabularProcessingSaveActivator(v.Col):
         self.style = {
             'row': 'display:flex; flex-direction:row; padding:0; padding-top:12px; width:50%; justify-content:flex-end;',
             'data_save_button': 'width:150px; height:35px; background-color:#636efa; color:white;',
-            } 
+            }
 
         self.data_save_button = v.Btn(
             style_ = self.style['data_save_button'],
             children = ['가공 데이터 저장'],
         )
+
+        self.data_save_button.hide()
 
         def _save_data(widget, event=None, data=None):
             data_name = self.app_context.tabular_dataset.current_data_name + "_preprocessed"
@@ -36,7 +38,13 @@ class TabularProcessingSaveActivator(v.Col):
             style_ = self.style["row"]
         )
 
-class TabularSingleProcessing(v.Container):
+    def show_btn(self):
+        self.data_save_button.show()
+
+    def hide_btn(self):
+        self.data_save_button.hide()
+
+class TabularSingleProcessingView(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
@@ -50,9 +58,9 @@ class TabularSingleProcessing(v.Container):
         )
 
         self.processing_dialog = get_or_create_class(
-            'tabular_data_single_processing_dialog',
+            'tabular_data_single_processing_dialog_view',
             app_context=self.app_context,
-            context_key= 'tabular_data_single_processing_dialog'
+            context_key= 'tabular_data_single_processing_dialog_view'
         )
         # column summary
         self.column_summary = self._get_column_sumary(dataset=self.app_context.tabular_dataset.current_data)
@@ -88,9 +96,10 @@ class TabularSingleProcessing(v.Container):
 
     def update(self):
         self.app_context.progress_linear.start()
-        self.processing_menu.update()
-        # column summary
-        self.column_summary = self._get_column_sumary(self.app_context.tabular_dataset.current_data, update=True)
+        if self.app_context.tabular_dataset.current_data is not None:
+            self.processing_menu.update()
+            # column summary
+            self.column_summary = self._get_column_sumary(self.app_context.tabular_dataset.current_data, update=True)
         self.app_context.progress_linear.active = False
         self.children = [
             v.Col(
@@ -105,7 +114,6 @@ class TabularSingleProcessing(v.Container):
 class TabularSingleProcessingMenu(BaseCard):
     def __init__(self, app_context: object = None, context_key: str = "", title:str="", **kwargs):
         self.app_context = app_context
-        self.dataset = self.app_context.tabular_dataset.current_data
         self.context_key = context_key
 
         self.style = {
@@ -133,12 +141,12 @@ class TabularSingleProcessingMenu(BaseCard):
         )
 
     def update(self):
-        self.dataset = self.app_context.tabular_dataset.current_data
-        self.processing_ui= self._make_single_processing_ui()
-        self.update_body_items(body_items=[self.processing_ui])
+        if self.app_context.tabular_dataset.current_data is not None:
+            self.processing_ui= self._make_single_processing_ui()
+            self.update_body_items(body_items=[self.processing_ui])
 
     def _make_single_processing_ui(self) -> list:
-        num_rows = len(self.dataset.columns)
+        num_rows = len(self.app_context.tabular_dataset.current_data.columns)
 
         # (1) delete column icon ------------------------------------------------------
         delete_column_buttons = self._make_delete_column_buttons()
@@ -149,7 +157,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 class_ = '',
                 children = [column_name],
                 style_ = "font-size:1rem; max-width:200px; min-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;",
-            ) for column_name in self.dataset.columns
+            ) for column_name in self.app_context.tabular_dataset.current_data.columns
         ]
 
         # (3) pandas_data_types -------------------------------------------------
@@ -159,7 +167,7 @@ class TabularSingleProcessingMenu(BaseCard):
                 v_model = dtype,
                 style_ = "text-align: center; font-size:1rem; max-width:100px; min-width:100px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;",
                 children= [dtype]
-            ) for dtype in self.dataset.dtypes.apply(lambda x: x.name).to_list()
+            ) for dtype in self.app_context.tabular_dataset.current_data.dtypes.apply(lambda x: x.name).to_list()
         ]
 
         # (4) process method button -------------------------------------------------
@@ -184,7 +192,7 @@ class TabularSingleProcessingMenu(BaseCard):
             index = int(item.index)
             if self.last_clicked_processing_options_rows != index:
                 self.last_clicked_processing_options_rows = index
-                self.app_context.tabular_data_processing__column_summary.update_data(self.dataset[self.dataset.columns[index]])
+                self.app_context.tabular_data_processing__column_summary.update_data(self.app_context.tabular_dataset.current_data[self.app_context.tabular_dataset.current_data.columns[index]])
 
         for row in self.processing_options_rows:
             row.on_event('click', _on_click_processing_options_rows)
@@ -207,11 +215,11 @@ class TabularSingleProcessingMenu(BaseCard):
 
         def _on_click_delete_column_button(btn, event=None, data=None):
             index= int(btn.index)
-            column_name = self.dataset.columns[index]
-            self.dataset = self.dataset.drop(column_name, axis=1)
-            self.app_context.tabular_dataset.current_data = self.dataset
-            tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-            tabular_data_single_processing.update()
+            column_name = self.app_context.tabular_dataset.current_data.columns[index]
+            self.app_context.tabular_dataset.current_data = self.app_context.tabular_dataset.current_data.drop(column_name, axis=1)
+            tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
+            tabular_data_single_processing_view.update()
+            self.app_context.tabular_data_processing__save_activator.show_btn() # activate save btn 
             alert = get_or_create_class('alert', self.app_context)
             alert.show_and_auto_close(
                 message=f"'{column_name}'이(가) 삭제되었습니다!", 
@@ -220,7 +228,7 @@ class TabularSingleProcessingMenu(BaseCard):
             )
             
             
-        for i in range(len(self.dataset.columns)):
+        for i in range(len(self.app_context.tabular_dataset.current_data.columns)):
             delete_column_button = StatedBtn(
                                         index=i,
                                         state="delete",
@@ -243,7 +251,7 @@ class TabularSingleProcessingMenu(BaseCard):
         def _activate_process_dialog(widget=None, event=None, data=None):
             column_name = widget.v_model["column_name"]
             process = widget.v_model["process"]
-            dialog = self.app_context.tabular_data_single_processing_dialog
+            dialog = self.app_context.tabular_data_single_processing_dialog_view
             
             def _close_dialog(widget, event=None, data=None):
                 widget.value = 0
@@ -251,12 +259,12 @@ class TabularSingleProcessingMenu(BaseCard):
             dialog.on_event('click:outside', _close_dialog)
             dialog.initialize(column_name=column_name, process=process)
 
-        for col_name in self.dataset.columns:
+        for col_name in self.app_context.tabular_dataset.current_data.columns:
             process_type_dialog = {
                 process: None for process in single_process_type.keys()
             }
 
-            dtype = self.dataset[col_name].dtype.name
+            dtype = self.app_context.tabular_dataset.current_data[col_name].dtype.name
             for process in process_type_dialog.keys():
                 disabled = True
                 if process in config['dtype'][dtype].keys():
@@ -276,7 +284,7 @@ class TabularSingleProcessingMenu(BaseCard):
 
         return dialog_buttons
 
-class TabularSingleProcessingDialog(v.Dialog):
+class TabularSingleProcessingDialogView(v.Dialog):
     def __init__(self, app_context, context_key) -> None:
         self.app_context = app_context
 
@@ -338,9 +346,10 @@ class TabularSingleProcessingDialog(v.Dialog):
             processed_column = self.processing_data(before_coulumn)
             new_colunm_name = self.column_name + "_" + self.suffix[self.method]
             self.app_context.tabular_dataset.current_data[new_colunm_name] = processed_column
-            tabular_data_single_processing = get_or_create_class('tabular_data_single_processing', app_context=self.app_context)
-            tabular_data_single_processing.update()
-            self.value = 0
+            tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
+            tabular_data_single_processing_view.update()
+            self.value = 0  # close dialog
+            self.app_context.tabular_data_processing__save_activator.show_btn() # activate save btn 
             alert = get_or_create_class('alert', self.app_context)
             alert.show_and_auto_close(
                 message=f"'{new_colunm_name}'이(가) 생성되었습니다!", 
@@ -351,29 +360,32 @@ class TabularSingleProcessingDialog(v.Dialog):
         save_btn.on_event('click', _on_click_save)
 
         # dialog contents
-        self.dialog_contents = v.Card(children=[
-            v.CardTitle(
-                class_='headline grey lighten-2',
-                primary_title=True,
-                children=[
-                    "Card Title",
+        self.dialog_contents = v.Card(
+            children=[
+                v.CardTitle(
+                    class_='headline grey lighten-2',
+                    primary_title=True,
+                    children=[
+                        "Card Title",
+                        v.Spacer(),
+                        self.close_btn,
+                    ],
+                ),
+                v.CardText(class_="py-0", children=[self.method_selector]),
+                v.CardActions(children=[
                     v.Spacer(),
-                    self.close_btn,
-                ],
-            ),
-            v.CardText(class_="py-0", children=[self.method_selector]),
-            v.CardActions(children=[
-                v.Spacer(),
-                save_btn                
-            ])
-        ])
+                    save_btn                
+                ])
+            ],
+            max_height=700,
+        )
 
         super().__init__(
-            class_="d-flex",
             scrollable=True,
             children=[self.dialog_contents],
             min_width=700,
             max_width=1200,
+            max_height=900,
             value=0,
         )
 
@@ -686,7 +698,6 @@ class TabularSingleProcessingDialog(v.Dialog):
         processed_result.children = children
         
         contents = v.Card(
-            class_="overlow-auto",            
             children=[
                 v.CardTitle(
                     class_="headline justify-center",
@@ -708,7 +719,8 @@ class TabularSingleProcessingDialog(v.Dialog):
             tag = 'iframe',
             attributes = {
                 'src': os.path.relpath(char_file_name, self.app_context.env_values['workspace_dir']),
-                'style': "border:none; width:100%; height:350px;",
+                'style': "border:none; width:100%; height:300px;",
+                'scrolling': 'no',
             },
         )
         return chart 
@@ -732,8 +744,6 @@ class TabularMultipleProcessing(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
-
-        self.dataset = self.app_context.tabular_dataset.current_data
 
         self.processing_menu = BaseCard(
             app_context=self.app_context,

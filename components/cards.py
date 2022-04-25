@@ -389,7 +389,11 @@ class IconCard(v.Card):
                         'class': '',
                         'style': "",
                         },
-                    children = [v.Icon(children = self.workbook_icon, style_ = "font-size:36px;")],
+                    children = [v.Icon(
+                        children = self.workbook_icon,
+                        color="#FFB300" if favorite else "#0000008a",
+                        style_ = "font-size:36px;",
+                    )],
                 )
             ],
         )
@@ -409,6 +413,26 @@ class IconCard(v.Card):
                             v.ListItemTitle(
                                 style_ = "font-size:14px; color:#000000;",
                                 children = ["이름 변경"],
+                            ),
+                        ],
+                        class_ = f'{self.idx}|{self.title_text}'
+                    ),
+                    v.ListItem(
+                        style_ = "font-size:14px; color:#000000; padding-left:8px; padding-right:18px;",
+                        children = [
+                            v.ListItemTitle(
+                                style_ = "font-size:14px; color:#000000;",
+                                children = ["즐겨찾기 추가"],
+                            ),
+                        ],
+                        class_ = f'{self.idx}|{self.title_text}'
+                    ),
+                    v.ListItem(
+                        style_ = "font-size:14px; color:#000000; padding-left:8px; padding-right:18px;",
+                        children = [
+                            v.ListItemTitle(
+                                style_ = "font-size:14px; color:#000000;",
+                                children = ["즐겨찾기 제거"],
                             ),
                         ],
                         class_ = f'{self.idx}|{self.title_text}'
