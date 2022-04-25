@@ -355,6 +355,8 @@ class SimpleCard(v.Card):
             style_ = self.style['card'],
             children = [self.header, self.body, self.footer],
         )
+    def add_controls(self, controls:list = []):
+        self.children[0].children[1].children = controls
 
 class IconCard(v.Card):
     def __init__(

@@ -7,6 +7,51 @@ from pathlib import Path
 import pandas as pd
 from IPython.display import display, clear_output
 from ..upload.upload_utils import make_backtick_name
+from impala.dbapi import connect
+
+AIAN_EDAP_USER_ID="aidu"
+AIAN_EDAP_USER_PW="new1234!"
+
+sample_data ={
+    'databases':
+        ['aian','datastore','default','edu',
+        'education', 'henry', 'it_ds_edu_team_1', 'kingsyda', 'kingsyda_work', 'ma_scy', 'ndap_temp', 'ods', 
+        'pd_bdip', 'pd_bidw', 'pd_bigsight', 'pd_bizin', 'pd_bom', 'pd_cpsc', 'pd_cretop', 'pd_dss', 'pd_gfs', 
+        'pd_idh', 'pd_inh', 'pd_isp', 'pd_ites', 'pd_kdapc_bas', 'pd_kdapc_cdr_dw', 'pd_kdapc_cdr_mart', 
+        'pd_kdapc_cfc_dw', 'pd_kdapc_cfc_mart', 'pd_kdapc_imp', 'pd_kdapr_edw', 'pd_kdapr_ibada', 'pd_kos', 
+        'pd_kpop_live_mart', 'pd_mars', 'pd_mbrain_dw', 'pd_mbrain_mart', 'pd_mbsp', 'pd_mdm', 'pd_mss', 
+        'pd_prism', 'pd_publicdb', 'pd_wing', 'pj_ai_inv', 'pj_aih', 'pj_aiplay2020', 'pj_bdip', 'pj_lesson', 
+        'pj_local_currency', 'pj_moin_trmn', 'pj_network', 'pj_network_1', 'pj_oneday_class', 'pj_packet', 
+        'pj_python_training', 'pj_syda', 'pj_test_schema', 'pj_user', 'syda_data', 'syda_work', 'test_2022', 
+        'test_category_db', 'test_db', 'tm_hb', 'workspace_group6'],          
+    'tables':
+        ['house_price','output10064107','output_10048717','output_10063058','output_10063506','output_10086456',
+        'output_10126222','output_10138415','output_10143656','output_10143776','output_10148471','output_10149638',
+        'output_10151984','output_10152046','output_10152083','output_82226130','output_bjp','output_khs','output_pyj',],
+    'desc':
+        [{'col_name': 'id', 'data_type': 'bigint', 'comment': ''},
+         {'col_name': 'mssubclass', 'data_type': 'bigint', 'comment': ''},
+         {'col_name': 'mszoning', 'data_type': 'string', 'comment': ''},
+         {'col_name': 'lotfrontage', 'data_type': 'bigint', 'comment': ''},
+         {'col_name': 'lotarea', 'data_type': 'bigint', 'comment': ''},
+         {'col_name': 'street', 'data_type': 'string', 'comment': ''},
+         {'col_name': 'saleprice', 'data_type': 'bigint', 'comment': ''}],
+    'data':
+        [{'id': 1, 'mssubclass': 60, 'mszoning': 'RL', 'lotfrontage': 65.0, 'lotarea': 8450, 'street': '포장', 'saleprice': 208500},
+        {'id': 2, 'mssubclass': 20, 'mszoning': 'RL', 'lotfrontage': 80.0, 'lotarea': 9600, 'street': '포장', 'saleprice': 181500},
+        {'id': 3, 'mssubclass': 60, 'mszoning': 'RL', 'lotfrontage': 68.0, 'lotarea': 11250, 'street': '포장', 'saleprice': 223500},
+        {'id': 4, 'mssubclass': 70, 'mszoning': 'RL', 'lotfrontage': 60.0, 'lotarea': 9550, 'street': '포장', 'saleprice': 140000},
+        {'id': 5, 'mssubclass': 60, 'mszoning': 'RL', 'lotfrontage': 84.0, 'lotarea': 14260, 'street': '포장', 'saleprice': 250000},
+        {'id': 6, 'mssubclass': 50, 'mszoning': 'RL', 'lotfrontage': 85.0, 'lotarea': 14115, 'street': '포장', 'saleprice': 143000},
+        {'id': 7, 'mssubclass': 20, 'mszoning': 'RL', 'lotfrontage': 75.0, 'lotarea': 10084, 'street': '포장', 'saleprice': 307000},
+        {'id': 8, 'mssubclass': 60, 'mszoning': 'RL', 'lotfrontage': 65.0, 'lotarea': 8450, 'street': '포장', 'saleprice': 208500},
+        {'id': 9, 'mssubclass': 20, 'mszoning': 'RL', 'lotfrontage': 80.0, 'lotarea': 9600, 'street': '포장', 'saleprice': 181500},
+        {'id': 10, 'mssubclass': 60, 'mszoning': 'RL', 'lotfrontage': 68.0, 'lotarea': 11250, 'street': '포장', 'saleprice': 223500},
+        {'id': 11, 'mssubclass': 70, 'mszoning': 'RL', 'lotfrontage': 60.0, 'lotarea': 9550, 'street': '포장', 'saleprice': 140000},
+        {'id': 12, 'mssubclass': 60, 'mszoning': 'RL', 'lotfrontage': 84.0, 'lotarea': 14260, 'street': '포장', 'saleprice': 250000},
+        {'id': 13, 'mssubclass': 50, 'mszoning': 'RL', 'lotfrontage': 85.0, 'lotarea': 14115, 'street': '포장', 'saleprice': 143000},
+        {'id': 14, 'mssubclass': 20, 'mszoning': 'RL', 'lotfrontage': 75.0, 'lotarea': 10084, 'street': '포장', 'saleprice': 307000}]
+}
 class EncodingWidgets:
     def __init__(self):
         self.encoding = "UTF-8"
@@ -315,3 +360,106 @@ class EDAPWidgets:
             return widget
         else:
             return self.connect_status_html
+
+class EdapDBMapper:
+    '''
+    edap 데이터베이스 연동
+    aian_ide > aian > app > cells > cell_widgets > upload_widgets.py
+    '''
+    def __init__(
+            self, 
+            is_dev:bool=False,
+            *args,
+            **kwargs,
+        ):
+        self.is_dev=is_dev
+
+        try:
+            if self.is_dev:
+                self.conn = None
+            else:
+                import os
+                self.conn = connect(
+                    host="10.220.232.209",
+                    port=10000,
+                    auth_mechanism="LDAP",
+                    user=os.environ.get("AIAN_EDAP_USER_ID"),
+                    password=os.environ.get("AIAN_EDAP_USER_PW"),
+                )
+                self.cursor = self.conn.cursor(dictify = True)
+
+        except Exception as e:
+            self.conn = None
+            return e
+
+    # aian_ide: set_top_left_box
+    def fetch_db_names(self):
+        if self.is_dev:
+            return sample_data['databases'], str(len(sample_data['databases']))+ " databases fetched"
+
+        try:
+            self.cursor.execute("""show databases""")
+            databases = [dbName["database_name"] for dbName in self.cursor.fetchall()]
+            return databases, str(len(databases))+ " databases fetched"
+        
+        except Exception as e:
+            return None, e
+    
+    # aian_ide: set_top_right_box
+    def fetch_table_names(self, current_db):
+        if self.is_dev:
+            return sample_data['tables'], str(len(sample_data['tables']))+" tables fetched"
+            
+        try:
+            self.cursor.execute("""show tables in """ + current_db)
+            tables = [tabName["tab_name"] for tabName in self.cursor.fetchall()]
+            return tables, str(len(tables))+" tables fetched"
+        
+        except Exception as e:
+            return None, e
+    
+    # aian_ide: set_bottom_left_box
+    def fetch_table_desc(self, current_db, current_table):
+        if self.is_dev:
+            return sample_data['desc'], current_db+" > "+current_table+" desc fetched" 
+        try:
+            import pandas as pd
+            desc= pd.read_sql("DESC " + current_db + "." + current_table, self.conn)
+            return desc.to_dict('records'), current_db+" > "+current_table+" desc fetched"
+        
+        except Exception as e:
+            return None, e
+    
+    # aian_ide: set_bottom_right_box
+    def fetch_rows(self, current_db, current_table, rows):
+        if self.is_dev:
+            return sample_data['data'], str(len(sample_data['data']))+"rows"
+        try:
+            import re
+            import pandas as pd
+            
+            self.select_query = "SELECT * FROM " + current_db + "." + current_table + """ limit {limit}"""
+            params = re.findall(r"\{([a-zA-Z0-9]*)\}", self.select_query)
+            self.params = {p: rows for p in params}
+            data = pd.read_sql(self.select_query.format_map(self.params), self.conn)                
+                
+            return data.to_dict('records'), str(len(data))+"rows"
+        
+        except Exception as e:
+            return None, e
+    
+    # 커넥션 클로즈
+    def __del__(self):
+        if self.conn is not None:
+            self.conn.close()
+        return 'connection closed successfully'
+'''
+def test_edap_db_mapper():
+    edap_mapper_op=EdapDBMapper(is_dev=False)
+    edap_mapper_dev=EdapDBMapper(is_dev=True)
+    
+    assert edap_mapper_op.fetch_db_names() == edap_mapper_dev.fetch_db_names()
+    assert edap_mapper_op.fetch_table_names(current_db='edu') == edap_mapper_dev.fetch_table_names(current_db='edu')
+    assert edap_mapper_op.fetch_table_desc(current_db='edu', current_table='house_price') == edap_mapper_dev.fetch_table_desc(current_db='edu', current_table='house_price')
+    assert edap_mapper_op.fetch_rows(current_db='edu', current_table='house_price', rows=7) == edap_mapper_dev.fetch_rows(current_db='edu', current_table='house_price', rows=7)
+'''

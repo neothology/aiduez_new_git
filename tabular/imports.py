@@ -87,9 +87,26 @@ class TabularImportAIDU(TabularImportBase):
         self.app_context.current_workbook.create_new_work(self.data_name, self.data)
         self.view_instance.workbook_data_list_view.update(self.app_context.tabular_dataset.data_name_list)
 
+
 class TabularImportEDAP(TabularImportBase):
+    import pandas as pd
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context
         self.context_key = context_key
         self.target_view_name = 'tabular_import_edap_view'
+
         super().__init__(self.app_context, self.context_key, self.target_view_name, **kwargs)
+
+        self.view_instance = get_or_create_class(
+            self.target_view_name, 
+            self.app_context, 
+            target_area = self.target_area,
+            database_list = [],
+            table_list = []
+        )
+    def load_data(self, data_name: str, data: pd.DataFrame):
+        from io import StringIO
+        self.data = data 
+        self.data_name= data_name
+        self.app_context.current_workbook.create_new_work(self.data_name, self.data)
+        self.view_instance.workbook_data_list_view.update(self.app_context.tabular_dataset.data_name_list)
