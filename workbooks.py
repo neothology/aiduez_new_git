@@ -190,12 +190,12 @@ class TabularWorkbook:
         elif stage == 'tabular_data_processing':
             if self.app_context.tabular_data_processing:
                 self.app_context.tabular_data_processing__sub_contents.children = []
-                self.app_context.tabular_data_processing__options = None
+                self.app_context.tabular_data_processing__save_activator.hide_btn()
                 if self.app_context.tabular_data_processing__sub_menu.last_activated_item is not None:
                     self.app_context.tabular_data_processing__sub_menu.last_activated_item.class_list.remove("now_active")
                 self.app_context.tabular_data_processing__sub_menu.last_activated_item = None
-                if self.app_context.tabular_data_single_processing is not None:
-                    self.app_context.tabular_data_single_processing.update()
+                if self.app_context.tabular_data_single_processing_view is not None:
+                    self.app_context.tabular_data_single_processing_view.update()
 
         elif stage == 'tabular_ai_training':
             if self.app_context.tabular_ai_training:
