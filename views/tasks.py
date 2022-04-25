@@ -150,7 +150,7 @@ class TaskBaseView(v.Container):
         self.last_clicked_card = None
         self.just_clicked_card = None
         def _on_click_workbook_card(item, event, data):
-            self.app_context.base_overlay.start()
+            # self.app_context.base_overlay.start()
             
             self.idx = int(item.class_)
             self.just_clicked_card = self.workbook_cards[self.idx]

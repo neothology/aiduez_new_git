@@ -76,9 +76,9 @@ class_paths:
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_save_activator: views.tabular.processing.TabularProcessingSaveActivator
   tabular_data_processing_options: views.tabular.processing.TabularProcessingOptionArea
-  tabular_data_single_processing_view: views.tabular.processing.TabularSingleProcessingView
-  tabular_data_single_processing_dialog_view: views.tabular.processing.TabularSingleProcessingDialogView
-  tabular_data_multiple_processing_view: views.tabular.processing.TabularMultipleProcessingView
+  tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
+  tabular_data_single_processing_dialog: views.tabular.processing.TabularSingleProcessingDialog
+  tabular_data_multiple_processing: views.tabular.processing.TabularMultipleProcessing
   # tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard
 
   tabular_ai_training: workflows.tabular.TabularAITraining
@@ -175,11 +175,11 @@ workflows_list:
           -
             icon: mdi-clipboard-text-outline
             title: 단일 칼럼 변환
-            target: tabular_data_single_processing_view
+            target: tabular_data_single_processing
           -
             icon: mdi-clipboard-text-multiple-outline
             title: 복합 칼럼 변환
-            target: tabular_data_multiple_processing_view
+            target: tabular_data_multiple_processing
       - 
         title: AI모델 학습
         target: tabular_ai_training
