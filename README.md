@@ -1,4 +1,4 @@
-# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 4/25/22 - 10:30PM)</span>
+# AIDUez3.0 <span style="font-size:1.3rem; font-weight:lighter">(Last Updated: 4/27/22 - 03:42AM)</span>
 
 ## Development
 
