@@ -33,7 +33,7 @@ class_paths:
   select_autocomplete: components.forms.SelectAutoComplete
   datatable: components.tables.DataTable
   simple_range_card: components.forms.SimpleRangeCard
-  
+
   # task
   task_recent: tasks.TaskRecent
   task_recent_view: views.tasks.TaskRecentView
@@ -81,8 +81,8 @@ class_paths:
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_save_activator: views.tabular.processing.TabularProcessingSaveActivator
   tabular_data_processing_options: views.tabular.processing.TabularProcessingOptionArea
-  tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
-  tabular_data_single_processing_dialog: views.tabular.processing.TabularSingleProcessingDialog
+  tabular_data_single_processing: views.tabular.processing.TabularSingleProcessingView
+  tabular_data_single_processing_dialog_view: views.tabular.processing.TabularSingleProcessingDialogView
   tabular_data_multiple_processing: views.tabular.processing.TabularMultipleProcessing
   # tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard
 
@@ -276,13 +276,11 @@ theme:
       style: 
         base: 
           default: >
-            min-width:1920px; max-width:1920px !important;border-right:1px dashed #cccccc;
             height: 1800px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
             display:flex;
             left:0;
           dark: >
-            min-width:1920px; max-width:1920px !important; border-right:1px dashed #cccccc;
             height: 1800px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
             display:flex;
@@ -305,7 +303,6 @@ theme:
             border-bottom:1px solid #e2e8f0; 
             background-color: rgb(30, 41, 59);
             z-index:776;
-            min-width:1920px; max-width:1920px;border-right:1px dashed #cccccc;
             position:absolute;
           light: >
             height:199px; padding:10px; 
@@ -314,7 +311,6 @@ theme:
             border-bottom:1px solid #e2e8f0; 
             background-color: #ffffff;
             z-index:776;
-            min-width:1920px; max-width:1920px;border-right:1px dashed #cccccc;
             position:absolute;
         nav_icon:
           default: >
@@ -349,8 +345,6 @@ theme:
         list_item_title:
           default: >
             font-size:0.9rem;
-          small: >
-            font-size:0.85rem;
     work_area:
       style: 
         base:

@@ -99,11 +99,11 @@ class TabularDataImport(v.Container):
                 'title': 'PC에서 가져오기',
                 'target': 'tabular_import_pc',
             },
-            {   
-                'icon': 'mdi-dns-outline',
-                'title': 'EDAP에서 가져오기',
-                'target': 'tabular_import_edap',
-            },
+            # {   
+            #     'icon': 'mdi-dns-outline',
+            #     'title': 'EDAP에서 가져오기',
+            #     'target': 'tabular_import_edap',
+            # },
         ]
 
         # top area(data_context, button)
@@ -149,7 +149,7 @@ class TabularDataImport(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column; position:absolute;",
             children = [
                 self.top_area,
                 v.Col(
@@ -276,7 +276,7 @@ class TabularDataAnalytics(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column; position:absolute;",
             children = [
                 self.top_area,
                 v.Col(
@@ -352,7 +352,7 @@ class TabularDataProcessing(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column;",
+            style_ = "min-width:100%; min-height:100%; padding:0; display:flex; flex-direction:column; position:absolute;",
             children = [
                 self.top_area,
                 v.Col(

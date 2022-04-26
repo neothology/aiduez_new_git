@@ -53,8 +53,10 @@ COPY custom/custom.js /root/.jupyter/custom/custom.js
 COPY custom/index.html.j2 /usr/local/share/jupyter/nbconvert/templates/lab/index.html.j2
 COPY custom/configuration.py /usr/local/lib/python3.8/dist-packages/voila/configuration.py
 COPY custom/api.py /usr/local/lib/python3.8/dist-packages/ludwig/api.py
-COPY assets/fonts/Nanum_Gothic/NanumGothic-Regular.ttf /usr/share/fonts/
-COPY assets/fonts /opt/code/assets/fonts
 COPY custom/file_input.vue /usr/local/lib/python3.8/dist-packages/ipyvuetify/extra/file_input.vue
+
+COPY assets/fonts/Nanum_Gothic/NanumGothic.ttf /usr/share/fonts/
+COPY assets/fonts/AppleSD /usr/local/lib/python3.8/dist-packages/notebook/static/components/AppleSD
+COPY assets/material_icons /usr/local/lib/python3.8/dist-packages/notebook/static/components/material_icon
 
 WORKDIR /aihub/workspace

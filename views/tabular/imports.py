@@ -320,7 +320,7 @@ class TabularImportEDAPView(TabularImportBaseView):
             context_key = 'tabular_data_import__workbook_data_list_view',
             title = '데이터베이스 목록',
             data=self.database_list,
-            size = {'width':'250px', 'height':'185px'},
+            # size = {'width':'2500px', 'height':'185px'},
             select = True,
             single_select=True,
         )
