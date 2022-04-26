@@ -31,11 +31,11 @@ div.output_subarea {
     font-style: normal;
     font-weight: normal;
     src: local('Apple SD');
-    src: url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoB.ttf") format("truetype"),
-         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoEB.ttf") format("truetype"),
-         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoH.ttf") format("truetype"),
-         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoL.ttf") format("truetype"),
-         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoM.ttf") format("truetype");
+    src: url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoB.woff") format("woff"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoEB.woff") format("woff"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoH.woff") format("woff"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoL.woff") format("woff"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoM.woff") format("woff");
 
 }
 
