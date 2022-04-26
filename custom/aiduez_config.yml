@@ -24,11 +24,16 @@ class_paths:
   select_table_card: components.tables.SelectTableCard
   select_table_card_no_header: components.tables.SelectTableCardNH
   simple_slider_card: components.forms.SimpleSliderCard
+  simple_slider: components.forms.SimpleSlider
   simple_radio_card: components.forms.SimpleRadioCard
+  simple_input_card: components.forms.SimpleInputCard
+  simple_datatable_card: components.forms.SimpleDataTableCard
+  edap_data_table: components.tables.EdapDataTable
   data_info: components.data_profiler.DataInfo
   select_autocomplete: components.forms.SelectAutoComplete
   datatable: components.tables.DataTable
-
+  simple_range_card: components.forms.SimpleRangeCard
+  
   # task
   task_recent: tasks.TaskRecent
   task_recent_view: views.tasks.TaskRecentView

@@ -327,3 +327,49 @@ class DataTable(v.VuetifyTemplate):
         if title is not None:
             self.title = title
 
+
+class EdapDataTable(v.VuetifyTemplate):
+    headers = traitlets.List([]).tag(sync=True)
+    items = traitlets.List([]).tag(sync=True)
+    headline = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
+
+    @traitlets.default('template')
+    def _template(self):
+        return'''
+        <template>
+            <div>
+                <v-data-table 
+                    light
+                    dense
+                    class="elevation-0"
+                    :headers="headers"
+                    :items="items"
+                    :items-per-page="10"
+                    item-key="name"
+                    style="width:623px;"
+                ></v-data-table>
+            </div>
+        </template>
+        <style id="datatable_style">
+            .v-data-table > .v-data-table__wrapper > table > tbody > tr > th, .v-data-table > .v-data-table__wrapper > table > thead > tr > th, 
+            .v-data-table > .v-data-table__wrapper > table > tfoot > tr > th, .v-data-table > .v-data-table__wrapper > table > tbody > tr > td
+            {
+                font-size: 0.7rem;
+                important!;
+                font-weight: normal;
+            }
+        </style>
+        '''
+
+    def __init__(
+        self, 
+        headers:list = [], 
+        items:list = [], 
+        headline:str = '',
+        *args, 
+        **kwargs
+        ):
+        super().__init__(*args, **kwargs)
+        self.headers = headers
+        self.items=items
+        self.headline =headline

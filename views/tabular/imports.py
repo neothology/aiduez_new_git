@@ -285,7 +285,6 @@ class TabularImportAIDUView(TabularImportBaseView):
             if self.aidu_data_list_view.children[1].children[0].selected == []:
                 raise Exception('선택된 AIDU 데이터가 없습니다.')
 
-
             self.file_upload_button.disabled = True
             encoding_option = self.select_encoding_options.selected_option
             delimiter_option = self.select_delimiter_options.selected_option
@@ -300,10 +299,145 @@ class TabularImportAIDUView(TabularImportBaseView):
 
 class TabularImportEDAPView(TabularImportBaseView):
     def __init__(self, app_context, context_key, **kwargs):
+        from components.tables import EdapDataTable
+        from components.upload.upload_widgets import EdapDBMapper
+        from components.selector import SingleSelector
+        from components.forms import SimpleInputCard
+
         self.app_context = app_context
         self.context_key = context_key
+        self.target_area = kwargs.get('target_area')
+        self.database_list = kwargs.get('workbook_data_list')
+        self.table_list = kwargs.get('aidu_data_list')
+        self.current_db= 'edu'
+        self.current_table= 'house_price'
+        
+        edap_mapper=EdapDBMapper(is_dev=True)
+
+        self.workbook_data_list_view = get_or_create_class(
+            'select_table_card_no_header',
+            self.app_context,
+            context_key = 'tabular_data_import__workbook_data_list_view',
+            title = '데이터베이스 목록',
+            data=self.database_list,
+            size = {'width':'250px', 'height':'185px'},
+            select = True,
+            single_select=True,
+        )
+        self.workbook_data_list_view.add_controls([v.Icon(children=['mdi-cached'],small=True)])
+
+        self.df=pd.DataFrame({'NoData': [],})
+        self.datatable = EdapDataTable(
+            headers = [
+                {'text': colname,'value': colname} for colname in self.df.columns.to_list()
+            ],
+            items = self.df.to_dict('records'),
+            headline = "HEADLINE"
+        )
+
+        self.table_list_view = get_or_create_class(
+            'select_table_card_no_header',
+            self.app_context,
+            context_key = 'tabular_data_import__aidu_data_list_view',
+            title = '테이블 목록',
+            data = self.table_list,
+            size = {'width':'250px', 'height':'185px'},
+            select = True,
+            single_select=True,
+        )
+        self.table_list_view.add_controls([v.Icon(children=['mdi-cached'],small=True)])
+
+        self.show_table_data = get_or_create_class(
+            'simple_datatable_card',
+            self.app_context,
+            context_key = f'{self.context_key}__show_edap_data',
+            title = '데이터 보기',
+            datatable=self.datatable,
+            size = {'width':'650px', 'height':'520px'},
+            style_ = "font-size:14px;",
+        )
+        self.show_table_data.add_controls([v.Icon(children=['mdi-cached'],small=True)])
+
+        self.select_row_range_options =get_or_create_class(
+            'simple_input_card',
+            self.app_context,
+            context_key = f'{self.context_key}__input_row_range_options',
+            title = '행 범위 입력',
+            size = {'width':'250px', 'height':'100px'},
+            style_ = "font-size:14px;",
+        )
+
+        self.file_upload_button = v.Btn(
+            style_ = "background-color:#636efa; color:white;",
+            children = ['가져오기'],
+            depressed = True,
+        )
+
+        file_upload_button_row = v.Row(
+            children = [self.file_upload_button],
+            style_ = "width:600px; padding-left: 560px; padding-bottom:29px;",
+            class_ = "",
+        )
 
         super().__init__(
             self.app_context,
-            self.context_key
+            self.context_key,
+            left_area = [
+                self.workbook_data_list_view,
+                v.Spacer(style_ = "min-height:20px"),
+                self.table_list_view,
+                v.Spacer(style_ = "min-height:20px"),
+                self.select_row_range_options,
+            ],
+            right_area = [
+                self.show_table_data,
+                v.Spacer(style_ = "min-height:25px"),
+                file_upload_button_row
+            ],
+            middle_area = [
+            ],
+            size = {
+                'left':"max-width:25%; max-height:380px; min-height:380px;",
+                'right':"max-width:75%; max-height:380px; min-height:380px;",
+                'top':"max-height:250px; max-height:380px; min-height:380px;",
+                'middle':"max-height:100px;",
+            },
+            style = {
+                'left':"",
+                'right':"",
+                'top':"",
+                'middle':"border:0; margin-right:405px; align-items:flex-start; justify-content:flex-end;",
+            }
         )
+        def _show_db_list(item, event, data):
+            self.workbook_data_list_view.update(
+                data=pd.DataFrame(edap_mapper.fetch_db_names()[0]).rename(columns={0:'data_name'})
+            )
+        def _show_table_list(item, event, data):
+            self.current_db=self.workbook_data_list_view.children[1].children[0].selected[0]['data_name']
+            self.table_list_view.update(
+                data=pd.DataFrame(edap_mapper.fetch_table_names(current_db=self.current_db)[0]).rename(columns={0:'data_name'})
+            )
+        def _show_data(item, event, data):
+            self.current_table=self.table_list_view.children[1].children[0].selected[0]['data_name']
+            current_row=self.select_row_range_options.body.children[0].children[0].v_model
+            self.df=edap_mapper.fetch_rows(current_db=self.current_db, current_table=self.current_table, rows=current_row)[0]
+            self.datatable = EdapDataTable(
+                headers = [
+                    {'text': colname,'value': colname} for colname in self.df[0].keys()
+                ],
+                items = self.df,
+                headline = "HEADLINE"
+            )
+            self.show_table_data.body.children[0].children=[self.datatable]
+        def _upload_file(item, event, data):
+            controller = self.app_context.tabular_import_edap
+            controller.load_data(
+                data_name=self.current_table,
+                data=pd.DataFrame(self.df),
+            ) 
+        self.workbook_data_list_view.header.children[1].children[0].on_event('click',_show_db_list)
+        self.table_list_view.header.children[1].children[0].on_event('click',_show_table_list)
+        self.show_table_data.header.children[1].children[0].on_event('click',_show_data)
+        self.file_upload_button.on_event('click',_upload_file)
+        
