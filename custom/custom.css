@@ -27,6 +27,19 @@ div.output_subarea {
 }
 
 @font-face {
+    font-family: 'Apple SD';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Apple SD');
+    src: url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoB.ttf") format("truetype"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoEB.ttf") format("truetype"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoH.ttf") format("truetype"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoL.ttf") format("truetype"),
+         url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoM.ttf") format("truetype");
+
+}
+
+@font-face {
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
@@ -62,8 +75,14 @@ div.output_subarea {
     text-rendering: optimizeLegibility;
 }
 
+
+
+
+/* .vuetify-styles .v-application {
+    font-family: NanumGothic !important
+} */
 .vuetify-styles .v-application {
-    font-family: Roboto, sans-serif !important;
+    font-family: 'Apple SD' !important
 }
 
 .vuetify-styles .v-list-item--link:before {
