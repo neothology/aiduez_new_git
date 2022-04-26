@@ -62,6 +62,20 @@ class TaskBaseView(v.Container):
                     style_ ="padding:10px 20px 0 20px;",
                 )
             },
+            'favorite_add':{
+                'title': '즐겨찾기 추가',
+                'body': v.Col(
+                    children = [],
+                    style_=""
+                ),
+            },
+            'favorite_delete':{
+                'title': '즐겨찾기 삭제',
+                'body': v.Col(
+                    children = [],
+                    style_=""
+                ),
+            },
             'delete':{
                 'title':'Workbook 삭제',
                 'body': v.Col(
@@ -136,7 +150,7 @@ class TaskBaseView(v.Container):
         self.last_clicked_card = None
         self.just_clicked_card = None
         def _on_click_workbook_card(item, event, data):
-            self.app_context.base_overlay.start()
+            # self.app_context.base_overlay.start()
             
             self.idx = int(item.class_)
             self.just_clicked_card = self.workbook_cards[self.idx]
@@ -182,7 +196,44 @@ class TaskBaseView(v.Container):
             self.cancel_btn.on_event('click', _on_click_cancel_button)  
             self.confrim_btn.on_event('click', _on_click_confirm_button)
 
-        # callbacks: (3) 삭제
+        # callbacks: (3) 즐겨찾기 추가
+        def _on_select_favorite_add(item, event, data):
+            self.selected_workbook_full_name = item.class_.split('|')[-1]
+            message = f""
+            self.more_menu_dialog_contents['favorite_add']['body'].children = [
+                f"{self.selected_workbook_full_name}을 즐겨찾기에 추가하시겠습니까?"
+                ]
+            self.more_menu_dialog.update(self.more_menu_dialog_contents['favorite_add'])
+            self.more_menu_dialog.show() 
+            def _on_click_cancel_button(item, event, data):
+                self.more_menu_dialog.value = 0
+
+            def _on_click_confirm_button(item, event, data):
+                self.controller.favorite_workbook(self.selected_workbook_full_name)
+                self.more_menu_dialog.value = 0
+            
+            self.cancel_btn.on_event('click', _on_click_cancel_button)  
+            self.confrim_btn.on_event('click', _on_click_confirm_button) 
+
+        # callbacks: (4) 즐겨찾기 제거
+        def _on_select_favorite_delete(item, event, data):
+            self.selected_workbook_full_name = item.class_.split('|')[-1]
+            self.more_menu_dialog_contents['favorite_delete']['body'].children = [
+                f"{self.selected_workbook_full_name}을 즐겨찾기에서 제거하시겠습니까?"
+                ]
+            self.more_menu_dialog.update(self.more_menu_dialog_contents['favorite_delete'])
+            self.more_menu_dialog.show() 
+            def _on_click_cancel_button(item, event, data):
+                self.more_menu_dialog.value = 0
+
+            def _on_click_confirm_button(item, event, data):
+                self.controller.favorite_workbook(self.selected_workbook_full_name)
+                self.more_menu_dialog.value = 0
+            
+            self.cancel_btn.on_event('click', _on_click_cancel_button)  
+            self.confrim_btn.on_event('click', _on_click_confirm_button) 
+
+        # callbacks: (5) 삭제
         self.selected_workbook_full_name = ''
         def _on_select_delete(item, event, data):
             self.controller.check_active(self.selected_workbook_full_name)
@@ -205,8 +256,17 @@ class TaskBaseView(v.Container):
             self.confrim_btn.on_event('click', _on_click_confirm_button)
 
         for workbook_card in self.workbook_cards:
-            workbook_card.more_items.children[0].on_event('click', _on_select_rename)
-            workbook_card.more_items.children[1].on_event('click', _on_select_delete)
+            workbook_card.more_items.children[0].on_event('click', _on_select_rename)   # 이름변경
+            # 즐겨찾기 추가/제거
+            if workbook_card.favorite is True:
+                workbook_card.more_items.children[1].hide() # hide favorite_add menu
+                workbook_card.more_items.children[2].show()
+                workbook_card.more_items.children[2].on_event('click', _on_select_favorite_delete)
+            else:
+                workbook_card.more_items.children[1].show()
+                workbook_card.more_items.children[2].hide() # hide favorite_delete menu
+                workbook_card.more_items.children[1].on_event('click', _on_select_favorite_add)
+            workbook_card.more_items.children[-1].on_event('click', _on_select_delete)   # 삭제
 
     def show(self, target_area:object):
         self.target_area = target_area

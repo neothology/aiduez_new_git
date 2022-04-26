@@ -158,15 +158,47 @@ body {
 
 
 
+
+
+
+
+
 @font-face {
     font-family: 'NanumGothic';
     font-style: normal;
     font-weight: normal;
-    src: local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic.woff") format('woff'),
-         local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothicBold.woff") format('woff')
-         local("/opt/code/assets/fonts/Nanum_Gothic/NanumGothic-Bold.ttf") format('truetype')
-        
-   
+    src: local('NanumGothic');
+    src: url("/opt/code/aiduez/assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
+         url("/opt/code/aiduez/assets/fonts/Nanum_Gothic/NanumGothic.woff") format('woff'),
+}
+
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://example.com/MaterialIcons-Regular.eot); /* For IE6-8 */
+    src: local('Material Icons'),
+      local('MaterialIcons-Regular'),
+      url("/opt/code/aiduez/assets/mateial_icon/MaterialIcons-Regular.ttf") format('truetype'),
+  }
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+  
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
 }
 
 

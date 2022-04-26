@@ -389,7 +389,11 @@ class IconCard(v.Card):
                         'class': '',
                         'style': "",
                         },
-                    children = [v.Icon(children = self.workbook_icon, style_ = "font-size:36px;")],
+                    children = [v.Icon(
+                        children = self.workbook_icon,
+                        color="#FFB300" if favorite else "#0000008a",
+                        style_ = "font-size:36px;",
+                    )],
                 )
             ],
         )
@@ -409,6 +413,26 @@ class IconCard(v.Card):
                             v.ListItemTitle(
                                 style_ = "font-size:14px; color:#000000;",
                                 children = ["이름 변경"],
+                            ),
+                        ],
+                        class_ = f'{self.idx}|{self.title_text}'
+                    ),
+                    v.ListItem(
+                        style_ = "font-size:14px; color:#000000; padding-left:8px; padding-right:18px;",
+                        children = [
+                            v.ListItemTitle(
+                                style_ = "font-size:14px; color:#000000;",
+                                children = ["즐겨찾기 추가"],
+                            ),
+                        ],
+                        class_ = f'{self.idx}|{self.title_text}'
+                    ),
+                    v.ListItem(
+                        style_ = "font-size:14px; color:#000000; padding-left:8px; padding-right:18px;",
+                        children = [
+                            v.ListItemTitle(
+                                style_ = "font-size:14px; color:#000000;",
+                                children = ["즐겨찾기 제거"],
                             ),
                         ],
                         class_ = f'{self.idx}|{self.title_text}'
@@ -489,7 +513,7 @@ class IconCard(v.Card):
             class_ = "task_icon_card",
             style_ = f"width:{size.get('width')}; height:{size.get('height')}; \
                 margin-right:20px; margin-bottom:20px; padding:0; display:flex; flex-direction:column; \
-                border-radius:8px; border-left:3px solid #{self.workbook_color};",
+                border-radius:8px;",# border-left:3px solid #{self.workbook_color};",
             children = [self.header, self.body],
         )
 

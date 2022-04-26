@@ -173,9 +173,11 @@ workflows_list:
         target: tabular_data_processing
         menu_list: 
           -
+            icon: mdi-clipboard-text-outline
             title: 단일 칼럼 변환
             target: tabular_data_single_processing
           -
+            icon: mdi-clipboard-text-multiple-outline
             title: 복합 칼럼 변환
             target: tabular_data_multiple_processing
       - 
