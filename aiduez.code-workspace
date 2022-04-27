@@ -42,6 +42,9 @@
 		},
 		{
 			"path": "../../../usr/local/lib/python3.8/dist-packages/notebook"
+		},
+		{
+			"path": "../../../usr/local/share/jupyter"
 		}
 	],
 	"settings": {}

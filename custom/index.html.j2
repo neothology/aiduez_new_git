@@ -164,25 +164,49 @@ body {
 
 
 @font-face {
-    font-family: 'AppleSD';
+    font-family: 'AppleSD-M';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/AppleSD/AppleSDGothicNeoB.ttf") format("truetype"),
-         url("/static/components/AppleSD/AppleSDGothicNeoEB.ttf") format("truetype"),
-         url("/static/components/AppleSD/AppleSDGothicNeoH.ttf") format("truetype"),
-         url("/static/components/AppleSD/AppleSDGothicNeoL.ttf") format("truetype"),
-         url("/static/components/AppleSD/AppleSDGothicNeoM.ttf") format("truetype");
+    src: url("/voila/nbextensions/AppleSD/AppleSDGothicNeoM.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'AppleSD-B';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/voila/nbextensions/AppleSD/AppleSDGothicNeoB.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'AppleSD-EB';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/voila/nbextensions/AppleSD/AppleSDGothicNeoEB.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'AppleSD-H';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/voila/nbextensions/AppleSD/AppleSDGothicNeoH.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'AppleSD-L';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/voila/nbextensions/AppleSD/AppleSDGothicNeoL.ttf") format('truetype');
 }
 
 @font-face {
     font-family: 'Material_Icons';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/material_icons/MaterialIcons-Regular.ttf") format('truetype'),
-         url("/static/components/material_icons/MaterialIconsOutlined-Regular.otf") format('opentype'),
-         url("/static/components/material_icons/MaterialIconsRound-Regular.otf") format('opentype'),
-         url("/static/components/material_icons/MaterialIconsSharp-Regular.otf") format('opentype'),
-         url("/static/components/material_icons/MaterialIconsTwoTone-Regular.otf") format('opentype');
+    src: url("/voila/nbextensions/material_icons/MaterialIcons-Regular.ttf") format('truetype'),
+         url("/voila/nbextensions/material_icons/MaterialIconsOutlined-Regular.otf") format('opentype'),
+         url("/voila/nbextensions/material_icons/MaterialIconsRound-Regular.otf") format('opentype'),
+         url("/voila/nbextensions/material_icons/MaterialIconsSharp-Regular.otf") format('opentype'),
+         url("/voila/nbextensions/material_icons/MaterialIconsTwoTone-Regular.otf") format('opentype');
   }
 
 .material-icons {
@@ -207,7 +231,7 @@ body {
 
 
 .vuetify-styles .v-application {
-    font-family: 'AppleSD' !important
+    font-family: 'AppleSD-M' !important
 }
 
 .vuetify-styles .v-list-item--link:before {
@@ -221,7 +245,7 @@ body {
 
 .vuetify-styles .theme--light.v-list-item--disabled:before {
     background-color: #ffffff !important;
-    opacity: 0.08 !important;
+    opacity: 0.3 !important;
 }
 
 .main-menu-group .v-list-group__header__prepend-icon {
@@ -389,7 +413,7 @@ body {
     width: 805px !important;
 }
 
-.vuetify-styles .side_nav .v-list-item--link:before {
+.vuetify-styles .side_nav .v-list-item--link:before:not(.theme--light.v-list-item--disabled) {
     opacity: 0 !important
 }
 
@@ -441,6 +465,10 @@ body {
 
 .vuetify-styles .tabula-data-selector .theme--light.v-list-item:before {
     transition: none !important;
+}
+
+.main-menu-group .theme--light.v-list-item--active:before {
+    opacity: 0 !important;
 }
 
 </style>

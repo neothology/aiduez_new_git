@@ -58,5 +58,8 @@ COPY custom/file_input.vue /usr/local/lib/python3.8/dist-packages/ipyvuetify/ext
 COPY assets/fonts/NanumGothic.ttf /usr/share/fonts/NanumGothic.ttf
 COPY assets/fonts/AppleSD /usr/local/lib/python3.8/dist-packages/notebook/static/components/AppleSD
 COPY assets/material_icons /usr/local/lib/python3.8/dist-packages/notebook/static/components/material_icons
+COPY assets/fonts/AppleSD /usr/local/share/jupyter/nbextensions/AppleSD
+COPY assets/material_icons /usr/local/share/jupyter/nbextensions/material_icons
+
 
 WORKDIR /aihub/workspace

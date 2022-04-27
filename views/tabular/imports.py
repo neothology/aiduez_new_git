@@ -314,17 +314,17 @@ class TabularImportEDAPView(TabularImportBaseView):
         
         edap_mapper=EdapDBMapper(is_dev=True)
 
-        self.workbook_data_list_view = get_or_create_class(
-            'select_table_card_no_header',
-            self.app_context,
-            context_key = 'tabular_data_import__workbook_data_list_view',
-            title = '데이터베이스 목록',
-            data=self.database_list,
-            # size = {'width':'2500px', 'height':'185px'},
-            select = True,
-            single_select=True,
-        )
-        self.workbook_data_list_view.add_controls([v.Icon(children=['mdi-cached'],small=True)])
+        # self.workbook_data_list_view = get_or_create_class(
+        #     'select_table_card_no_header',
+        #     self.app_context,
+        #     context_key = 'tabular_data_import__workbook_data_list_view',
+        #     title = '데이터베이스 목록',
+        #     data=self.database_list,
+        #     size = {'width':'250px', 'height':'185px'},
+        #     select = True,
+        #     single_select=True,
+        # )
+        # self.workbook_data_list_view.add_controls([v.Icon(children=['mdi-cached'],small=True)])
 
         self.df=pd.DataFrame({'NoData': [],})
         self.datatable = EdapDataTable(
@@ -383,16 +383,16 @@ class TabularImportEDAPView(TabularImportBaseView):
             self.app_context,
             self.context_key,
             left_area = [
-                self.workbook_data_list_view,
-                v.Spacer(style_ = "min-height:20px"),
-                self.table_list_view,
-                v.Spacer(style_ = "min-height:20px"),
-                self.select_row_range_options,
+                # self.workbook_data_list_view,
+                # v.Spacer(style_ = "min-height:20px"),
+                # self.table_list_view,
+                # v.Spacer(style_ = "min-height:20px"),
+                # self.select_row_range_options,
             ],
             right_area = [
-                self.show_table_data,
-                v.Spacer(style_ = "min-height:25px"),
-                file_upload_button_row
+                # self.show_table_data,
+                # v.Spacer(style_ = "min-height:25px"),
+                # file_upload_button_row
             ],
             middle_area = [
             ],
