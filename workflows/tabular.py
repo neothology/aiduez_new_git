@@ -99,11 +99,11 @@ class TabularDataImport(v.Container):
                 'title': 'PC에서 가져오기',
                 'target': 'tabular_import_pc',
             },
-            # {   
-            #     'icon': 'mdi-dns-outline',
-            #     'title': 'EDAP에서 가져오기',
-            #     'target': 'tabular_import_edap',
-            # },
+            {   
+                'icon': 'mdi-dns-outline',
+                'title': 'EDAP에서 가져오기(준비중)',
+                'target': 'tabular_import_edap',
+            },
         ]
 
         # top area(data_context, button)
