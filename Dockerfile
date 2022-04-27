@@ -55,8 +55,8 @@ COPY custom/configuration.py /usr/local/lib/python3.8/dist-packages/voila/config
 COPY custom/api.py /usr/local/lib/python3.8/dist-packages/ludwig/api.py
 COPY custom/file_input.vue /usr/local/lib/python3.8/dist-packages/ipyvuetify/extra/file_input.vue
 
-COPY assets/fonts/Nanum_Gothic/NanumGothic.ttf /usr/share/fonts/
+COPY assets/fonts/NanumGothic.ttf /usr/share/fonts/NanumGothic.ttf
 COPY assets/fonts/AppleSD /usr/local/lib/python3.8/dist-packages/notebook/static/components/AppleSD
-COPY assets/material_icons /usr/local/lib/python3.8/dist-packages/notebook/static/components/material_icon
+COPY assets/material_icons /usr/local/lib/python3.8/dist-packages/notebook/static/components/material_icons
 
 WORKDIR /aihub/workspace
