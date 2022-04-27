@@ -278,13 +278,13 @@ theme:
           default: >
             height: 1800px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
-            display:flex;
+            display:flex; overflow:auto;
             left:0;
           dark: >
             height: 1800px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
             display:flex;
-            left:0;
+            left:0; overflow:auto;
     side_nav:
       style: 
         base:
