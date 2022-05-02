@@ -18,17 +18,16 @@ div.output_subarea {
 
 /* -------------------------------------------------------  */
 @font-face {
-    font-family: 'NanumGothic';
+    font-family: 'AppleSD-M';
     font-style: normal;
-    font-weight: normal;
-    src: local('NanumGothic');
-    src: url("/opt/code/aiduez/assets/fonts/Nanum_Gothic/NanumGothic.eot") format("embedded-opentype"),
-         url("/opt/code/aiduez/assets/fonts/Nanum_Gothic/NanumGothic.woff") format('woff'),
+    font-weight: 400;
+    src: url("/static/components/AppleSD/AppleSDGothicNeoM.ttf") format("truetype");
 }
 
 @font-face {
-    font-family: 'Apple SD';
+    font-family: 'AppleSD-B';
     font-style: normal;
+<<<<<<< HEAD
     font-weight: normal;
     src: local('Apple SD');
     src: url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoB.woff") format("woff"),
@@ -36,33 +35,52 @@ div.output_subarea {
          url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoH.woff") format("woff"),
          url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoL.woff") format("woff"),
          url("/opt/code/aiduez/assets/fonts/Apple SD/AppleSDGothicNeoM.woff") format("woff");
+=======
+    font-weight: 400;
+    src: url("/static/components/AppleSD/AppleSDGothicNeoB.ttf") format("truetype");
+}
+>>>>>>> 033242b5f8a0b647c6d907bcf592d6971f191fbc
 
+@font-face {
+    font-family: 'AppleSD-EB';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/static/components/AppleSD/AppleSDGothicNeoEB.ttf") format("truetype");
 }
 
 @font-face {
-    font-family: 'Material Icons';
+    font-family: 'AppleSD-H';
     font-style: normal;
     font-weight: 400;
-    src: local('Material Icons'),
-      local('MaterialIcons-Regular'),
-      url("/opt/code/aiduez/assets/mateial_icon/MaterialIcons-Regular.ttf") format('truetype'),
-  }
+    src: url("/static/components/AppleSD/AppleSDGothicNeoH.ttf") format("truetype");
+}
 
-  @font-face {
-    font-family: 'RussoOne';
+@font-face {
+    font-family: 'AppleSD-L';
     font-style: normal;
     font-weight: 400;
-    src: local('RussoOne'),
-      url("/opt/code/aiduez/assets/fonts/RussoOne-Regular.woff") format('woff'),
+    src: url("/static/components/AppleSD/AppleSDGothicNeoL.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Material_Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/static/components/material_icons/MaterialIcons-Regular.ttf") format('truetype'),
+         url("/static/components/material_icons/MaterialIconsOutlined-Regular.otf") format('opentype'),
+         url("/static/components/material_icons/MaterialIconsRound-Regular.otf") format('opentype'),
+         url("/static/components/material_icons/MaterialIconsSharp-Regular.otf") format('opentype'),
+         url("/static/components/material_icons/MaterialIconsTwoTone-Regular.otf") format('opentype');
   }
 
 .material-icons {
-    font-family: 'Material Icons';
+    font-family: 'Material_Icons';
     font-weight: normal;
-    font-style: normal;
+    font-style: 400;
     font-size: 24px;  /* Preferred icon size */
     display: inline-block;
     line-height: 1;
+    
     text-transform: none;
     letter-spacing: normal;
     word-wrap: normal;
@@ -75,14 +93,8 @@ div.output_subarea {
     text-rendering: optimizeLegibility;
 }
 
-
-
-
-/* .vuetify-styles .v-application {
-    font-family: NanumGothic !important
-} */
 .vuetify-styles .v-application {
-    font-family: 'Apple SD' !important
+    font-family: 'AppleSD-M' !important
 }
 
 .vuetify-styles .v-list-item--link:before {
@@ -96,7 +108,7 @@ div.output_subarea {
 
 .vuetify-styles .theme--light.v-list-item--disabled:before {
     background-color: #ffffff !important;
-    opacity: 0.08 !important;
+    opacity: 0.3 !important;
 }
 
 .main-menu-group .v-list-group__header__prepend-icon {
@@ -264,7 +276,7 @@ div.output_subarea {
     width: 805px !important;
 }
 
-.vuetify-styles .side_nav .v-list-item--link:before {
+.vuetify-styles .side_nav .v-list-item--link:before:not(.theme--light.v-list-item--disabled) {
     opacity: 0 !important
 }
 
@@ -318,3 +330,6 @@ div.output_subarea {
     transition: none !important;
 }
 
+.main-menu-group .theme--light.v-list-item--active:before {
+    opacity: 0 !important;
+}

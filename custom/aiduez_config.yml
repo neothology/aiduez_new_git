@@ -24,10 +24,15 @@ class_paths:
   select_table_card: components.tables.SelectTableCard
   select_table_card_no_header: components.tables.SelectTableCardNH
   simple_slider_card: components.forms.SimpleSliderCard
+  simple_slider: components.forms.SimpleSlider
   simple_radio_card: components.forms.SimpleRadioCard
+  simple_input_card: components.forms.SimpleInputCard
+  simple_datatable_card: components.forms.SimpleDataTableCard
+  edap_data_table: components.tables.EdapDataTable
   data_info: components.data_profiler.DataInfo
   select_autocomplete: components.forms.SelectAutoComplete
   datatable: components.tables.DataTable
+  simple_range_card: components.forms.SimpleRangeCard
 
   # task
   task_recent: tasks.TaskRecent
@@ -76,9 +81,9 @@ class_paths:
   tabular_data_processing: workflows.tabular.TabularDataProcessing
   tabular_data_processing_save_activator: views.tabular.processing.TabularProcessingSaveActivator
   tabular_data_processing_options: views.tabular.processing.TabularProcessingOptionArea
-  tabular_data_single_processing: views.tabular.processing.TabularSingleProcessing
-  tabular_data_single_processing_dialog: views.tabular.processing.TabularSingleProcessingDialog
-  tabular_data_multiple_processing: views.tabular.processing.TabularMultipleProcessing
+  tabular_data_single_processing_view: views.tabular.processing.TabularSingleProcessingView
+  tabular_data_single_processing_dialog_view: views.tabular.processing.TabularSingleProcessingDialogView
+  tabular_data_multiple_processing_view: views.tabular.processing.TabularMultipleProcessing
   # tabular_data_single_processing_card: views.tabular.processing.TabularSingleProcessingCard
 
   tabular_ai_training: workflows.tabular.TabularAITraining
@@ -175,11 +180,11 @@ workflows_list:
           -
             icon: mdi-clipboard-text-outline
             title: 단일 칼럼 변환
-            target: tabular_data_single_processing
+            target: tabular_data_single_processing_view
           -
             icon: mdi-clipboard-text-multiple-outline
-            title: 복합 칼럼 변환
-            target: tabular_data_multiple_processing
+            title: 복합 칼럼 변환(준비중)
+            target: tabular_data_multiple_processing_view
       - 
         title: AI모델 학습
         target: tabular_ai_training
@@ -271,17 +276,15 @@ theme:
       style: 
         base: 
           default: >
-            min-width:1920px; max-width:1920px !important;border-right:1px dashed #cccccc;
             height: 1800px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
-            display:flex;
+            display:flex; overflow:auto;
             left:0;
           dark: >
-            min-width:1920px; max-width:1920px !important; border-right:1px dashed #cccccc;
             height: 1800px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
             display:flex;
-            left:0;
+            left:0; overflow:auto;
     side_nav:
       style: 
         base:
@@ -300,7 +303,6 @@ theme:
             border-bottom:1px solid #e2e8f0; 
             background-color: rgb(30, 41, 59);
             z-index:776;
-            min-width:1920px; max-width:1920px;border-right:1px dashed #cccccc;
             position:absolute;
           light: >
             height:199px; padding:10px; 
@@ -309,7 +311,6 @@ theme:
             border-bottom:1px solid #e2e8f0; 
             background-color: #ffffff;
             z-index:776;
-            min-width:1920px; max-width:1920px;border-right:1px dashed #cccccc;
             position:absolute;
         nav_icon:
           default: >
@@ -344,8 +345,6 @@ theme:
         list_item_title:
           default: >
             font-size:0.9rem;
-          small: >
-            font-size:0.85rem;
     work_area:
       style: 
         base:

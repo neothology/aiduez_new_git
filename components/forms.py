@@ -24,6 +24,7 @@ class DataSelect(v.Select):
             style_ = kwargs.get('style_'),
         )
 
+
 class LabeledSelect(v.Col):
     def __init__(self, index:int, label:str, items, v_model, **kwargs):
         self.index = index
@@ -57,6 +58,7 @@ class LabeledSelect(v.Col):
                     ),
             ],
         )
+
 
 class DataSlider(v.Col):
     def __init__(self, index:int = None, label:str = "", range:list = [], **kwargs):
@@ -130,6 +132,36 @@ class SimpleSlider(v.Row):
                 counter
             ],
         )
+class SimpleInputCard(SimpleCard):
+    def __init__(
+        self,
+        app_context:object = None, 
+        context_key:str = "",  
+        title:str = "",
+        size:dict = {},
+        **kwargs
+    ):
+
+        input = v.TextField(
+            style_ = "max-width:200px; margin:0;",
+            single_line = True,
+            v_model= None
+        )
+
+        body = v.Row(
+            children = [
+                input,
+            ],
+            style_ = "margin:0; padding-left:22px; padding-bottom:10px; align-items:center;" + kwargs.get('style', ""),        )
+
+        super().__init__(
+            class_ = kwargs.get('class_'),
+            title= title,
+            body = body,
+            no_footer=True,
+            size = size,
+        )
+
 class SimpleSliderCard(SimpleCard):
     def __init__(
         self,
@@ -220,6 +252,56 @@ class SimpleRadioCard(SimpleCard):
                 size = size,
             )
 
+class SimpleRangeCard(SimpleCard):
+    def __init__(
+        self,
+        app_context:object = None, 
+        context_key:str = "",  
+        title:str = "",
+        direction:str = "",
+        options:dict = {}, 
+        size:dict = {},
+        range:list = [], 
+        **kwargs
+    ):
+        self.direction = True if direction == 'row' else False
+
+        slider = v.Slider(
+            min = range[0],
+            max = range[1],
+            step = range[2],
+            v_model = range[3],
+            dense = True,
+            hide_details = True,
+            style_ = "margin-left: 24px; max-width:250px; padding:0; height:25px;"
+        )
+
+        counter = v.TextField(
+            class_ = "extra-dense",
+            v_model = range[3],
+            dense = True,
+            hide_details = True,
+            style_ = "max-width:100px; margin:0;",
+        )
+
+        ipywidgets.jslink((slider, 'v_model'), (counter, 'v_model'))
+
+        body = v.Row(
+            children = [
+                slider,
+            ],
+            style_ = "margin:0; padding-bottom:10px; align-items:center;" + kwargs.get('style', ""), 
+        )
+
+        super().__init__(
+            class_ = kwargs.get('class_'),
+            title= title,
+            body = body,
+            controls = [counter],
+            no_footer=True,
+            size = size,
+        )
+
 class SelectAutoComplete(v.Autocomplete):
     def __init__(
         self,
@@ -245,3 +327,35 @@ class SelectAutoComplete(v.Autocomplete):
 
     def change_value(self, widget, event=None, data=None):
         self.value = widget.v_model
+
+class SimpleDataTableCard(SimpleCard):
+    def __init__(
+        self,
+        app_context:object = None, 
+        context_key:str = "",  
+        title:str = "",
+        direction:str = "",
+        options:dict = {}, 
+        size:dict = {},
+        range:list = [],
+        datatable:object = None, 
+        **kwargs
+    ):
+        self.direction = True if direction == 'row' else False
+        
+        self.datatable=datatable
+
+        body = v.Col(
+            children = [
+                self.datatable
+            ],
+            style_ = "margin:0; padding-bottom:10px; align-items:center; vertical-align: top; !important;" + kwargs.get('style', ""), 
+        )
+
+        super().__init__(
+            class_ = kwargs.get('class_'),
+            title= title,
+            body = body,
+            no_footer=True,
+            size = size,
+        )

@@ -13,7 +13,7 @@ class Aian:
         self.base_overlay = get_or_create_class('base_overlay', self.app_context)
         self.background = get_or_create_class('background', self.app_context)
         self.top_area = get_or_create_class('top_area', self.app_context)
-        self.page_progress = get_or_create_class('progress_linear', self.app_context, style = 'position:absolute; top:200px; z-index:780; width: 1920px;')
+        self.page_progress = get_or_create_class('progress_linear', self.app_context, style = 'position:absolute; top:200px; z-index:780;')
         self.work_area = get_or_create_class('work_area', self.app_context)
         self.side_nav = get_or_create_class('side_nav', self.app_context)
 

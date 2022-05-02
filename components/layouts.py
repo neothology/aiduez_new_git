@@ -92,8 +92,9 @@ class SubArea(v.Container):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "padding:0; height:100%; position:absolute;" + f'{kwargs.get("style", "")}',
+            style_ = "padding:0; min-height:100%; max-height:100%; position:absolute;" + f'{kwargs.get("style", "")}',
         )
+        
 class SubMenuArea(v.Container):
     def __init__(self, app_context, context_key, **kwargs):
         self.app_context = app_context

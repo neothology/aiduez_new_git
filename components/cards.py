@@ -355,6 +355,8 @@ class SimpleCard(v.Card):
             style_ = self.style['card'],
             children = [self.header, self.body, self.footer],
         )
+    def add_controls(self, controls:list = []):
+        self.children[0].children[1].children = controls
 
 class IconCard(v.Card):
     def __init__(
@@ -400,7 +402,7 @@ class IconCard(v.Card):
 
         self.title = v.Col(
             class_ = "",
-            style_ = "padding-left:18px; font-size:18px; padding-top:9px; color:#000000;",
+            style_ = "padding-left:18px; font-size:18px; padding-top:9px; color:#000000; font-family:AppleSD-B;",
             children = [self.title_text]
         )
 

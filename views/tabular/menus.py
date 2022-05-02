@@ -1,6 +1,5 @@
 import ipyvuetify as v
 from utils import get_or_create_class
-import time
 
 class TabMenu(v.Col):
 
@@ -60,7 +59,7 @@ class TabMenu(v.Col):
 
         super().__init__(
             class_ = self.context_key,
-            style_ = "margin-top:-36px !important; padding:0 70px; backgroung-color: none; max-height:37px; z-index:777;",
+            style_ = "margin-top:-36px !important; padding:0 70px; backgroung-color: none; max-height:37px; z-index:777; position:absolute;",
             children = [self.tab_menu, self.tab_menu_border_bottom_block]
         )
         

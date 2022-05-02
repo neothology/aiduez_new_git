@@ -14,7 +14,7 @@ class TaskBaseView(v.Container):
         # top_area: title + view option button
         self.title = v.Col(
             children = [self.title],
-            style_ = "padding-left:40px; font-size:18px; font-weight:bold; color:#8f8f8f; \
+            style_ = "padding-left:40px; font-size:18px; font-family:AppleSD-mfB; color:#8f8f8f; \
                       display:flex; align-items:center;",
         )
 
@@ -66,21 +66,21 @@ class TaskBaseView(v.Container):
                 'title': '즐겨찾기 추가',
                 'body': v.Col(
                     children = [],
-                    style_=""
+                    style_="align-self:center; text-align:center; font-size:16px;",
                 ),
             },
             'favorite_delete':{
                 'title': '즐겨찾기 삭제',
                 'body': v.Col(
                     children = [],
-                    style_=""
+                    style_="align-self:center; text-align:center; font-size:16px;"
                 ),
             },
             'delete':{
                 'title':'Workbook 삭제',
                 'body': v.Col(
                     children = [],
-                    style = ""
+                    style_ = "align-self:center; font-size:16px;"
                 ),
             },
         }
@@ -201,7 +201,7 @@ class TaskBaseView(v.Container):
             self.selected_workbook_full_name = item.class_.split('|')[-1]
             message = f""
             self.more_menu_dialog_contents['favorite_add']['body'].children = [
-                f"{self.selected_workbook_full_name}을 즐겨찾기에 추가하시겠습니까?"
+                f"{self.selected_workbook_full_name} 파일을 즐겨찾기에 추가하시겠습니까?"
                 ]
             self.more_menu_dialog.update(self.more_menu_dialog_contents['favorite_add'])
             self.more_menu_dialog.show() 
@@ -219,7 +219,7 @@ class TaskBaseView(v.Container):
         def _on_select_favorite_delete(item, event, data):
             self.selected_workbook_full_name = item.class_.split('|')[-1]
             self.more_menu_dialog_contents['favorite_delete']['body'].children = [
-                f"{self.selected_workbook_full_name}을 즐겨찾기에서 제거하시겠습니까?"
+                f"{self.selected_workbook_full_name} 파일을을 즐겨찾기에서 제거하시겠습니까?"
                 ]
             self.more_menu_dialog.update(self.more_menu_dialog_contents['favorite_delete'])
             self.more_menu_dialog.show() 
@@ -240,7 +240,7 @@ class TaskBaseView(v.Container):
 
             self.selected_workbook_full_name = item.class_.split('|')[-1]
             self.more_menu_dialog_contents['delete']['body'].children = [
-                f"{self.selected_workbook_full_name} 파일을 삭제 하시겠습니까? 삭제된 파일은 복구할 수 없습니다."
+                f"{self.selected_workbook_full_name} 파일을 목록에서 삭제하시겠습니까? 삭제된 파일은 복구할 수 없습니다."
                 ]
             self.more_menu_dialog.update(self.more_menu_dialog_contents['delete'])
             self.more_menu_dialog.show()

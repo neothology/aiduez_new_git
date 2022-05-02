@@ -55,7 +55,7 @@ class ListMenu(v.List):
                                 style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_contents'),
                                 children = [
                                     v.ListItemTitle(
-                                        style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_title', style_type='small'),
+                                        style_ = set_theme_style(self.app_context, self.context_key, elem='list_item_title'),
                                         children = [item['title']]
                                     ),
                                 ],
