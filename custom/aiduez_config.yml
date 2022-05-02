@@ -145,22 +145,22 @@ side_nav_menu_list:
         icon: mdi-border-all
         title: 테이블
         target: tabular_base
-      - 
-        icon: mdi-translate
-        title: 텍스트
-        target: text_base
-      - 
-        icon: mdi-image-outline
-        title: 이미지
-        target: image_base
-      - 
-        icon: mdi-volume-high
-        title: 오디오
-        target: audio_base
-      - 
-        icon: mdi-video-check-outline
-        title: 비디오
-        target: video_base
+      # - 
+      #   icon: mdi-translate
+      #   title: 텍스트
+      #   target: text_base
+      # - 
+      #   icon: mdi-image-outline
+      #   title: 이미지
+      #   target: image_base
+      # - 
+      #   icon: mdi-volume-high
+      #   title: 오디오
+      #   target: audio_base
+      # - 
+      #   icon: mdi-video-check-outline
+      #   title: 비디오
+      #   target: video_base
 
 workflows_list:
   tabular:
@@ -181,10 +181,10 @@ workflows_list:
             icon: mdi-clipboard-text-outline
             title: 단일 칼럼 변환
             target: tabular_data_single_processing_view
-          -
-            icon: mdi-clipboard-text-multiple-outline
-            title: 복합 칼럼 변환(준비중)
-            target: tabular_data_multiple_processing_view
+          # -
+          #   icon: mdi-clipboard-text-multiple-outline
+          #   title: 복합 칼럼 변환(준비중)
+          #   target: tabular_data_multiple_processing_view
       - 
         title: AI모델 학습
         target: tabular_ai_training
@@ -290,7 +290,7 @@ theme:
         base:
           default: >
             min-width:250px; height:1800px; 
-            padding:10px; z-index:1000; 
+            padding:10px; z-index:990; 
             display:flex; flex-direction:column; 
             background-color:#0f172a;
             position:absolute;

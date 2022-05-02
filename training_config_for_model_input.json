@@ -1,69 +1,32 @@
 {
     "input_features": [
         {
-            "name": "PassengerId",
+            "name": "Id",
             "type": "numerical",
             "encoder": "passthrough"
         },
         {
-            "name": "Pclass",
-            "type": "numerical",
-            "encoder": "dense",
-            "activation": "relu",
-            "num_fc_layers": 1,
-            "fc_size": 256,
-            "dropout": 0
-        },
-        {
-            "name": "Name",
-            "type": "category",
-            "encoder": "dense",
-            "embedding_size": 50,
-            "dropout": 0
-        },
-        {
-            "name": "Sex",
-            "type": "category",
-            "encoder": "dense",
-            "embedding_size": 50,
-            "dropout": 0
-        },
-        {
-            "name": "Age",
+            "name": "SepalLengthCm",
             "type": "numerical",
             "encoder": "passthrough"
         },
         {
-            "name": "SibSp",
+            "name": "SepalWidthCm",
             "type": "numerical",
             "encoder": "passthrough"
         },
         {
-            "name": "Parch",
+            "name": "PetalLengthCm",
             "type": "numerical",
             "encoder": "passthrough"
         },
         {
-            "name": "Ticket",
-            "type": "category",
-            "encoder": "dense",
-            "embedding_size": 50,
-            "dropout": 0
-        },
-        {
-            "name": "Fare",
+            "name": "PetalWidthCm",
             "type": "numerical",
             "encoder": "passthrough"
         },
         {
-            "name": "Cabin",
-            "type": "category",
-            "encoder": "dense",
-            "embedding_size": 50,
-            "dropout": 0
-        },
-        {
-            "name": "Embarked",
+            "name": "Species",
             "type": "category",
             "encoder": "dense",
             "embedding_size": 50,
@@ -73,17 +36,7 @@
     "combiner": {
         "type": "concat"
     },
-    "output_features": [
-        {
-            "name": "Survived",
-            "type": "numerical",
-            "decoder": "regressor",
-            "activation": "relu",
-            "num_fc_layers": 1,
-            "fc_size": 256,
-            "dropout": 0
-        }
-    ],
+    "output_features": [],
     "preprocessing": {
         "numerical": {
             "normalization": "zscore"

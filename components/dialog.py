@@ -59,9 +59,9 @@ class SimpleDialog(v.Dialog):
 
         super().__init__(
             persistent = True,
+            hide_overlay = True,
             children = [children],
             width = size.get('width'),
-            style_ = "position:absolute; top:8vh; right:3vh;",
         )
 
     def show(self):

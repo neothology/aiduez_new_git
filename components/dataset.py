@@ -55,8 +55,6 @@ class TabularDataContext(v.Col):
     def _make_data_selector(self):
         self.dataset = self.app_context.tabular_dataset
         self.data_name_list = self.dataset.data_name_list
-
-        # raise Exception('add_data')
         self.current_data_name = self.dataset.current_data_name
 
         self.data_selector = v.Col(

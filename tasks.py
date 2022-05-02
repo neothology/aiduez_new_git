@@ -98,15 +98,18 @@ class TaskBase:
     def rename_workbook(self, selected_workbook_name, new_workbook_name):
         # check new name is valid
         from utils import check_string_validation_a
-        _ = check_string_validation_a(new_workbook_name)
+        if not check_string_validation_a(self.app_context.snack_bar, new_workbook_name):
+            return
 
         #
         import shutil
         import os
         if os.path.exists(f'{self.workspace_dir}/{new_workbook_name}.ezx'):
-            raise Exception(f'{new_workbook_name} 은 이미 존재하는 이름입니다.')
-
-        shutil.move(os.path.join(self.workspace_dir, f'{selected_workbook_name}.ezx'), os.path.join(self.workspace_dir, f'{new_workbook_name}.ezx'))
+            self.app_context.snack_bar.error(f'{new_workbook_name} 은 이미 존재하는 이름입니다.')
+            return
+        else:
+            self.app_context.snack_bar.release()
+            shutil.move(os.path.join(self.workspace_dir, f'{selected_workbook_name}.ezx'), os.path.join(self.workspace_dir, f'{new_workbook_name}.ezx'))
 
         if self.app_context.current_workbook:
             if f'{selected_workbook_name}.ezx' == self.app_context.current_workbook.current_workbook_name:
@@ -153,7 +156,10 @@ class TaskBase:
     def check_active(self, workbook_full_name):
         if self.app_context.current_workbook:
             if  workbook_full_name == self.app_context.current_workbook.current_workbook_name:
-                raise Exception('현재 열려 있는 Workbook을 삭제할 수 없습니다.')
+                self.app_context.snack_bar.error('현재 실행중인 워크북은 삭제할 수 없습니다.')
+                return False
+            else:
+                return True
 
 class TaskRecent(TaskBase):
     def __init__(self, app_context:object, context_key:str, **kwargs):

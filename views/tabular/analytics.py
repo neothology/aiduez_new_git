@@ -15,7 +15,7 @@ class TabualrAnalyticsOptionArea(v.NavigationDrawer):
         context_key,
     ):
         super().__init__(
-            style_ = "height:1539px; min-width:220px; max-width:220px; padding-top:8px; background-color:#eeeeee;",
+            style_ = "height:777px; min-width:220px; max-width:220px; padding-top:8px; background-color:#eeeeee;",
             children = [
                 v.Col(
                     children = [],
@@ -174,7 +174,7 @@ class TabularaAnalyticsBasicinfoView(TabularAnalyticsBaseView):
                 v.Col(
                     class_ = "output_part_sub",
                     children = [self.data_info] + self.columns_info,
-                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
+                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:777px; overflow-y:auto; \
                               padding-top:15px; padding-left:15px; position:absolute;",
                 ),
             ]
@@ -805,7 +805,7 @@ class TabularAnalyticsWordCloudView(TabularAnalyticsBaseView):
                 v.Col(
                     class_ = "output_part_sub",
                     children = [img],
-                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
+                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:777px; overflow-y:auto; \
                             padding-top:15px; padding-left:15px",
                 )
             ]
@@ -1290,7 +1290,7 @@ class TabularAnalyticsDataSampleView(TabularAnalyticsBaseView):
                 v.Col(
                     class_ = "output_part_sub",
                     children = [self.data_head, v.Spacer(style_ = 'min-height:15px; max-height: 15px'), self.data_tail],
-                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:1539px; overflow-y:auto; \
+                    style_ = "margin:0; padding:0; display:flex; flex-direction:column; max-height:777px; overflow-y:auto; \
                               padding-top:15px; padding-left:15px; padding-right:15px; position:absolute;",
                 ),
             ]

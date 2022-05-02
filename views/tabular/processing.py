@@ -220,13 +220,8 @@ class TabularSingleProcessingMenu(BaseCard):
             tabular_data_single_processing_view = get_or_create_class('tabular_data_single_processing_view', app_context=self.app_context)
             tabular_data_single_processing_view.update()
             self.app_context.tabular_data_processing__save_activator.show_btn() # activate save btn 
-            alert = get_or_create_class('alert', self.app_context)
-            alert.show_and_auto_close(
-                message=f"'{column_name}'이(가) 삭제되었습니다!", 
-                alert_type="success",
-                seconds=3
-            )
-            
+
+            self.app_context.snack_bar.success(f"'{column_name}'이(가) 삭제되었습니다!")            
             
         for i in range(len(self.app_context.tabular_dataset.current_data.columns)):
             delete_column_button = StatedBtn(
@@ -350,12 +345,8 @@ class TabularSingleProcessingDialogView(v.Dialog):
             tabular_data_single_processing_view.update()
             self.value = 0  # close dialog
             self.app_context.tabular_data_processing__save_activator.show_btn() # activate save btn 
-            alert = get_or_create_class('alert', self.app_context)
-            alert.show_and_auto_close(
-                message=f"'{new_colunm_name}'이(가) 생성되었습니다!", 
-                alert_type="success",
-                seconds=3
-            )
+
+            self.app_context.snack_bar.success(f"'{new_colunm_name}'이(가) 생성되었습니다!")
 
         save_btn.on_event('click', _on_click_save)
 

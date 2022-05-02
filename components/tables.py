@@ -172,10 +172,12 @@ class SelectTableCardNH(SimpleCard):
     def _make_table(self, data, size, select, single_select):
         df = pd.DataFrame(data, columns = ['data_name']).iloc[:,0]
         return SelectTableNH(
+            self.app_context,
+            self.context_key,
             data = df,
             size = size,
             select = select,
-            single_select=single_select
+            single_select=single_select,
         )
 
     def __init__(
@@ -253,6 +255,8 @@ class SelectTableNH(v.VuetifyTemplate):
     
     def __init__(
         self, 
+        app_context:object,
+        context_key:str,
         data=pd.DataFrame(),
         size:dict = {},
         select:bool = False,    
@@ -260,6 +264,8 @@ class SelectTableNH(v.VuetifyTemplate):
         *args,
         **kwargs
         ):
+        self.app_context = app_context
+        self.context_key = context_key
         data = data.reset_index()
         self.index_col = data.columns[0]
         self.style = kwargs.get('style', "") + f'width:{size["width"]}; height:{size["height"]};' \
@@ -267,6 +273,7 @@ class SelectTableNH(v.VuetifyTemplate):
         self.select = select
         self.single_select = single_select
         self.template = self.template_with_select if select else self.template_no_select
+
         super().__init__(*args, **kwargs)
 
         headers = [{

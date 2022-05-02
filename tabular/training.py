@@ -29,7 +29,7 @@ class TabularModel:
         self.current_exp_and_model_name = ''
 
     def train(self, output_logs, output_plots, **kwargs):
-        self.app_context.tabular_ai_training__train_result.children[0].children[0].children[2].start()
+        self.app_context.tabular_ai_training__progress_linear.start()
 
         config = self.app_context.tabular_ai_training__training_options.retrieve_config()
         self.output_logs = output_logs
@@ -95,7 +95,7 @@ class TabularModel:
         # save workbook
         self.app_context.current_workbook.save_workbook()
 
-        self.app_context.tabular_ai_training__train_result.children[0].children[0].children[2].stop()
+        self.app_context.tabular_ai_training__progress_linear.stop()
 
     def save_as(self, exp_name, model_name: str):
 
@@ -111,12 +111,9 @@ class TabularModel:
         from_dir = self.current_train_result_dir
         to_dir = f'{self.output_directory}/{self.current_exp_and_model_name}'
         if from_dir == to_dir:
-            self.app_context.snack_bar.error('이름이 같은 모델이 존재합니다.')
-            return
-        else:
-            self.app_context.snack_bar.release()
-            shutil.copytree(from_dir, to_dir)
-            self.current_train_result_dir = to_dir
+            raise Exception('from_dir and to_dir are same')
+        shutil.copytree(from_dir, to_dir)
+        self.current_train_result_dir = to_dir
 
         # update workbook profile
         self.app_context.current_workbook.save_workbook(model = f'{self.data_name}_{self.current_model_name}')

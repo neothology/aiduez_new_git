@@ -79,16 +79,19 @@ class JsonEncoder(json.JSONEncoder):
             return super(JsonEncoder, self).default(obj)
 
 
-def check_string_validation_a(string):
+def check_string_validation_a(error_control, string):
     import re
     # 첫글자는 영문 또는 한글만 (2) 특수문자는 '_' 만 가능, 
     chk_all = re.compile('[^a-zA-Z0-9ㄱ-ㅎ가-힣_]')
     chk_first = re.compile('[a-zA-Zㄱ-ㅎ가-힣]')
     
     if chk_first.match(string) is None:
-        raise Exception('데이터 이름은 영문 또는 한글로 시작해야 합니다.')
-    elif chk_all.search(string) is not None:
-        raise Exception("데이터 이름은 영문, 숫자, 한글, 그리고 '_'만 가능합니다.")
+        error_control.error('데이터 이름은 영문 또는 한글로 시작해야 합니다.')
+        return False
 
-    return string
+    elif chk_all.search(string) is not None:
+        error_control('데이터 이름은 영문, 숫자, 한글, 그리고 \'_\'만 가능합니다.')
+        return False
+
+    return True
 

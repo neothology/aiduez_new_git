@@ -14,7 +14,7 @@ class TaskBaseView(v.Container):
         # top_area: title + view option button
         self.title = v.Col(
             children = [self.title],
-            style_ = "padding-left:40px; font-size:18px; font-family:AppleSD-mfB; color:#8f8f8f; \
+            style_ = "padding-left:40px; font-size:18px; font-family:AppleSD-B; color:#8f8f8f; \
                       display:flex; align-items:center;",
         )
 
@@ -39,7 +39,7 @@ class TaskBaseView(v.Container):
 
         self.view_option_area = v.Col(
             class_= "",
-            children = [self.view_option_tooltip],
+            children = [], #[self.view_option_tooltip]
             style_ = "display:flex; justify-content:flex-end; padding-right:40px;",
         )
 
@@ -121,6 +121,13 @@ class TaskBaseView(v.Container):
             ) for idx, card_data in enumerate(self.workbook_card_data)
         ]   
 
+        if self.app_context.current_workbook:
+            for card in self.workbook_cards:
+                if card.title.children[0] == self.app_context.current_workbook.current_workbook_name:
+                    print(card.title.children[0])
+                    card.class_list.add("now_in_use")
+                    break
+
         self.middle_area = v.Row(
             style_ = 'margin:0; padding:0; padding-left:40px; padding-right:25px; padding-top:20px;',
             class_ = "",
@@ -185,6 +192,7 @@ class TaskBaseView(v.Container):
             self.more_menu_dialog.show()
 
             def _on_click_cancel_button(item, event, data):
+                self.app_context.snack_bar.release()
                 self.more_menu_dialog.value = 0
 
             def _on_click_confirm_button(item, event, data):
@@ -199,13 +207,14 @@ class TaskBaseView(v.Container):
         # callbacks: (3) 즐겨찾기 추가
         def _on_select_favorite_add(item, event, data):
             self.selected_workbook_full_name = item.class_.split('|')[-1]
-            message = f""
             self.more_menu_dialog_contents['favorite_add']['body'].children = [
                 f"{self.selected_workbook_full_name} 파일을 즐겨찾기에 추가하시겠습니까?"
                 ]
             self.more_menu_dialog.update(self.more_menu_dialog_contents['favorite_add'])
             self.more_menu_dialog.show() 
+            
             def _on_click_cancel_button(item, event, data):
+                self.app_context.snack_bar.release()
                 self.more_menu_dialog.value = 0
 
             def _on_click_confirm_button(item, event, data):
@@ -219,7 +228,7 @@ class TaskBaseView(v.Container):
         def _on_select_favorite_delete(item, event, data):
             self.selected_workbook_full_name = item.class_.split('|')[-1]
             self.more_menu_dialog_contents['favorite_delete']['body'].children = [
-                f"{self.selected_workbook_full_name} 파일을을 즐겨찾기에서 제거하시겠습니까?"
+                f"{self.selected_workbook_full_name} 파일을 즐겨찾기에서 제거하시겠습니까?"
                 ]
             self.more_menu_dialog.update(self.more_menu_dialog_contents['favorite_delete'])
             self.more_menu_dialog.show() 
@@ -236,14 +245,14 @@ class TaskBaseView(v.Container):
         # callbacks: (5) 삭제
         self.selected_workbook_full_name = ''
         def _on_select_delete(item, event, data):
-            self.controller.check_active(self.selected_workbook_full_name)
-
             self.selected_workbook_full_name = item.class_.split('|')[-1]
-            self.more_menu_dialog_contents['delete']['body'].children = [
-                f"{self.selected_workbook_full_name} 파일을 목록에서 삭제하시겠습니까? 삭제된 파일은 복구할 수 없습니다."
-                ]
-            self.more_menu_dialog.update(self.more_menu_dialog_contents['delete'])
-            self.more_menu_dialog.show()
+            if self.controller.check_active(self.selected_workbook_full_name):
+                self.selected_workbook_full_name = item.class_.split('|')[-1]
+                self.more_menu_dialog_contents['delete']['body'].children = [
+                    f"{self.selected_workbook_full_name} 파일을 삭제하시겠습니까? 삭제된 파일은 복구할 수 없습니다."
+                    ]
+                self.more_menu_dialog.update(self.more_menu_dialog_contents['delete'])
+                self.more_menu_dialog.show()
 
             def _on_click_cancel_button(item, event, data):
                 self.more_menu_dialog.value = 0

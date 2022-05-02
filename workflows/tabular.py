@@ -99,11 +99,11 @@ class TabularDataImport(v.Container):
                 'title': 'PC에서 가져오기',
                 'target': 'tabular_import_pc',
             },
-            {   
-                'icon': 'mdi-dns-outline',
-                'title': 'EDAP에서 가져오기(준비중)',
-                'target': 'tabular_import_edap',
-            },
+            # {   
+            #     'icon': 'mdi-dns-outline',
+            #     'title': 'EDAP에서 가져오기(준비중)',
+            #     'target': 'tabular_import_edap',
+            # },
         ]
 
         # top area(data_context, button)
@@ -281,7 +281,7 @@ class TabularDataAnalytics(v.Container):
                 self.top_area,
                 v.Col(
                     class_ = 'tabular_sub_menu',
-                    style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    style_ = "display:flex; max-height:777px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
                         self.work_area_contents_sub_area
@@ -357,7 +357,7 @@ class TabularDataProcessing(v.Container):
                 self.top_area,
                 v.Col(
                     class_ = 'tabular_sub_menu',
-                    style_ = "display:flex; max-height:1539px; flex-direction:row; padding:0; width:1570px; margin:0;",
+                    style_ = "display:flex; max-height:777px; flex-direction:row; padding:0; width:1570px; margin:0;",
                     children = [
                         self.work_area_contents_sub_menu,
                         self.work_area_contents_sub_area

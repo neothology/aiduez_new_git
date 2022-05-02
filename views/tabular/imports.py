@@ -1,3 +1,4 @@
+from select import select
 from numpy import size
 import pandas as pd
 import ipyvuetify as v
@@ -63,7 +64,7 @@ class TabularImportBaseView(v.Container):
         # work area bottom side - data info, etc.
         self.work_area_contents_sub_area__bottom = v.Row(
             children = bottom_area,
-            style_ = self.style['top'],
+            style_ = self.style['bottom'],
             class_ = f"{self.context_key}__work_area_contents_sub_area__bottom", # tabular_import_common_layout__work_area_contents_sub_area__bottom",
         )         
 
@@ -207,7 +208,6 @@ class TabularImportAIDUView(TabularImportBaseView):
             title = 'Workbook 데이터 목록',
             data = self.workbook_data_list,
             size = {'width':'400px', 'height':'185px'},
-            single_select = True,
         )
 
         self.aidu_data_list_view = get_or_create_class(
@@ -270,8 +270,9 @@ class TabularImportAIDUView(TabularImportBaseView):
             size = {
                 'left':"max-width:40%; max-height:380px; min-height:380px;",
                 'right':"max-width:60%; max-height:380px; min-height:380px;",
-                'top':"max-height:250px; max-height:380px; min-height:380px;",
+                'top':"max-height:380px; min-height:380px;",
                 'middle':"max-height:100px;",
+                'bottom':"max-height:360px; min-height:360px;",
             },
             style = {
                 'left':"",
@@ -283,8 +284,10 @@ class TabularImportAIDUView(TabularImportBaseView):
 
         def _upload_file(item, event, data):
             if self.aidu_data_list_view.children[1].children[0].selected == []:
-                raise Exception('선택된 AIDU 데이터가 없습니다.')
+                self.app_context.snack_bar.error('선택된 AIDU 데이터가 없습니다.')
+                return
 
+            self.app_context.snack_bar.release()
             self.file_upload_button.disabled = True
             encoding_option = self.select_encoding_options.selected_option
             delimiter_option = self.select_delimiter_options.selected_option
@@ -399,8 +402,9 @@ class TabularImportEDAPView(TabularImportBaseView):
             size = {
                 'left':"max-width:25%; max-height:380px; min-height:380px;",
                 'right':"max-width:75%; max-height:380px; min-height:380px;",
-                'top':"max-height:250px; max-height:380px; min-height:380px;",
+                'top':"max-height:380px; min-height:380px;",
                 'middle':"max-height:100px;",
+                'bottom':"max-height:360px; min-height:360px;",
             },
             style = {
                 'left':"",

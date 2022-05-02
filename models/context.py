@@ -23,6 +23,7 @@ class AppContext:
 ## base layout object ##
     background: object = None
     alert: object = None
+    snack_bar: object = None
     side_nav: object = None
     side_nav_menu: object = None
     list_menu_sub: object = None
@@ -169,39 +170,3 @@ class AppContext:
         self.training_params: dict = app_config['training_params']
         self.workbook_icons: list = app_config['workbook_icons']
         self.workbook_colors: list = app_config['workbook_colors']
-
-    def clear_workflow(self):
-        self.workflow_base = None
-        self.workflow_tab_menu = None
-        self.workflow_contents = None
-        self.workflow_data_import = None
-        self.workflow_data_import__sub_menu = None
-        self.workflow_data_import__sub_contents = None
-        self.workflow_data_import__workbook_data_list = None
-        self.workflow_data_import__workbook_aidu_list = None
-        self.workflow_import_pc = None
-        self.workflow_import_pc_view = None
-        self.workflow_import_aidu = None
-        self.workflow_import_aidu_view = None
-        self.workflow_import_edap = None
-        self.workflow_import_edap_view = None
-        self.workflow_data_analytics = None
-        self.workflow_data_analytics__sub_menu = None
-        self.workflow_data_analytics__sub_contents = None
-        self.workflow_data_analytics_options = None
-        self.workflow_analytics_basicinfo = None
-        self.workflow_analytics_basicinfo__data_info = None
-        self.workflow_analytics_basicinfo__column_summary_simple = None
-        self.workflow_analytics_scatter = None
-        self.workflow_analytics_scatter_view = None
-        self.workflow_analytics_heatmap = None
-        self.workflow_analytics_heatmap_view = None
-        self.workflow_analytics_boxplot = None
-        self.workflow_analytics_boxplot_view = None
-        self.workflow_analytics_density = None
-        self.workflow_analytics_density_view = None
-        self.workflow_analytics_wcloud = None
-        self.workflow_analytics_wcloud_view = None
-        self.workflow_analytics_reduction = None
-        self.workflow_analytics_reduction_view = None
-        self.work
