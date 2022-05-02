@@ -21,46 +21,46 @@ div.output_subarea {
     font-family: 'AppleSD-M';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/AppleSD/AppleSDGothicNeoM.ttf") format("truetype");
+    src: url("../static/components/AppleSD/AppleSDGothicNeoM.ttf") format("truetype");
 }
 
 @font-face {
     font-family: 'AppleSD-B';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/AppleSD/AppleSDGothicNeoB.ttf") format("truetype");
+    src: url("../static/components/AppleSD/AppleSDGothicNeoB.ttf") format("truetype");
 }
 
 @font-face {
     font-family: 'AppleSD-EB';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/AppleSD/AppleSDGothicNeoEB.ttf") format("truetype");
+    src: url("../static/components/AppleSD/AppleSDGothicNeoEB.ttf") format("truetype");
 }
 
 @font-face {
     font-family: 'AppleSD-H';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/AppleSD/AppleSDGothicNeoH.ttf") format("truetype");
+    src: url("../static/components/AppleSD/AppleSDGothicNeoH.ttf") format("truetype");
 }
 
 @font-face {
     font-family: 'AppleSD-L';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/AppleSD/AppleSDGothicNeoL.ttf") format("truetype");
+    src: url("../static/components/AppleSD/AppleSDGothicNeoL.ttf") format("truetype");
 }
 
 @font-face {
     font-family: 'Material_Icons';
     font-style: normal;
     font-weight: 400;
-    src: url("/static/components/material_icons/MaterialIcons-Regular.ttf") format('truetype'),
-         url("/static/components/material_icons/MaterialIconsOutlined-Regular.otf") format('opentype'),
-         url("/static/components/material_icons/MaterialIconsRound-Regular.otf") format('opentype'),
-         url("/static/components/material_icons/MaterialIconsSharp-Regular.otf") format('opentype'),
-         url("/static/components/material_icons/MaterialIconsTwoTone-Regular.otf") format('opentype');
+    src: url("../static/components/material_icons/MaterialIcons-Regular.ttf") format('truetype'),
+         url("../static/components/material_icons/MaterialIconsOutlined-Regular.otf") format('opentype'),
+         url("../static/components/material_icons/MaterialIconsRound-Regular.otf") format('opentype'),
+         url("../static/components/material_icons/MaterialIconsSharp-Regular.otf") format('opentype'),
+         url("../static/components/material_icons/MaterialIconsTwoTone-Regular.otf") format('opentype');
   }
 
 .material-icons {
@@ -322,4 +322,8 @@ div.output_subarea {
 
 .main-menu-group .theme--light.v-list-item--active:before {
     opacity: 0 !important;
+}
+
+.vuetify-styles .v-snack__content {
+    justify-content: left !important;
 }

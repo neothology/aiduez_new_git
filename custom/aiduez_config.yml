@@ -21,6 +21,7 @@ class_paths:
   base_overlay: components.overlays.BaseOverlay
   progress_linear: components.progress.ProgressLinear
   alert: components.alerts.Alert
+  snack_bar: components.snackbars.SnackBar
   select_table_card: components.tables.SelectTableCard
   select_table_card_no_header: components.tables.SelectTableCardNH
   simple_slider_card: components.forms.SimpleSliderCard
@@ -276,12 +277,12 @@ theme:
       style: 
         base: 
           default: >
-            height: 1800px; margin:0px; padding:0;
+            height: 988px; margin:0px; padding:0;
             background-color:#f1f5f9; z-index:0;
             display:flex; overflow:auto;
             left:0;
           dark: >
-            height: 1800px; margin:0px; padding:0;
+            height: 988px; margin:0px; padding:0;
             background-color:#000000; z-index:0;
             display:flex;
             left:0; overflow:auto;
@@ -289,8 +290,8 @@ theme:
       style: 
         base:
           default: >
-            min-width:250px; height:1800px; 
-            padding:10px; z-index:990; 
+            min-width:250px; height:988px; 
+            padding:10px; z-index:1000; 
             display:flex; flex-direction:column; 
             background-color:#0f172a;
             position:absolute;
@@ -298,17 +299,19 @@ theme:
       style: 
         base:
           default: >
-            height:199px; padding:10px; 
+            height:149px; padding:10px; 
             box-shadow:none; border:0; 
             border-bottom:1px solid #e2e8f0; 
+            border-right:1px solid rgb(204, 204, 204);
             background-color: rgb(30, 41, 59);
             z-index:776;
             position:absolute;
           light: >
-            height:199px; padding:10px; 
+            height:149px; padding:10px; 
             min-width:100%;
             box-shadow:none; border:0; 
             border-bottom:1px solid #e2e8f0; 
+            border-right:1px solid rgb(204, 204, 204);
             background-color: #ffffff;
             z-index:776;
             position:absolute;
@@ -352,7 +355,7 @@ theme:
             min-width:1570px; max-width:1570px !important;
             border-left:1px dashed #cccccc;
             border-right:1px dashed #cccccc;
-            height: 1599px; top:200px;
+            height: 837px; top:150px;
             background-color:#f1f5f9;
             margin:0; padding:0;
             position:absolute; left:10px; z-index:777;
@@ -360,7 +363,7 @@ theme:
             min-width:1570px; max-width:1570px !important;
             border-left:1px dashed #cccccc;
             border-right:1px dashed #cccccc;
-            height: 1599px; top:200px;
+            height: 837px; top:150px;
             background-color:#f1f5f9;
             margin:0; padding:0;
             position:absolute; left:256px; z-index:777;
